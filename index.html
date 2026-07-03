@@ -33,6 +33,7 @@
     .nav-center a{font-size:0.875rem;font-weight:500;color:var(--text-secondary);transition:color 0.2s;cursor:pointer}
     .nav-center a:hover,.nav-center a.active{color:var(--text)}
     .nav-right{display:flex;align-items:center;gap:0.75rem}
+    .nav-balance-standalone{display:none;padding:0.4rem 0.9rem;border-radius:var(--radius-sm);background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.2);font-size:0.8rem;font-weight:600;color:var(--primary);white-space:nowrap;letter-spacing:0.01em}
     .nav-btn{padding:0.5rem 1.25rem;border-radius:var(--radius-sm);background:var(--primary);color:#0A0B14;font-weight:600;font-size:0.85rem;transition:all 0.2s;box-shadow:var(--primary-glow);border:none}
     .nav-btn:hover{background:var(--primary-hover);box-shadow:var(--primary-glow-strong)}
     .nav-btn-outline{padding:0.5rem 1.25rem;border-radius:var(--radius-sm);background:transparent;color:var(--text);font-weight:500;font-size:0.85rem;border:1px solid var(--border);transition:all 0.2s}
@@ -46,9 +47,35 @@
     .dropdown.open{display:block}
     .dropdown a{display:flex;align-items:center;gap:8px;padding:0.5rem 0.75rem;border-radius:6px;font-size:0.85rem;color:var(--text-secondary);transition:all 0.15s;cursor:pointer}
     .dropdown a:hover{background:var(--primary-subtle);color:var(--text)}
-    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
-.mobile-actions{display:none}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;z-index:201;position:relative}
     .hamburger span{width:24px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s}
+    .hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+    .hamburger.active span:nth-child(2){opacity:0}
+    .hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+    .mobile-overlay{display:none;position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--bg);z-index:200;padding:1.5rem;overflow-y:auto;animation:slideDown 0.2s ease}
+    .mobile-overlay.open{display:flex;flex-direction:column;gap:0.5rem}
+    .mobile-overlay a{font-size:1rem;padding:0.85rem 0.75rem;border-radius:var(--radius-sm);border-bottom:1px solid var(--border-light);color:var(--text-secondary);cursor:pointer;display:block}
+    .mobile-overlay a:hover,.mobile-overlay a.active{color:var(--text);background:var(--primary-subtle);border-color:transparent}
+    .mobile-overlay .m-section{border-top:1px solid var(--border);padding-top:1.25rem;margin-top:0.75rem;display:flex;flex-direction:column;gap:0.75rem}
+    .mobile-overlay .m-theme{display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm)}
+    .mobile-overlay .m-theme span{font-size:0.9rem;font-weight:500;color:var(--text-secondary)}
+    .mobile-overlay .m-theme .toggle-switch{width:48px;height:28px;background:var(--border);border-radius:14px;position:relative;cursor:pointer;border:none;flex-shrink:0;padding:0}
+    .mobile-overlay .m-theme .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--text);transition:transform 0.3s}
+    html.light .mobile-overlay .m-theme .toggle-switch{background:var(--primary)}
+    html.light .mobile-overlay .m-theme .toggle-switch::after{transform:translateX(20px)}
+    .mobile-overlay .m-btns{display:flex;gap:0.75rem}
+    .mobile-overlay .m-btns a{flex:1;text-align:center;padding:0.85rem;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;border:none!important}
+    .mobile-overlay .m-btns .m-outline{background:transparent;border:1px solid var(--border)!important;color:var(--text)}
+    .mobile-overlay .m-btns .m-gold{background:var(--primary);color:#0A0B14;box-shadow:var(--primary-glow)}
+    .mobile-overlay .m-user-card{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm)}
+    .mobile-overlay .m-user-card .m-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),hsl(44 96% 40%));display:flex;align-items:center;justify-content:center;font-weight:700;color:#0A0B14;flex-shrink:0}
+    .mobile-overlay .m-user-card .m-info{flex:1}
+    .mobile-overlay .m-user-card .m-info .m-name{font-size:0.9rem;font-weight:600}
+    .mobile-overlay .m-user-card .m-info .m-email{font-size:0.75rem;color:var(--text-muted)}
+    .mobile-overlay .m-user-card .m-bal{font-size:0.8rem;font-weight:600;color:var(--primary);padding:0.3rem 0.6rem;background:var(--primary-subtle);border-radius:6px}
+    .mobile-overlay .m-signout{width:100%;padding:0.85rem;text-align:center;border-radius:var(--radius-sm);background:var(--destructive);color:#fff;font-weight:600;font-size:0.9rem;border:none;cursor:pointer}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .mobile-actions{display:none}
     .hero{min-height:85vh;display:flex;align-items:center;background:var(--hero-grad);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 50%,hsla(44 96% 52% / 0.07) 0%,transparent 60%),radial-gradient(ellipse at 70% 30%,hsla(44 96% 52% / 0.04) 0%,transparent 50%);pointer-events:none}
     .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;position:relative;z-index:1}
@@ -261,30 +288,9 @@
       .model-grid{grid-template-columns:repeat(2,1fr)}
       .footer-grid{grid-template-columns:1fr 1fr}
       .nav-center{display:none}.hamburger{display:flex}
+      .mobile-overlay{display:none}
+      .mobile-overlay.open{display:flex}
       .nav-right .theme-toggle,.nav-right #navGuest,.nav-right #navUser{display:none!important}
-      .nav-center.open{display:flex;flex-direction:column;position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--bg);border-bottom:1px solid var(--border);padding:1.5rem;gap:0.5rem;z-index:200;overflow-y:auto}
-      .nav-center.open a{font-size:1rem;padding:0.75rem;border-radius:var(--radius-sm);border-bottom:1px solid var(--border-light)}
-      .nav-center.open a:last-of-type{border-bottom:none}
-      .nav-center.open a:hover{background:var(--primary-subtle)}
-      .nav-center.open .mobile-actions{display:flex;flex-direction:column;gap:0.75rem;margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border)}
-      .nav-center.open .mobile-actions .mobile-theme{display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border)}
-      .nav-center.open .mobile-actions .mobile-theme span{font-size:0.9rem;font-weight:500;color:var(--text-secondary)}
-      .nav-center.open .mobile-actions .mobile-theme .toggle-switch{width:48px;height:28px;background:var(--border);border-radius:14px;position:relative;cursor:pointer;transition:background 0.3s;border:none;flex-shrink:0}
-      .nav-center.open .mobile-actions .mobile-theme .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--text);transition:transform 0.3s}
-      html.light .nav-center.open .mobile-actions .mobile-theme .toggle-switch{background:var(--primary)}
-      html.light .nav-center.open .mobile-actions .mobile-theme .toggle-switch::after{transform:translateX(20px)}
-      .nav-center.open .mobile-actions .mobile-login{display:flex;gap:0.75rem}
-      .nav-center.open .mobile-actions .mobile-login a{flex:1;text-align:center;padding:0.85rem;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all 0.2s;border:none!important}
-      .nav-center.open .mobile-actions .mobile-login .m-btn-outline{background:transparent;border:1px solid var(--border)!important;color:var(--text)}
-      .nav-center.open .mobile-actions .mobile-login .m-btn-primary{background:var(--primary);color:#0A0B14;box-shadow:var(--primary-glow)}
-      .nav-center.open .mobile-actions .mobile-logged{display:flex;flex-direction:column;gap:0.5rem}
-      .nav-center.open .mobile-actions .mobile-logged .m-user{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border)}
-      .nav-center.open .mobile-actions .mobile-logged .m-user .m-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),hsl(44 96% 40%));display:flex;align-items:center;justify-content:center;font-weight:700;color:#0A0B14;flex-shrink:0}
-      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info{flex:1}
-      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info .m-name{font-size:0.9rem;font-weight:600}
-      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info .m-email{font-size:0.75rem;color:var(--text-muted)}
-      .nav-center.open .mobile-actions .mobile-logged .m-user .m-bal{font-size:0.8rem;font-weight:600;color:var(--primary);padding:0.3rem 0.6rem;background:var(--primary-subtle);border-radius:6px}
-      .nav-center.open .mobile-actions .mobile-logged .m-btn-danger{width:100%;padding:0.85rem;text-align:center;border-radius:var(--radius-sm);background:var(--destructive);color:#fff;font-weight:600;font-size:0.9rem;border:none;transition:all 0.2s;cursor:pointer}
       .topup-grid{grid-template-columns:1fr}
       .chat-window{width:calc(100vw - 2rem);height:60vh;bottom:5rem;right:1rem}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
@@ -298,8 +304,10 @@
       .model-card h4{font-size:0.85rem}
       .model-card .meta{font-size:0.7rem;gap:0.5rem}
       .footer-grid{grid-template-columns:1fr;gap:1.5rem}
-      .footer-grid .footer-col h4{margin-bottom:0.5rem}
-      .footer-grid .footer-col span{margin-bottom:0.35rem}
+      .footer-grid .footer-col h4{margin-bottom:0.5rem;font-size:0.8rem}
+      .footer-grid .footer-col span{margin-bottom:0.25rem;font-size:0.8rem}
+      .footer-brand .nav-logo{font-size:1.1rem}
+      .footer-brand p{font-size:0.8rem;margin-top:0.5rem}
       .footer-bottom{flex-direction:column;gap:0.75rem;text-align:center}
       .footer-brand p{max-width:100%}
       .dash-stats{grid-template-columns:1fr 1fr}
@@ -319,7 +327,6 @@
       .calc-result .big{font-size:1.35rem}
       .container{padding:0 1rem}
       section{padding:3rem 0}
-      .nav-center.open .mobile-actions .mobile-login{flex-direction:column}
     }
     @media(max-width:400px){
       .hero h1{font-size:1.65rem}
@@ -342,36 +349,14 @@
       <a onclick="showPage('models')">AI Models</a>
       <a onclick="showPage('apikeys')">API / Dev</a>
     </div>
-    <div class="mobile-actions" id="mobileActions">
-      <div class="mobile-theme"><span>🌙 Dark Mode</span><button class="toggle-switch" onclick="toggleTheme()"></button></div>
-      <div id="mobileGuest">
-        <div class="mobile-login">
-          <a class="m-btn-outline" onclick="showPage('login');toggleMobile()">Login</a>
-          <a class="m-btn-primary" onclick="showPage('register');toggleMobile()">Get Started</a>
-        </div>
-      </div>
-      <div id="mobileUser" style="display:none">
-        <div class="mobile-logged">
-          <div class="m-user">
-            <div class="m-avatar" id="mobileAvatar">U</div>
-            <div class="m-info">
-              <div class="m-name" id="mobileName">User</div>
-              <div class="m-email" id="mobileEmail">user@email.com</div>
-            </div>
-            <div class="m-bal" id="mobileBalance">0</div>
-          </div>
-          <button class="m-btn-danger" onclick="logoutUser()">🚪 Sign Out</button>
-        </div>
-      </div>
-    </div>
     <div class="nav-right">
         <a class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</a>
+        <span class="nav-balance-standalone" id="navBalance">0 Tokens</span>
         <div id="navGuest">
           <a class="nav-btn-outline" onclick="showPage('login')">Login</a>
           <a class="nav-btn" onclick="showPage('register')">Get Started</a>
         </div>
         <div id="navUser" style="display:none">
-          <span class="nav-balance" id="navBalance">0 Tokens</span>
           <div class="nav-avatar" onclick="toggleDropdown()">U<div class="dropdown" id="userDropdown">
             <div style="padding:0.75rem;border-bottom:1px solid var(--border);margin-bottom:0.25rem">
               <div style="font-weight:600;font-size:0.9rem" id="dropName">User</div>
@@ -388,8 +373,37 @@
           </div></div>
         </div>
     </div>
-    <button class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
   </div></nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-overlay" id="mobileOverlay">
+    <a onclick="showPage('home');closeMobile()">Home</a>
+    <a onclick="showPage('pricing');closeMobile()">Pricing</a>
+    <a onclick="showPage('how');closeMobile()">How It Works</a>
+    <a onclick="showPage('models');closeMobile()">AI Models</a>
+    <a onclick="showPage('apikeys');closeMobile()">API / Dev</a>
+    <div class="m-section">
+      <div class="m-theme"><span>🌙 Dark Mode</span><button class="toggle-switch" onclick="toggleTheme()"></button></div>
+      <div id="mGuest">
+        <div class="m-btns">
+          <a class="m-outline" onclick="showPage('login');closeMobile()">Login</a>
+          <a class="m-gold" onclick="showPage('register');closeMobile()">Get Started</a>
+        </div>
+      </div>
+      <div id="mUser" style="display:none">
+        <div class="m-user-card">
+          <div class="m-av" id="mAvatar">U</div>
+          <div class="m-info">
+            <div class="m-name" id="mName">User</div>
+            <div class="m-email" id="mEmail">user@email.com</div>
+          </div>
+          <div class="m-bal" id="mBalance">0</div>
+        </div>
+        <button class="m-signout" onclick="logoutUser()">🚪 Sign Out</button>
+      </div>
+    </div>
+  </div>
 
   <!-- HOME -->
   <div class="page active" id="page-home">
@@ -731,9 +745,9 @@
       <div class="footer-brand"><div class="nav-logo" onclick="showPage('home')"><span class="nav-logo-icon">GT</span> GlbTOKEN</div><p>Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges"><span class="trust-badge">💳 Stripe</span><span class="trust-badge">🔶 Paystack</span><span class="trust-badge">₿ USDT</span><span class="trust-badge">₿ BTC</span></div></div>
       <div class="footer-col"><h4>Product</h4><span onclick="showPage('pricing')">Pricing</span><span onclick="showPage('models')">AI Models</span><span onclick="showPage('apikeys')">API Docs</span></div>
       <div class="footer-col"><h4>Support</h4><span onclick="showPage('faq')">FAQ</span><span onclick="window.location.href='mailto:global@kai.com'">Contact: global@kai.com</span><span onclick="showPage('terms')">Terms</span><span onclick="showPage('privacy')">Privacy</span><span onclick="showPage('refund')">Refund Policy</span></div>
-      <div class="footer-col"><h4>Company</h4><span onclick="showPage('about')">About</span><span onclick="showPage('blog')">Blog</span><span>Powered by KAI.COM</span></div>
+      <div class="footer-col"><h4>Company</h4><span onclick="showPage('about')">About</span><span onclick="showPage('blog')">Blog</span></div>
     </div>
-    <div class="footer-bottom"><span>&copy; 2026 GlbTOKEN</span><span>Powered by KAI.COM</span></div>
+    <div class="footer-bottom"><span>&copy; 2026 GlbTOKEN</span></div>
   </div></footer>
 
   <!-- Chat -->
@@ -1006,9 +1020,10 @@
       const loggedIn=!!token;
       document.getElementById('navGuest').style.display=loggedIn?'none':'flex';
       document.getElementById('navUser').style.display=loggedIn?'flex':'none';
+      document.getElementById('navBalance').style.display=loggedIn?'inline-block':'none';
       // Mobile menu sync
-      document.getElementById('mobileGuest').style.display=loggedIn?'none':'block';
-      document.getElementById('mobileUser').style.display=loggedIn?'block':'none';
+      document.getElementById('mGuest').style.display=loggedIn?'none':'block';
+      document.getElementById('mUser').style.display=loggedIn?'block':'none';
       if(loggedIn&&userData.name){
         document.getElementById('dashUserName').textContent=userData.name||'User';
         const initial=(userData.name||'U')[0].toUpperCase();
@@ -1022,16 +1037,16 @@
         document.getElementById('dropName').textContent=userData.name||'User';
         document.getElementById('dropEmail').textContent=userData.email||'';
         // Mobile sync
-        document.getElementById('mobileAvatar').textContent=initial;
-        document.getElementById('mobileName').textContent=userData.name||'User';
-        document.getElementById('mobileEmail').textContent=userData.email||'';
+        document.getElementById('mAvatar').textContent=initial;
+        document.getElementById('mName').textContent=userData.name||'User';
+        document.getElementById('mEmail').textContent=userData.email||'';
       }
       updateBalance();
     }
     function updateBalance(){
       const b=userData.token_balance||0;
       document.getElementById('navBalance').textContent=b.toLocaleString()+' Tokens';
-      document.getElementById('mobileBalance').textContent=b.toLocaleString();
+      document.getElementById('mBalance').textContent=b.toLocaleString();
       const db=document.getElementById('dashBalance');
       if(db)db.textContent=b.toLocaleString();
       const du=document.getElementById('dashUsd');
@@ -1282,13 +1297,16 @@
       clearTimeout(t._timeout);t._timeout=setTimeout(()=>t.classList.remove('show'),3000);
     }
     function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
-    function toggleMobile(){document.getElementById('navCenter').classList.toggle('open')}
-    // Auto-close mobile menu on link click
-    document.getElementById('navCenter').addEventListener('click', function(e){
-      if(e.target.tagName==='A' || e.target.closest('.mobile-login a')) {
-        this.classList.remove('open');
-      }
-    });
+    function toggleMobile(){
+      const overlay = document.getElementById('mobileOverlay');
+      const btn = document.getElementById('hamburgerBtn');
+      overlay.classList.toggle('open');
+      btn.classList.toggle('active');
+    }
+    function closeMobile(){
+      document.getElementById('mobileOverlay').classList.remove('open');
+      document.getElementById('hamburgerBtn').classList.remove('active');
+    }
   </script>
 </body>
 </html>
