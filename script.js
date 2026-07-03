@@ -726,29 +726,17 @@
       document.getElementById('mobileOverlay').classList.remove('open');
       document.getElementById('hamburgerBtn').classList.remove('active');
     }
-    function switchTopView(view){
-      const models=document.getElementById('tmModelsView');
-      const code=document.getElementById('tmCodeView');
-      const tabs=document.querySelectorAll('.tm-tab');
-      const title=document.getElementById('topModelsTitle');
-      if(view==='code'){
-        models.style.display='none';
-        code.style.display='grid';
-        title.textContent='💻 Quick Start Code';
-      }else{
-        models.style.display='grid';
-        code.style.display='none';
-        title.textContent='🔥 Top Models This Week';
-      }
-      tabs.forEach(t=>{
-        t.style.color='var(--text-muted)';
-        t.style.background='transparent';
-        t.style.boxShadow='none';
-        if(t.dataset.view===view){
-          t.style.color='var(--text)';
-          t.style.background='var(--card)';
-          t.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';
-        }
+    let tmIndex=0,tmInterval,tmTotal=2;
+    function slideTopView(dir){
+      tmIndex=(tmIndex+dir+tmTotal)%tmTotal;
+      document.getElementById('tmTrack').style.transform='translateX(-'+(tmIndex*100)+'%)';
+      document.querySelectorAll('.tm-dot').forEach((d,i)=>{
+        d.style.background=i===tmIndex?'var(--primary)':'var(--text-muted)';
+        d.style.width=i===tmIndex?'10px':'8px';
+        d.style.height=i===tmIndex?'10px':'8px';
       });
+      clearInterval(tmInterval);tmInterval=setInterval(()=>slideTopView(1),5000);
     }
+    function goToSlide(i){tmIndex=i-1;slideTopView(1)}
+    document.addEventListener('DOMContentLoaded',()=>{tmInterval=setInterval(()=>slideTopView(1),5000)});
   
