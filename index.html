@@ -264,6 +264,45 @@
     .chat-input input{flex:1;padding:0.625rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.85rem}
     .chat-input input:focus{outline:none;border-color:var(--primary)}
     .chat-input button{padding:0.625rem 1rem;border-radius:var(--radius-sm);background:var(--primary);color:#0A0B14;font-weight:600;font-size:0.85rem;border:none;cursor:pointer}
+    .ai-chat-section{background:var(--bg-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .ai-chat-inner{display:grid;grid-template-columns:240px 1fr;gap:1.5rem;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card);overflow:hidden;min-height:480px}
+    .ai-chat-side{background:var(--bg-alt);padding:1.25rem;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:0.75rem}
+    .ai-chat-side h4{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:500;margin-bottom:0.25rem}
+    .ai-model-opt{display:flex;align-items:center;gap:0.625rem;padding:0.625rem 0.75rem;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;border:1px solid transparent;font-size:0.85rem}
+    .ai-model-opt:hover{background:var(--card);border-color:var(--border-light)}
+    .ai-model-opt.selected{background:var(--primary-subtle);border-color:hsla(44 96% 52% / 0.3);color:var(--primary);font-weight:500}
+    .ai-model-opt .mo-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;background:var(--card);border:1px solid var(--border-light)}
+    .ai-model-opt.selected .mo-av{background:var(--primary);color:#0A0B14;border-color:transparent}
+    .ai-model-opt .mo-info{flex:1;min-width:0}
+    .ai-model-opt .mo-info .mo-name{font-weight:600;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ai-model-opt .mo-info .mo-prov{font-size:0.7rem;color:var(--text-muted)}
+    .ai-chat-main{display:flex;flex-direction:column;height:480px}
+    .ai-chat-main .chat-msgs{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem}
+    .ai-chat-main .chat-msg{display:flex;gap:10px;max-width:85%}
+    .ai-chat-main .chat-msg.ai{margin-right:auto}
+    .ai-chat-main .chat-msg.user{margin-left:auto;flex-direction:row-reverse}
+    .ai-chat-main .chat-msg .av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+    .ai-chat-main .chat-msg.ai .av{background:var(--primary-subtle);color:var(--primary)}
+    .ai-chat-main .chat-msg.user .av{background:var(--bg-alt);border:1px solid var(--border);color:var(--text)}
+    .ai-chat-main .chat-msg .bubble{padding:0.75rem 1rem;border-radius:var(--radius-sm);font-size:0.875rem;line-height:1.6;white-space:pre-wrap}
+    .ai-chat-main .chat-msg.ai .bubble{background:var(--bg-alt);border:1px solid var(--border-light);color:var(--text-secondary)}
+    .ai-chat-main .chat-msg.user .bubble{background:var(--primary-subtle);color:var(--text)}
+    .ai-chat-main .chat-input{border-top:1px solid var(--border);padding:0.75rem 1rem;display:flex;gap:0.5rem;align-items:center}
+    .ai-chat-main .chat-input textarea{flex:1;padding:0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.875rem;resize:none;min-height:44px;max-height:120px;font-family:inherit;line-height:1.5}
+    .ai-chat-main .chat-input textarea:focus{outline:none;border-color:var(--primary)}
+    .ai-chat-main .chat-input button{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#0A0B14;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;transition:all 0.2s;box-shadow:var(--primary-glow)}
+    .ai-chat-main .chat-input button:hover{background:var(--primary-hover);box-shadow:var(--primary-glow-strong)}
+    .ai-chat-main .chat-input button:disabled{opacity:0.4;cursor:not-allowed}
+    .ai-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;height:100%}
+    .ai-welcome .aw-icon{width:64px;height:64px;border-radius:50%;background:var(--primary-subtle);display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin-bottom:1rem}
+    .ai-welcome h3{font-size:1.15rem;font-weight:600;margin-bottom:0.5rem}
+    .ai-welcome p{font-size:0.85rem;color:var(--text-secondary);max-width:360px;line-height:1.6}
+    .ai-typing{display:flex;gap:4px;padding:0.5rem 0}
+    .ai-typing span{width:7px;height:7px;border-radius:50%;background:var(--text-muted);animation:aiDot 1.2s infinite}
+    .ai-typing span:nth-child(2){animation-delay:0.2s}
+    .ai-typing span:nth-child(3){animation-delay:0.4s}
+    @keyframes aiDot{0%,80%,100%{opacity:0.3}40%{opacity:1}}
+    @media(max-width:768px){.ai-chat-inner{grid-template-columns:1fr;min-height:auto}.ai-chat-side{border-right:none;border-bottom:1px solid var(--border);padding:0.75rem 1rem;flex-direction:row;overflow-x:auto;gap:0.5rem}.ai-chat-side h4{display:none}.ai-model-opt{white-space:nowrap;flex-shrink:0;padding:0.5rem 0.75rem;font-size:0.8rem}.ai-model-opt .mo-info .mo-prov{display:none}.ai-chat-main{height:400px}}
     .footer{border-top:1px solid var(--border);padding:3rem 0 2rem}
     .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem}
     .footer-brand p{font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;max-width:300px}
@@ -502,12 +541,38 @@
         <div class="step-card"><div class="step-num">3</div><h3>Use Any AI</h3><p>Generate an API key and use 100+ models via one endpoint. Full OpenRouter-compatible API.</p></div>
       </div>
     </div></section>
-    <section><div class="container" style="text-align:center">
-      <span class="section-label">Pricing</span><h2 class="section-title">Buy Token Packages</h2><p class="section-sub" style="margin:0 auto">From $5. Min $2.</p>
-      <div class="pricing-grid" style="max-width:900px;margin:2rem auto 0">
-        <div class="pricing-card"><div class="plan-name">Starter</div><div class="plan-price">$5</div><div class="plan-desc">5,000 Tokens</div><ul class="plan-features"><li>All 100+ models</li><li>API key access</li><li>Email support</li></ul><button class="btn-primary" style="width:100%" onclick="showPage('register')">Get Started</button></div>
-        <div class="pricing-card featured"><div class="plan-name">Professional</div><div class="plan-price">$20</div><div class="plan-desc">22,000 Tokens</div><ul class="plan-features"><li>All 100+ models</li><li>API key access</li><li>Priority support</li><li>30-day validity</li></ul><button class="btn-primary" style="width:100%" onclick="showPage('register')">Get Started</button></div>
-        <div class="pricing-card"><div class="plan-name">Enterprise</div><div class="plan-price">$100</div><div class="plan-desc">120,000 Tokens</div><ul class="plan-features"><li>All 100+ models</li><li>Dedicated support</li><li>90-day validity</li><li>Team sharing</li></ul><button class="btn-primary" style="width:100%" onclick="showPage('register')">Get Started</button></div>
+    <section class="ai-chat-section"><div class="container">
+      <div style="text-align:center;margin-bottom:2rem">
+        <span class="section-label">Try AI</span>
+        <h2 class="section-title">Chat with AI Models</h2>
+        <p class="section-sub" style="margin:0 auto">Try our free AI models right now. No account needed.</p>
+      </div>
+      <div class="ai-chat-inner">
+        <div class="ai-chat-side">
+          <h4>Select Model</h4>
+          <div class="ai-model-opt selected" onclick="selectAIModel(this,'gpt4o-mini')"><div class="mo-av">🧠</div><div class="mo-info"><div class="mo-name">GPT-4o Mini</div><div class="mo-prov">OpenAI · Free</div></div></div>
+          <div class="ai-model-opt" onclick="selectAIModel(this,'claude-haiku')"><div class="mo-av">🎨</div><div class="mo-info"><div class="mo-name">Claude 3 Haiku</div><div class="mo-prov">Anthropic · Free</div></div></div>
+          <div class="ai-model-opt" onclick="selectAIModel(this,'gemini-flash')"><div class="mo-av">🔬</div><div class="mo-info"><div class="mo-name">Gemini Flash</div><div class="mo-prov">Google · Free</div></div></div>
+          <div class="ai-model-opt" onclick="selectAIModel(this,'llama-scout')"><div class="mo-av">🦙</div><div class="mo-info"><div class="mo-name">Llama 4 Scout</div><div class="mo-prov">Meta · Free</div></div></div>
+          <div class="ai-model-opt" onclick="selectAIModel(this,'deepseek-flash')"><div class="mo-av">⚡</div><div class="mo-info"><div class="mo-name">DeepSeek Flash</div><div class="mo-prov">DeepSeek · Free</div></div></div>
+          <div class="ai-model-opt" onclick="selectAIModel(this,'mistral-small')"><div class="mo-av">🌬️</div><div class="mo-info"><div class="mo-name">Mistral Small</div><div class="mo-prov">Mistral · Free</div></div></div>
+        </div>
+        <div class="ai-chat-main">
+          <div class="chat-msgs" id="aiChatMsgs">
+            <div class="ai-welcome" id="aiWelcome">
+              <div class="aw-icon">💬</div>
+              <h3>Ask me anything</h3>
+              <p>Choose a model from the left and start chatting. I can help with code, writing, analysis, research, and more — all for free.</p>
+            </div>
+          </div>
+          <div class="chat-input">
+            <textarea id="aiChatInput" placeholder="Send a message..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChatMsg()}"></textarea>
+            <button onclick="sendAIChatMsg()" id="aiSendBtn">➤</button>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:1.25rem">
+        <span style="font-size:0.8rem;color:var(--text-muted)">Want more? <a onclick="showPage('register')" style="color:var(--primary);cursor:pointer">Create an account</a> for 100+ models, API keys, and unlimited usage.</span>
       </div>
     </div></section>
     <section><div class="container"><div class="cta-section"><h2>Ready for Premium AI?</h2><p>One token. 100+ models. No subscriptions.</p><button class="btn-primary" style="padding:1rem 2.5rem;font-size:1.05rem" onclick="showPage('register')">Create Free Account →</button></div></div></section>
@@ -1371,7 +1436,84 @@
       document.getElementById('txConsumption').style.display=tab==='consumption'?'block':'none';
     }
 
-    // ── Chat ──
+    // ── AI Chat (Homepage) ──
+    let aiModel = 'gpt4o-mini';
+    const AI_RESPONSES = {
+      'gpt4o-mini': ['Great question! GPT-4o Mini is our lightweight flagship — fast, capable, and cost-effective for everyday tasks.', 'I can help you write code, analyze data, draft emails, explain concepts, and more. What would you like to work on?', 'Here's a quick tip: GPT-4o Mini excels at tasks like summarization, code generation, and creative writing while being extremely efficient.'],
+      'claude-haiku': ['Claude 3 Haiku is Anthropic's fastest model. Perfect for quick analysis, structured outputs, and tasks that need careful reasoning.', 'I take a thoughtful approach to your questions. Let me think this through carefully.', 'Claude Haiku is great for parsing documents, answering questions with citations, and following complex instructions.'],
+      'gemini-flash': ['Gemini Flash by Google is designed for speed and efficiency. It handles multimodal tasks and long context windows with ease.', 'Google's latest flash model here! I can process up to 1M tokens of context — that's like reading entire books at once.', 'With Gemini Flash, you get Google's search-grounded knowledge and fast response times.'],
+      'llama-scout': ['Llama 4 Scout from Meta has a 10M token context window — the largest of any open model. Great for analyzing huge documents.', 'Meta's Llama 4 here! I'm open-source and designed for long-context tasks. Ask me to analyze large codebases or documents.', 'Llama Scout excels at processing enormous amounts of text. It's the go-to for document-heavy workflows.'],
+      'deepseek-flash': ['DeepSeek Flash is engineered for blazing-fast inference with top-tier performance. Best price-performance ratio in the market.', 'I'm DeepSeek's fastest model. Check my math, reason through problems, or get quick code solutions. I'm optimized for speed.', 'DeepSeek Flash delivers GPT-4 class performance at a fraction of the cost. Perfect for production workloads.'],
+      'mistral-small': ['Mistral Small is our efficient model for everyday AI tasks. Fast, reliable, and open-source.', 'Bonjour! Mistral Small is perfect for classification, summarization, and lightweight chat applications.', 'Mistral models are known for their efficiency and strong performance on benchmarks. Small doesn't mean weak!']
+    };
+    const AI_GENERIC = [
+      'That's an interesting question! Here's what I think: The key is to break complex problems into smaller steps and tackle them one at a time.',
+      'Great point! In the AI landscape, we're seeing rapid advances in reasoning capabilities, multimodal understanding, and context length. Models are getting smarter every quarter.',
+      'I'd recommend exploring this further by creating a GlbTOKEN account — you'll get access to 100+ models with a single API key and one token balance.',
+      'That depends on your use case. For speed, try DeepSeek Flash or Gemini Flash. For deep reasoning, Claude Haiku or GPT-4o Mini. For long documents, Llama 4 Scout is unbeatable.',
+      'Here's a practical perspective: start with the free tier, experiment with different models, and find what works best for your specific workflow. Each model has unique strengths.'
+    ];
+    function selectAIModel(el, model){
+      document.querySelectorAll('.ai-model-opt').forEach(o=>o.classList.remove('selected'));
+      el.classList.add('selected');
+      aiModel = model;
+      const welcome = document.getElementById('aiWelcome');
+      if(welcome) welcome.style.display='flex';
+    }
+    function sendAIChatMsg(){
+      const input = document.getElementById('aiChatInput');
+      const msg = input.value.trim();
+      if(!msg) return;
+      const msgs = document.getElementById('aiChatMsgs');
+      // Hide welcome
+      const welcome = document.getElementById('aiWelcome');
+      if(welcome) welcome.style.display='none';
+      // Add user message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-msg user';
+      userDiv.innerHTML = '<div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div>';
+      msgs.appendChild(userDiv);
+      input.value = '';
+      input.style.height = 'auto';
+      msgs.scrollTop = msgs.scrollHeight;
+      // Disable button
+      const btn = document.getElementById('aiSendBtn');
+      btn.disabled = true;
+      btn.textContent = '⋯';
+      // Add typing indicator
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'chat-msg ai';
+      typingDiv.id = 'aiTyping';
+      typingDiv.innerHTML = '<div class="av">🤖</div><div class="bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+      msgs.appendChild(typingDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+      // Simulate response
+      setTimeout(() => {
+        const typing = document.getElementById('aiTyping');
+        if(typing) typing.remove();
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-msg ai';
+        const modelResponses = AI_RESPONSES[aiModel] || AI_GENERIC;
+        const allResponses = [...modelResponses, ...AI_GENERIC];
+        const response = allResponses[Math.floor(Math.random() * allResponses.length)];
+        aiDiv.innerHTML = '<div class="av">🤖</div><div class="bubble">'+escapeHtml(response)+'</div>';
+        msgs.appendChild(aiDiv);
+        msgs.scrollTop = msgs.scrollHeight;
+        btn.disabled = false;
+        btn.textContent = '➤';
+      }, 800 + Math.random() * 1200);
+    }
+    // Auto-resize textarea
+    document.addEventListener('DOMContentLoaded',function(){
+      const ta = document.getElementById('aiChatInput');
+      if(ta){
+        ta.addEventListener('input',function(){
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+      }
+    });
+    // ── Support Chat (floating) ──
     function toggleChat(){document.getElementById('chatWindow').classList.toggle('open')}
     function sendChatMsg(){
       const input=document.getElementById('chatInput');
