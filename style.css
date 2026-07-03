@@ -412,32 +412,43 @@
     }
   /* ── Shooting Stars Background ── */
   .stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--primary);opacity:0}
-  .star:nth-child(1){top:10%;left:20%;animation:shoot 6s ease-in infinite;animation-delay:0s}
-  .star:nth-child(2){top:25%;left:60%;animation:shoot 8s ease-in infinite;animation-delay:2s}
-  .star:nth-child(3){top:40%;left:10%;animation:shoot 7s ease-in infinite;animation-delay:4s}
-  .star:nth-child(4){top:15%;left:80%;animation:shoot 9s ease-in infinite;animation-delay:1s}
-  .star:nth-child(5){top:55%;left:30%;animation:shoot 5.5s ease-in infinite;animation-delay:3s}
-  .star:nth-child(6){top:70%;left:70%;animation:shoot 7.5s ease-in infinite;animation-delay:5s}
-  .star:nth-child(7){top:5%;left:45%;animation:shoot 6.5s ease-in infinite;animation-delay:2.5s}
-  .star:nth-child(8){top:85%;left:15%;animation:shoot 8.5s ease-in infinite;animation-delay:0.5s}
-  .star:nth-child(9){top:35%;left:90%;animation:shoot 5s ease-in infinite;animation-delay:3.5s}
-  .star:nth-child(10){top:60%;left:50%;animation:shoot 7s ease-in infinite;animation-delay:4.5s}
-  .star:nth-child(11){top:50%;left:5%;animation:shoot 9.5s ease-in infinite;animation-delay:1.5s}
-  .star:nth-child(12){top:75%;left:85%;animation:shoot 6s ease-in infinite;animation-delay:5.5s}
-  @keyframes shoot{
-    0%{transform:translate(0,0) scale(1);opacity:0}
-    5%{opacity:1}
-    15%{opacity:0.8}
-    30%{transform:translate(-80px,180px) scale(0.6);opacity:0.4}
-    50%{transform:translate(-150px,350px) scale(0.3);opacity:0.1}
-    100%{transform:translate(-250px,600px) scale(0);opacity:0}
-  }
-  /* Slight variation for some stars (longer trails) */
-  .star.trail{width:1px;height:8px;background:linear-gradient(to bottom,var(--primary),transparent);border-radius:1px}
-  .star.trail:nth-child(13){top:20%;left:40%;animation:shoot 10s ease-in infinite;animation-delay:0.8s;height:12px}
-  .star.trail:nth-child(14){top:45%;left:75%;animation:shoot 7s ease-in infinite;animation-delay:3.2s;height:10px}
-  .star.trail:nth-child(15){top:65%;left:25%;animation:shoot 8.5s ease-in infinite;animation-delay:6s;height:6px}
+  .star{position:absolute;border-radius:50%;opacity:0}
+  /* Gold shooting stars (default) */
+  .star.gold{background:hsl(44 96% 52%);width:2px;height:2px;box-shadow:0 0 4px hsla(44 96% 52% / 0.6)}
+  /* Teal shooting stars */
+  .star.teal{background:#00D68F;width:2px;height:2px;box-shadow:0 0 4px hsla(160 100% 42% / 0.6)}
+  /* Blue shooting stars */
+  .star.blue{background:hsl(211 82% 57%);width:2px;height:2px;box-shadow:0 0 4px hsla(211 82% 57% / 0.6)}
+  /* White shooting stars */
+  .star.white{background:hsl(210 22% 96%);width:2px;height:2px;box-shadow:0 0 4px hsla(210 22% 96% / 0.4)}
+  /* Light mode reduces brightness */
+  html.light .star.gold{box-shadow:0 0 4px hsla(44 96% 47% / 0.4)}
+  html.light .star.teal{box-shadow:0 0 4px hsla(160 100% 40% / 0.3)}
+  html.light .star.blue{box-shadow:0 0 4px hsla(211 82% 55% / 0.3)}
+  html.light .star.white{box-shadow:0 0 4px hsla(0 0% 9% / 0.15)}
+  /* Trail variations */
+  .star.trail{height:6px;border-radius:2px;background:linear-gradient(to right,transparent,var(--star-color,var(--primary)));width:0;opacity:0}
+  .star.trail.gold{--star-color:hsl(44 96% 52%)}
+  .star.trail.teal{--star-color:#00D68F}
+  .star.trail.blue{--star-color:hsl(211 82% 57%)}
+  /* Diag 1: top-left to bottom-right (↘) */
+  @keyframes shootDR{0%{transform:translate(0,0) scale(1);opacity:0}4%{opacity:1}12%{opacity:0.8}30%{transform:translate(120px,200px) scale(0.5);opacity:0.3}60%{transform:translate(280px,480px) scale(0.1);opacity:0}100%{transform:translate(400px,720px) scale(0);opacity:0}}
+  /* Diag 2: top-right to bottom-left (↙) */
+  @keyframes shootDL{0%{transform:translate(0,0) scale(1);opacity:0}4%{opacity:1}12%{opacity:0.8}30%{transform:translate(-120px,200px) scale(0.5);opacity:0.3}60%{transform:translate(-280px,480px) scale(0.1);opacity:0}100%{transform:translate(-400px,720px) scale(0);opacity:0}}
+  /* Downward (↓) */
+  @keyframes shootD{0%{transform:translate(0,0) scale(1);opacity:0}4%{opacity:1}15%{opacity:0.7}40%{transform:translate(30px,250px) scale(0.4);opacity:0.2}70%{transform:translate(60px,500px) scale(0.1);opacity:0}100%{transform:translate(80px,700px) scale(0);opacity:0}}
+  /* Gentle arc (↗ then ↘) */
+  @keyframes shootArc{0%{transform:translate(0,0) scale(1);opacity:0}5%{opacity:1}15%{opacity:0.9}35%{transform:translate(80px,-60px) scale(0.6);opacity:0.4}65%{transform:translate(200px,80px) scale(0.2);opacity:0.1}100%{transform:translate(300px,200px) scale(0);opacity:0}}
+  /* Row 1: Gold stars */
+  .star:nth-child(1){top:8%;left:15%;animation:shootDR 10s ease-in infinite;animation-delay:0s}.star:nth-child(2){top:22%;left:55%;animation:shootDL 12s ease-in infinite;animation-delay:2s}.star:nth-child(3){top:38%;left:8%;animation:shootDR 11s ease-in infinite;animation-delay:4s}.star:nth-child(4){top:12%;left:78%;animation:shootDL 13s ease-in infinite;animation-delay:1s}
+  /* Row 2: Teal stars */
+  .star:nth-child(5){top:52%;left:28%;animation:shootD 9s ease-in infinite;animation-delay:3s}.star:nth-child(6){top:68%;left:72%;animation:shootDR 14s ease-in infinite;animation-delay:5s}.star:nth-child(7){top:3%;left:42%;animation:shootDL 8s ease-in infinite;animation-delay:6s}.star:nth-child(8){top:82%;left:12%;animation:shootD 11s ease-in infinite;animation-delay:0.5s}
+  /* Row 3: Blue stars */
+  .star:nth-child(9){top:32%;left:88%;animation:shootDL 10s ease-in infinite;animation-delay:3.5s}.star:nth-child(10){top:58%;left:48%;animation:shootArc 15s ease-in infinite;animation-delay:7s}.star:nth-child(11){top:48%;left:3%;animation:shootDR 9s ease-in infinite;animation-delay:1.5s}.star:nth-child(12){top:73%;left:82%;animation:shootArc 16s ease-in infinite;animation-delay:4.5s}
+  /* Row 4: White stars */
+  .star:nth-child(13){top:18%;left:35%;animation:shootDR 12s ease-in infinite;animation-delay:8s}.star:nth-child(14){top:88%;left:60%;animation:shootDL 10s ease-in infinite;animation-delay:6.5s}.star:nth-child(15){top:42%;left:65%;animation:shootArc 14s ease-in infinite;animation-delay:2.5s}
+  /* Trails (longer streaks) */
+  .star.trail:nth-child(16){top:15%;left:25%;animation:shootDR 18s ease-in infinite;animation-delay:0.8s;height:10px}.star.trail:nth-child(17){top:50%;left:70%;animation:shootDL 16s ease-in infinite;animation-delay:3.2s;height:8px}.star.trail:nth-child(18){top:70%;left:20%;animation:shootD 14s ease-in infinite;animation-delay:5s;height:6px}.star.trail:nth-child(19){top:28%;left:50%;animation:shootArc 20s ease-in infinite;animation-delay:9s;height:12px}.star.trail:nth-child(20){top:60%;left:45%;animation:shootDR 15s ease-in infinite;animation-delay:7.5s;height:7px}
   /* ── Mobile Chat Full-Screen Expansion ── */
   @media(max-width:768px){
     .ai-chat-section.expanded{
