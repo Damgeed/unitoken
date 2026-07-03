@@ -716,6 +716,9 @@
         }
         // Prevent body scroll
         document.body.style.overflow='hidden';
+        // Hide floating support chat
+        const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
+        if(fab)fab.style.display='none';if(win)win.style.display='none';
         setTimeout(()=>{
           const msgs=document.getElementById('aiChatMsgs');
           if(msgs)msgs.scrollTop=msgs.scrollHeight;
@@ -728,6 +731,9 @@
       document.body.style.overflow='';
       const btn=document.querySelector('.chat-focused-close');
       if(btn)btn.remove();
+      // Restore floating support chat
+      const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
+      if(fab)fab.style.display='';if(win&&!win.classList.contains('open'))win.style.display='';
     }
     // ── Support Chat (floating) ──
     function toggleChat(){document.getElementById('chatWindow').classList.toggle('open')}
