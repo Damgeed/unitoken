@@ -463,7 +463,7 @@
     .ai-chat-section.chat-focused .ai-chat-inner{
       border:1px solid var(--border);border-radius:var(--radius-lg);
       background:var(--card);box-shadow:var(--shadow-elevated);
-      min-height:auto;max-height:70vh;overflow:hidden;height:auto
+      min-height:auto;max-height:70vh;overflow:hidden;height:70vh
     }
     .ai-chat-section.chat-focused .chat-header{flex-shrink:0}
     .ai-chat-section.chat-focused .ai-chat-main{flex:1;min-height:0;overflow:hidden}

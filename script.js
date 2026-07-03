@@ -652,7 +652,7 @@
       userDiv.innerHTML = '<div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div>';
       msgs.appendChild(userDiv);
       input.value = '';
-      input.style.height = 'auto';
+      input.style.height = '';
       // Keep keyboard open on mobile — refocus input
       if(window.innerWidth<=768)setTimeout(()=>input.focus(),0);
       msgs.scrollTop = msgs.scrollHeight;

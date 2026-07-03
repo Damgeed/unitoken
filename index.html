@@ -201,7 +201,7 @@
           </div>
           <div class="chat-input">
             <textarea id="aiChatInput" placeholder="Send a message..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChatMsg()}"></textarea>
-            <button type="button" onpointerdown="sendAIChatMsg();event.preventDefault()" id="aiSendBtn">➤</button>
+            <button type="button" onclick="sendAIChatMsg()" id="aiSendBtn">➤</button>
           </div>
         </div>
       </div>
