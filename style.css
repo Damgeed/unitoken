@@ -405,4 +405,71 @@
       .trust-badges{gap:0.4rem}
       .trust-badge{font-size:0.7rem;padding:0.25rem 0.5rem}
     }
-  /* Force rebuild Fri Jul  3 17:24:13 CST 2026 */
+  /* ── Shooting Stars Background ── */
+  .stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--primary);opacity:0}
+  .star:nth-child(1){top:10%;left:20%;animation:shoot 6s ease-in infinite;animation-delay:0s}
+  .star:nth-child(2){top:25%;left:60%;animation:shoot 8s ease-in infinite;animation-delay:2s}
+  .star:nth-child(3){top:40%;left:10%;animation:shoot 7s ease-in infinite;animation-delay:4s}
+  .star:nth-child(4){top:15%;left:80%;animation:shoot 9s ease-in infinite;animation-delay:1s}
+  .star:nth-child(5){top:55%;left:30%;animation:shoot 5.5s ease-in infinite;animation-delay:3s}
+  .star:nth-child(6){top:70%;left:70%;animation:shoot 7.5s ease-in infinite;animation-delay:5s}
+  .star:nth-child(7){top:5%;left:45%;animation:shoot 6.5s ease-in infinite;animation-delay:2.5s}
+  .star:nth-child(8){top:85%;left:15%;animation:shoot 8.5s ease-in infinite;animation-delay:0.5s}
+  .star:nth-child(9){top:35%;left:90%;animation:shoot 5s ease-in infinite;animation-delay:3.5s}
+  .star:nth-child(10){top:60%;left:50%;animation:shoot 7s ease-in infinite;animation-delay:4.5s}
+  .star:nth-child(11){top:50%;left:5%;animation:shoot 9.5s ease-in infinite;animation-delay:1.5s}
+  .star:nth-child(12){top:75%;left:85%;animation:shoot 6s ease-in infinite;animation-delay:5.5s}
+  @keyframes shoot{
+    0%{transform:translate(0,0) scale(1);opacity:0}
+    5%{opacity:1}
+    15%{opacity:0.8}
+    30%{transform:translate(-80px,180px) scale(0.6);opacity:0.4}
+    50%{transform:translate(-150px,350px) scale(0.3);opacity:0.1}
+    100%{transform:translate(-250px,600px) scale(0);opacity:0}
+  }
+  /* Slight variation for some stars (longer trails) */
+  .star.trail{width:1px;height:8px;background:linear-gradient(to bottom,var(--primary),transparent);border-radius:1px}
+  .star.trail:nth-child(13){top:20%;left:40%;animation:shoot 10s ease-in infinite;animation-delay:0.8s;height:12px}
+  .star.trail:nth-child(14){top:45%;left:75%;animation:shoot 7s ease-in infinite;animation-delay:3.2s;height:10px}
+  .star.trail:nth-child(15){top:65%;left:25%;animation:shoot 8.5s ease-in infinite;animation-delay:6s;height:6px}
+  /* ── Mobile Chat Full-Screen Expansion ── */
+  @media(max-width:768px){
+    .ai-chat-section.expanded{
+      position:fixed;inset:0;z-index:100;background:var(--bg);
+      display:flex;flex-direction:column;padding:0;border:none;
+      animation:chatExpand 0.25s ease-out
+    }
+    .ai-chat-section.expanded .container{
+      display:flex;flex-direction:column;flex:1;padding:0;max-width:100%
+    }
+    .ai-chat-section.expanded .section-label,
+    .ai-chat-section.expanded .section-title,
+    .ai-chat-section.expanded .section-sub{
+      display:none
+    }
+    .ai-chat-section.expanded .ai-chat-inner{
+      border:none;border-radius:0;min-height:0;flex:1;
+      display:flex;flex-direction:column;background:var(--bg)
+    }
+    .ai-chat-section.expanded .ai-chat-main{flex:1;min-height:0}
+    .ai-chat-section.expanded .chat-msgs{padding:1rem;flex:1}
+    .ai-chat-section.expanded .chat-input{
+      padding:0.625rem 0.75rem;
+      padding-bottom:calc(0.625rem + env(safe-area-inset-bottom, 10px));
+      background:var(--bg-alt);border-top:1px solid var(--border)
+    }
+    .chat-expand-close{
+      display:none;position:fixed;top:12px;right:12px;z-index:101;
+      width:36px;height:36px;border-radius:50%;background:var(--card);
+      border:1px solid var(--border);color:var(--text-secondary);
+      font-size:1.2rem;cursor:pointer;align-items:center;justify-content:center
+    }
+    .chat-expand-close.show{display:flex}
+    .ai-chat-section.expanded + .chat-expand-close{display:flex}
+  }
+  @keyframes chatExpand{
+    from{transform:translateY(30px);opacity:0.5}
+    to{transform:translateY(0);opacity:1}
+  }
+  /* Force rebuild */

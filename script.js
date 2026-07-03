@@ -698,6 +698,38 @@
       if(pageId==='history'&&token)loadTx();
       if(pageId==='models')loadModels();
     });
+    // ── Mobile Chat Full-Screen ──
+    function openMobileChat(){
+      if(window.innerWidth>768)return;
+      const section=document.querySelector('.ai-chat-section');
+      const close=document.getElementById('chatExpandClose');
+      if(section){section.classList.add('expanded');if(close)close.classList.add('show')}
+      setTimeout(()=>{
+        const msgs=document.getElementById('aiChatMsgs');
+        if(msgs)msgs.scrollTop=msgs.scrollHeight;
+      },100);
+    }
+    function closeMobileChat(){
+      const section=document.querySelector('.ai-chat-section');
+      const close=document.getElementById('chatExpandClose');
+      const input=document.getElementById('aiChatInput');
+      if(section)section.classList.remove('expanded');
+      if(close)close.classList.remove('show');
+      if(input)input.blur();
+      document.body.style.overflow='';
+    }
+    document.addEventListener('DOMContentLoaded',function(){
+      const input=document.getElementById('aiChatInput');
+      if(input){
+        input.addEventListener('focus',openMobileChat);
+        input.addEventListener('blur',function(){setTimeout(()=>{
+          const section=document.querySelector('.ai-chat-section');
+          if(section&&section.classList.contains('expanded')){
+            // Don't close on blur — user might tap send. Backdrop close button handles it.
+          }
+        },200)});
+      }
+    });
     // ── Support Chat (floating) ──
     function toggleChat(){document.getElementById('chatWindow').classList.toggle('open')}
     function sendChatMsg(){
