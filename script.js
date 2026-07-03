@@ -211,16 +211,45 @@
         applyAuth();showToast('Welcome back!','success');showPage('dashboard');
       }catch(e){showToast(e.message,'error')}
     }
-    async function oauthLogin(provider){
-      showToast(provider==='google'?'Google sign-in coming soon. Configure GOOGLE_CLIENT_ID in backend.':'GitHub sign-in coming soon. Configure GITHUB_CLIENT_ID in backend.','info');
-      // Fallback for demo: auto-login
+    function showOAuthModal(provider, isRegister){
+      const overlay=document.createElement('div');
+      overlay.className='modal-overlay';
+      overlay.innerHTML='<div class="modal-box" style="text-align:center;padding:2.5rem">'+
+        '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">✕</button>'+
+        '<div style="font-size:3rem;margin-bottom:1rem">'+(provider==='google'?'🔵':provider==='github'?'🐙':provider==='microsoft'?'🟦':'🍎')+'</div>'+
+        '<h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">'+
+          (isRegister?'Create Account with ':'Sign in with ')+
+          provider.charAt(0).toUpperCase()+provider.slice(1)+
+        '</h3>'+
+        '<p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem">'+
+          'OAuth '+provider+' integration coming soon.<br>For now, use the demo mode below.'+
+        '</p>'+
+        '<button class="btn-primary" style="width:100%;margin-bottom:0.75rem" onclick="this.closest(\'.modal-overlay\').remove();'+(isRegister?'oauthRegisterFallback':'oauthLoginFallback')+'(\''+provider+'\')">'+
+          'Continue with Demo →'+
+        '</button>'+
+        '<button class="btn-secondary" style="width:100%" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>'+
+      '</div>';
+      document.body.appendChild(overlay);
+      overlay.classList.add('open');
+    }
+    async function oauthLoginFallback(provider){
+      try{
+        const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':provider==='github'?'GitHub User':provider==='microsoft'?'Microsoft User':'Apple User',email:provider+'_user@glbtoken.io',password:'oauth_demo_123',country:''});
+        token=data.token;userData=data.user;
+        localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
+        applyAuth();showToast('Signed in with '+provider,'success');window.location.href='dashboard.html';
+      }catch(e){showToast(e.message,'error')}
+    }
+    async function oauthRegisterFallback(provider){
       try{
         const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':'GitHub User',email:provider+'_user@glbtoken.io',password:'oauth_demo_123',country:''});
         token=data.token;userData=data.user;
         localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
-        applyAuth();showToast('Signed in with '+provider,'success');showPage('dashboard');
+        applyAuth();showToast('Account created with '+provider,'success');window.location.href='dashboard.html';
       }catch(e){showToast(e.message,'error')}
     }
+    function oauthLogin(provider){showOAuthModal(provider,false)}
+    function oauthRegister(provider){showOAuthModal(provider,true)}
     function logoutUser(){
       token='';userData={};
       localStorage.removeItem('gt_token');localStorage.removeItem('gt_user');
