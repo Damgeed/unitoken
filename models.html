@@ -58,7 +58,11 @@
     <button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
     </div>
   </div></nav>  </div></nav>
+  </div></nav>
+  <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobile()"></div>
   <div class="mobile-overlay" id="mobileOverlay">
+    <div class="m-close"><button onclick="closeMobile()">X</button></div>
+    <div class="m-section-label">Navigate</div>
     <a href="index.html" onclick="closeMobile()">Home</a>
     <a href="pricing.html" onclick="closeMobile()">Pricing</a>
     <a href="how.html" onclick="closeMobile()">How It Works</a>
@@ -66,6 +70,7 @@
     <a href="apikeys.html" onclick="closeMobile()">API / Dev</a>
     <a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none">Dashboard</a>
     <hr>
+    <div class="m-section-label">Account</div>
     <div class="mobile-auth-grid">
       <a href="login.html" onclick="closeMobile()" id="mobileLoginLink" class="mobile-auth-btn mobile-auth-btn-outline">Login</a>
       <a href="register.html" onclick="closeMobile()" id="mobileRegisterLink" class="mobile-auth-btn mobile-auth-btn-primary">Get Started</a>

@@ -718,13 +718,20 @@
     function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
     function toggleMobile(){
       const overlay = document.getElementById('mobileOverlay');
+      const backdrop = document.getElementById('mobileBackdrop');
       const btn = document.getElementById('hamburgerBtn');
       overlay.classList.toggle('open');
+      if(backdrop)backdrop.classList.toggle('open');
       btn.classList.toggle('active');
+      document.body.style.overflow=overlay.classList.contains('open')?'hidden':'';
     }
     function closeMobile(){
-      document.getElementById('mobileOverlay').classList.remove('open');
+      const overlay = document.getElementById('mobileOverlay');
+      const backdrop = document.getElementById('mobileBackdrop');
+      overlay.classList.remove('open');
+      if(backdrop)backdrop.classList.remove('open');
       document.getElementById('hamburgerBtn').classList.remove('active');
+      document.body.style.overflow='';
     }
     let tmIndex=0,tmInterval,tmTotal=2,tmTouchStartX=0,tmTouchStartY=0;
     const tmTitles=['🔥 Top Models This Week','💻 API Quick Start'];
