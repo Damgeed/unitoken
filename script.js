@@ -704,6 +704,9 @@
       const section=document.querySelector('.ai-chat-section');
       const close=document.getElementById('chatExpandClose');
       if(section){section.classList.add('expanded');if(close)close.classList.add('show')}
+      // Hide floating support chat
+      const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
+      if(fab)fab.style.display='none';if(win)win.style.display='none';
       setTimeout(()=>{
         const msgs=document.getElementById('aiChatMsgs');
         if(msgs)msgs.scrollTop=msgs.scrollHeight;
@@ -717,6 +720,9 @@
       if(close)close.classList.remove('show');
       if(input)input.blur();
       document.body.style.overflow='';
+      // Restore floating support chat
+      const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
+      if(fab)fab.style.display='';if(win&&!win.classList.contains('open'))win.style.display='';
     }
     document.addEventListener('DOMContentLoaded',function(){
       const input=document.getElementById('aiChatInput');
