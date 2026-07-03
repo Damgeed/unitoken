@@ -98,7 +98,7 @@
     .calc-result{text-align:center;padding:1rem;background:var(--primary-subtle);border-radius:var(--radius-sm);margin-top:0.5rem}
     .calc-result .big{font-size:1.75rem;font-weight:700;color:var(--primary);display:block}
     .calc-result .small{font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem}
-    section{padding:5rem 0}
+    section{padding:2rem 0}
     .section-label{display:inline-flex;align-items:center;gap:6px;padding:0.25rem 0.75rem;border-radius:999px;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.2);font-size:0.75rem;font-weight:500;color:var(--primary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.06em}
     .section-title{font-size:2.25rem;font-weight:700;margin-bottom:0.75rem}
     .section-sub{font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin-bottom:3rem}
