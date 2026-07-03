@@ -453,4 +453,8 @@
   @media(max-width:768px){
     .ai-chat-section.chat-focused .container>div:first-child{display:none}
   }
+  /* ── Hamburger SVG Icons ── */
+  .mobile-overlay a svg{flex-shrink:0;opacity:0.6;transition:opacity 0.2s}
+  .mobile-overlay a:hover svg{opacity:1}
+  .m-section-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:0.5rem 0.75rem 0.25rem}
   /* Force rebuild */
