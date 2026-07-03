@@ -742,7 +742,7 @@
           btn.className='chat-focused-close';
           btn.innerHTML='✕';
           btn.onclick=closeMobileChat;
-          section.querySelector('.ai-chat-inner').appendChild(btn);
+          section.querySelector('.chat-header').appendChild(btn);
         }
         // Prevent body scroll
         document.body.style.overflow='hidden';
