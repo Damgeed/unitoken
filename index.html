@@ -300,10 +300,10 @@
       .hero h1{font-size:2.5rem}.hero-stats{gap:1.5rem}
       .model-grid{grid-template-columns:repeat(2,1fr)}
       .footer-grid{grid-template-columns:1fr 1fr}
-      .nav-center{display:none}.hamburger{display:flex}
+      .nav-center{display:none}.hamburger{display:flex}.theme-toggle{display:flex}.mobile-theme-btn{display:flex!important}
       .mobile-overlay{display:none}
       .mobile-overlay.open{display:flex}
-      .nav-right #navGuest,.nav-right #navUser{display:none!important}
+      .nav-right #navGuest,.nav-right #navUser,.nav-right .theme-toggle{display:none!important}
       .topup-grid{grid-template-columns:1fr}
       .chat-window{width:calc(100vw - 2rem);height:60vh;bottom:5rem;right:1rem}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
@@ -313,17 +313,18 @@
       .hero p{text-align:center;margin-left:auto;margin-right:auto}
       .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
       .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;text-align:center;padding:0.75rem 1rem;font-size:0.9rem}
-      .vp-grid,.steps-grid,.pricing-grid{grid-template-columns:1fr 1fr;gap:0.75rem}
+      .vp-grid,.steps-grid{grid-template-columns:1fr 1fr;gap:0.75rem}.pricing-grid{grid-template-columns:1fr;gap:0.75rem}
       .model-grid{grid-template-columns:1fr}
       .model-card{padding:1rem}
       .model-card h4{font-size:0.85rem}
       .model-card .meta{font-size:0.7rem;gap:0.5rem}
-      .footer-grid{grid-template-columns:1fr;gap:1.5rem}
-      .footer-grid .footer-col h4{margin-bottom:0.5rem;font-size:0.8rem}
-      .footer-grid .footer-col span{margin-bottom:0.25rem;font-size:0.8rem}
-      .footer-brand .nav-logo{font-size:1.1rem}
-      .footer-brand p{font-size:0.8rem;margin-top:0.5rem}
-      .footer-bottom{flex-direction:column;gap:0.75rem;text-align:center}
+      .footer-grid{grid-template-columns:1fr 1fr;gap:1.25rem}
+      .footer-grid .footer-brand{grid-column:1/-1}
+      .footer-grid .footer-col h4{margin-bottom:0.35rem;font-size:0.8rem}
+      .footer-grid .footer-col span{margin-bottom:0.2rem;font-size:0.8rem}
+      .footer-brand .nav-logo{font-size:1.05rem}
+      .footer-brand p{font-size:0.78rem;margin-top:0.4rem}
+      .footer-bottom{flex-direction:row;justify-content:center;gap:0.75rem;text-align:center;font-size:0.75rem}
       .footer-brand p{max-width:100%}
       .dash-stats{grid-template-columns:1fr 1fr}
       .dash-grid{grid-template-columns:1fr}
@@ -333,7 +334,7 @@
       .section-sub{text-align:center}
       .vp-card{padding:1.25rem}
       .pricing-card{padding:1.25rem}
-      .auth-card{padding:1.5rem;margin:0 0.5rem}
+      .auth-card{padding:1.5rem 1.25rem;margin:0}.auth-page{padding:4rem 1rem 2rem}.auth-field input,.auth-field select{font-size:1rem;padding:0.85rem 0.75rem}
       .auth-oauth{grid-template-columns:1fr}
       .models-toolbar{flex-direction:column;gap:0.75rem}
       .models-toolbar input,.models-toolbar select{width:100%}
@@ -396,6 +397,7 @@
           </div></div>
         </div>
     </div>
+    <a class="theme-toggle mobile-theme-btn" onclick="toggleTheme()" id="mobileThemeBtn" title="Toggle theme">🌙</a>
     <button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
   </div></nav>
 
@@ -407,7 +409,7 @@
     <a onclick="showPage('models');closeMobile()">AI Models</a>
     <a onclick="showPage('apikeys');closeMobile()">API / Dev</a>
     <div class="m-section">
-      <div class="m-theme"><span>🌙 Dark Mode</span><button class="toggle-switch" onclick="toggleTheme()"></button></div>
+      <!-- Theme toggle removed — redundant with navbar toggle -->
       <div id="mGuest">
         <div class="m-btns">
           <a class="m-outline" onclick="showPage('login');closeMobile()">Login</a>
@@ -574,7 +576,6 @@
     <h2>Create Account</h2><p class="sub">Start using 100+ AI models</p>
     <div class="auth-field"><label>Full Name</label><input type="text" id="regName" placeholder="Your name"></div>
     <div class="auth-field"><label>Email</label><input type="email" id="regEmail" placeholder="you@example.com"></div>
-    <div class="auth-field"><label>Country</label><select id="regCountry" style="width:100%;padding:0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.95rem"><option value="">Select country</option><option value="GH">Ghana</option><option value="NG">Nigeria</option><option value="KE">Kenya</option><option value="ZA">South Africa</option><option value="US">United States</option><option value="UK">United Kingdom</option><option value="other">Other</option></select></div>
     <div class="auth-field"><label>Password</label><input type="password" id="regPassword" placeholder="Min 6 characters"></div>
     <div class="auth-field"><label>Confirm Password</label><input type="password" id="regConfirm" placeholder="Confirm"></div>
     <button class="btn-primary" style="width:100%" onclick="registerUser()">Create Account</button>
@@ -821,9 +822,7 @@
       h.className=isDark?'light':'dark';
       localStorage.setItem('gt_theme',h.className);
       document.getElementById('themeBtn').textContent=h.className==='dark'?'🌙':'☀️';
-      // Sync mobile theme text
-      const mobileThemeEl = document.querySelector('.mobile-theme span');
-      if(mobileThemeEl) mobileThemeEl.textContent = h.className==='dark'?'🌙 Dark Mode':'☀️ Light Mode';
+      // Mobile theme toggle now uses the navbar button — no overlay sync needed
     }
 
     // ── API Helper (with demo fallback) ──
@@ -1000,7 +999,7 @@
       const email=document.getElementById('regEmail').value;
       const pass=document.getElementById('regPassword').value;
       const confirm=document.getElementById('regConfirm').value;
-      const country=document.getElementById('regCountry').value;
+      const country='';
       if(!name||!email||!pass){showToast('Fill all fields','error');return}
       if(pass!==confirm){showToast('Passwords dont match','error');return}
       try{
@@ -1220,19 +1219,67 @@
     function renderModelCards(models){
       const grid=document.getElementById('modelGrid');
       if(!grid)return;
-      grid.innerHTML=models.map(m=>`
-        <div class="model-card">
-          <div class="provider">${m.provider}</div>
-          <h4>${m.model_id}</h4>
-          ${m.version?`<span class="version">v${m.version}</span>`:''}
-          ${m.description?`<div class="desc">${m.description}</div>`:`<div class="desc">${m.name||''}</div>`}
-          <div class="meta">
-            <span>📐 ${(m.context_length/1000).toFixed(0)}K ctx</span>
-            <span>🏷️ ${m.category||'General'}</span>
+      // Group by provider
+      const groups = {};
+      models.forEach(m => {
+        const p = m.provider || 'Other';
+        if (!groups[p]) groups[p] = [];
+        groups[p].push(m);
+      });
+      let html = '';
+      const providerOrder = ['OpenAI','Anthropic','Google','Meta Llama','DeepSeek','Mistral','Qwen','Cohere','Perplexity','X AI','Amazon','Nvidia','NousResearch','Microsoft'];
+      providerOrder.forEach(p => {
+        if (groups[p]) {
+          html += \`<div class="model-group-header"><span class="arrow">▶</span><span class="name">\${p}</span><span class="count">\${groups[p].length} models</span></div>
+                    <div class="model-group-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1rem">\`;
+          html += groups[p].map(m => \`
+            <div class="model-card">
+              <div class="provider">\${m.provider}</div>
+              <h4>\${m.model_id}</h4>
+              \${m.version?\`<span class="version">v\${m.version}</span>\`:''}
+              \${m.description?\`<div class="desc">\${m.description}</div>\`:\`<div class="desc">\${m.name||''}</div>\`}
+              <div class="meta">
+                <span>📐 \${(m.context_length/1000).toFixed(0)}K ctx</span>
+                <span>🏷️ \${m.category||'General'}</span>
+              </div>
+              <div class="price">\$\${(m.prompt_price*1000).toFixed(4)} <span>/1K input · \$\${(m.completion_price*1000).toFixed(4)} /1K output</span></div>
+            </div>
+          \`).join('');
+          html += '</div>';
+          delete groups[p];
+        }
+      });
+      // Remaining providers
+      Object.keys(groups).forEach(p => {
+        html += \`<div class="model-group-header"><span class="arrow">▶</span><span class="name">\${p}</span><span class="count">\${groups[p].length} models</span></div>
+                  <div class="model-group-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1rem">\`;
+        html += groups[p].map(m => \`
+          <div class="model-card">
+            <div class="provider">\${m.provider}</div>
+            <h4>\${m.model_id}</h4>
+            \${m.version?\`<span class="version">v\${m.version}</span>\`:''}
+            \${m.description?\`<div class="desc">\${m.description}</div>\`:\`<div class="desc">\${m.name||''}</div>\`}
+            <div class="meta">
+              <span>📐 \${(m.context_length/1000).toFixed(0)}K ctx</span>
+              <span>🏷️ \${m.category||'General'}</span>
+            </div>
+            <div class="price">\$\${(m.prompt_price*1000).toFixed(4)} <span>/1K input · \$\${(m.completion_price*1000).toFixed(4)} /1K output</span></div>
           </div>
-          <div class="price">$${(m.prompt_price*1000).toFixed(4)} <span>/1K input · $${(m.completion_price*1000).toFixed(4)} /1K output</span></div>
-        </div>
-      `).join('');
+        \`).join('');
+        html += '</div>';
+      });
+      grid.innerHTML = html;
+      // Add click toggle for group headers
+      grid.querySelectorAll('.model-group-header').forEach(h => {
+        h.addEventListener('click', function(){
+          const body = this.nextElementSibling;
+          const arrow = this.querySelector('.arrow');
+          if (body) {
+            body.style.display = body.style.display === 'none' ? 'grid' : 'none';
+            if (arrow) arrow.classList.toggle('open');
+          }
+        });
+      });
     }
     function filterModelCards(){
       const q=document.getElementById('modelSearch').value.toLowerCase();
