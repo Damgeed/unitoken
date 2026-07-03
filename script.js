@@ -653,6 +653,8 @@
       msgs.appendChild(userDiv);
       input.value = '';
       input.style.height = 'auto';
+      // Keep keyboard open on mobile — refocus input
+      if(window.innerWidth<=768)setTimeout(()=>input.focus(),0);
       msgs.scrollTop = msgs.scrollHeight;
       // Disable button
       const btn = document.getElementById('aiSendBtn');

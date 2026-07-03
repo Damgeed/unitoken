@@ -133,7 +133,7 @@
     /* Custom slider styling */
     input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:2px solid var(--card);box-shadow:0 0 6px hsla(44 96% 52% / 0.4)}
     input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:2px solid var(--card);box-shadow:0 0 6px hsla(44 96% 52% / 0.4)}
-    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 1.25rem 2rem}
+    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1.25rem 2rem}
     .auth-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem}
     .auth-card h2{font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;text-align:center}
     .auth-card .sub{font-size:0.9rem;color:var(--text-secondary);text-align:center;margin-bottom:1.75rem}
@@ -182,7 +182,7 @@
     .dash-activity{display:flex;flex-direction:column;gap:0.75rem}
     .dash-activity-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border-light);font-size:0.85rem}
     /* Models grid */
-    .models-page{padding:6rem 1.25rem 3rem}
+    .models-page{padding:2rem 1.25rem 3rem}
     .models-toolbar{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
     .models-toolbar input{flex:1;min-width:200px;padding:0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem}
     .models-toolbar input:focus{outline:none;border-color:var(--primary)}
@@ -205,7 +205,7 @@
     .model-group-header .name{font-weight:600;font-size:0.95rem;flex:1}
     .model-group-header .count{font-size:0.8rem;color:var(--text-muted)}
     .model-group-body{display:block}
-    .topup-page{padding:6rem 1.25rem 3rem}
+    .topup-page{padding:2rem 1.25rem 3rem}
     .topup-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
     .topup-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;transition:all 0.2s;cursor:pointer}
     .topup-card:hover,.topup-card.selected{border-color:var(--primary);box-shadow:var(--shadow-hover)}
@@ -230,13 +230,13 @@
     .payment-opt .pm-info{flex:1}
     .payment-opt .pm-info h4{font-size:0.95rem;font-weight:600;margin-bottom:0.15rem}
     .payment-opt .pm-info p{font-size:0.8rem;color:var(--text-muted);margin:0}
-    .apikey-page{padding:6rem 1.25rem 3rem}
+    .apikey-page{padding:2rem 1.25rem 3rem}
     .api-key-card{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem}
     .api-key-card .key-info .key-name{font-weight:600;font-size:0.9rem}
     .api-key-card .key-info .key-val{font-family:monospace;font-size:0.85rem;color:var(--primary);margin-top:0.15rem;word-break:break-all}
     .api-key-card .key-info .meta{font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem}
     .api-key-card .key-actions{display:flex;gap:0.5rem}
-    .history-page{padding:6rem 1.25rem 3rem}
+    .history-page{padding:2rem 1.25rem 3rem}
     .tx-tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid var(--border)}
     .tx-tab{padding:0.75rem 1.25rem;font-size:0.9rem;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
     .tx-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
@@ -385,7 +385,7 @@
       .section-sub{text-align:center}
       .vp-card{padding:1.25rem}
       .pricing-card{padding:1.25rem}
-      .auth-card{padding:1.5rem 1.25rem;margin:0}.auth-page{padding:4rem 1rem 2rem}.auth-field input,.auth-field select{font-size:1rem;padding:0.85rem 0.75rem}
+      .auth-card{padding:1.5rem 1.25rem;margin:0}.auth-page{padding:1rem 1rem 2rem}.auth-field input,.auth-field select{font-size:1rem;padding:0.85rem 0.75rem}
       .auth-oauth{grid-template-columns:1fr 1fr}
       .models-toolbar{flex-direction:column;gap:0.75rem}
       .models-toolbar input,.models-toolbar select{width:100%}
