@@ -700,26 +700,34 @@
       if(pageId==='history'&&token)loadTx();
       if(pageId==='models')loadModels();
     });
-    // ── Mobile Chat: scroll into view + hide heading on focus ──
+    // ── Mobile Chat: floating popup on focus ──
     function openMobileChat(){
       if(window.innerWidth>768)return;
       const section=document.querySelector('.ai-chat-section');
       if(section){
         section.classList.add('chat-focused');
-        // Align top of chat with bottom of fixed navbar (56px)
-        const rect=section.getBoundingClientRect();
-        const offset=window.scrollY+rect.top-56;
-        window.scrollTo({top:offset,behavior:'smooth'});
-        // After a brief delay, scroll messages to bottom
+        // Add close button if not exists
+        if(!document.querySelector('.chat-focused-close')){
+          const btn=document.createElement('button');
+          btn.className='chat-focused-close';
+          btn.innerHTML='✕';
+          btn.onclick=closeMobileChat;
+          section.querySelector('.ai-chat-inner').appendChild(btn);
+        }
+        // Prevent body scroll
+        document.body.style.overflow='hidden';
         setTimeout(()=>{
           const msgs=document.getElementById('aiChatMsgs');
           if(msgs)msgs.scrollTop=msgs.scrollHeight;
-        },400);
+        },200);
       }
     }
     function closeMobileChat(){
       const section=document.querySelector('.ai-chat-section');
       if(section)section.classList.remove('chat-focused');
+      document.body.style.overflow='';
+      const btn=document.querySelector('.chat-focused-close');
+      if(btn)btn.remove();
     }
     // ── Support Chat (floating) ──
     function toggleChat(){document.getElementById('chatWindow').classList.toggle('open')}
