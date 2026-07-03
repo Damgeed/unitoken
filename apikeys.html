@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>API Keys — GlbTOKEN</title>
-  <meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
+  <title>API Docs — GlbTOKEN</title>
+  <meta name="description" content="GlbTOKEN API documentation. OpenAI-compatible endpoint for 100+ AI models." />
   <meta name="theme-color" content="#0A0B14" id="metaTheme" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -17,11 +16,11 @@
 <nav class="navbar"><div class="container navbar-inner">
     <a href="/glbtoken/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a>
     <div class="nav-center" id="navCenter">
-      <a href="index.html" class="active">Home</a>
+      <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
       <a href="how.html">How It Works</a>
       <a href="models.html">AI Models</a>
-      <a href="apikeys.html" class="active" id="navApiLink">API / Dev</a>
+      <a href="apikeys.html" class="active" id="navApiLink">API Docs</a>
       <a href="dashboard.html" id="navDashLink" style="display:none">Dashboard</a>
     </div>
     <div class="nav-right">
@@ -58,7 +57,7 @@
     <a class="theme-toggle-mobile" onclick="toggleTheme()" id="themeBtnMobile" title="Toggle theme">🌙</a>
     <button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
     </div>
-  </div></nav>
+    </div></nav>
   </div></nav>
   <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobile()"></div>
   <div class="mobile-overlay" id="mobileOverlay">
@@ -68,7 +67,7 @@
     <a href="pricing.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Pricing</a>
     <a href="how.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V4a2 2 0 012-2h8.5L20 7.5V20a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg> How It Works</a>
     <a href="models.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> AI Models</a>
-    <a href="apikeys.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> API / Dev</a>
+    <a href="apikeys.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> API Docs</a>
     <a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
     <hr>
     <div class="m-section-label">Account</div>
@@ -82,40 +81,273 @@
       <a href="#" onclick="logoutUser();closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sign Out</a>
     </div>
   </div>
-<div class="mobile-overlay" id="mobileOverlay">
-    <a href="index.html" onclick="closeMobile()">Home</a>
-    <a href="pricing.html" onclick="closeMobile()">Pricing</a>
-    <a href="how.html" onclick="closeMobile()">How It Works</a>
-    <a href="models.html" onclick="closeMobile()">AI Models</a>
-    <a href="apikeys.html" onclick="closeMobile()">API / Dev</a>
-    <a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none">Dashboard</a>
-    <hr>
-    <div class="mobile-auth-grid">
-      <a href="login.html" onclick="closeMobile()" id="mobileLoginLink" class="mobile-auth-btn mobile-auth-btn-outline">Login</a>
-      <a href="register.html" onclick="closeMobile()" id="mobileRegisterLink" class="mobile-auth-btn mobile-auth-btn-primary">Get Started</a>
-    </div>
-    <div id="mobileUserSection" style="display:none">
-      <a href="dashboard.html" onclick="closeMobile()">Dashboard</a>
-      <a href="topup.html" onclick="closeMobile()">Buy Tokens</a>
-      <a href="#" onclick="logoutUser();closeMobile()">Sign Out</a>
-    </div>
-  </div>
-<div class="apikey-page"><div class="container" style="max-width:750px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
-        <div><span class="section-label">Developer</span><h2 class="section-title" style="font-size:1.75rem">API Keys</h2><p style="font-size:0.85rem;color:var(--text-secondary)">OpenRouter-compatible endpoint. 100+ models.</p></div>
-        <button class="btn-primary" onclick="showCreateKeyModal()">+ New Key</button>
-      </div>
-      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
-        <button class="sort-btn" onclick="sortKeys('newest')">↓ Newest</button>
-        <button class="sort-btn" onclick="sortKeys('oldest')">↑ Oldest</button>
-        <button class="sort-btn" onclick="sortKeys('name')">A-Z</button>
-        <button class="sort-btn" onclick="sortKeys('usage')">📊 Usage</button>
-      </div>
-      <div class="dash-card" id="keyList"></div>
-    </div></div>
+
+<div class="apikey-page"><div class="container" style="max-width:900px">
+  <div style="text-align:center;margin-bottom:2.5rem">
+    <span class="section-label">Developer</span>
+    <h2 class="section-title" style="font-size:2rem">API Documentation</h2>
+    <p style="color:var(--text-secondary);max-width:600px;margin:0.5rem auto 0">OpenAI-compatible endpoint. One API key for 100+ models. Integrate in minutes.</p>
   </div>
 
-  <!-- HISTORY -->
+  <!-- API Key Management -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:600">🔑 Your API Keys</h3>
+        <p style="font-size:0.85rem;color:var(--text-secondary)">Create and manage API keys from your Dashboard</p>
+      </div>
+      <button class="btn-primary" onclick="window.location.href='dashboard.html'">Manage Keys →</button>
+    </div>
+    <div id="keyList"></div>
+    <div id="loginPrompt" style="text-align:center;padding:2rem 1rem">
+      <p style="color:var(--text-muted);margin-bottom:1rem">Sign in to generate and manage your API keys</p>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <a class="nav-btn" href="login.html" style="padding:0.75rem 2rem">Sign In</a>
+        <a class="nav-btn-outline" href="register.html" style="padding:0.75rem 2rem">Create Account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="dash-card" style="margin-bottom:2rem" id="quickstart">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🚀 Quick Start</h3>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem">
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Use the OpenAI Python SDK with your GlbTOKEN API key:</p>
+      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--text-muted)"># pip install openai</span>
+<span style="color:var(--primary)">from</span> openai <span style="color:var(--primary)">import</span> OpenAI
+
+client = OpenAI(
+  api_key=<span style="color:var(--text-muted)">"sk-glt_..."</span>,
+  base_url=<span style="color:var(--text-muted)">"https://glbtoken-api.onrender.com/api/proxy"</span>
+)
+
+response = client.chat.completions.create(
+  model=<span style="color:var(--text-muted)">"gpt-4o-mini"</span>,
+  messages=[
+    {<span style="color:var(--text-muted)">"role"</span>: <span style="color:var(--text-muted)">"user"</span>, <span style="color:var(--text-muted)">"content"</span>: <span style="color:var(--text-muted)">"Hello!"</span>}
+  ]
+)
+print(response.choices[0].message.content)</pre>
+    </div>
+  </div>
+
+  <!-- Base URL -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🌐 Base URL</h3>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:0.75rem;font-family:monospace;font-size:0.9rem;color:var(--primary);word-break:break-all">https://glbtoken-api.onrender.com/api/proxy</div>
+    <p style="font-size:0.85rem;color:var(--text-secondary)">This endpoint is fully compatible with the OpenAI SDK. Just change the <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">base_url</code> and your <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">api_key</code>.</p>
+  </div>
+
+  <!-- Authentication -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🔐 Authentication</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">All API requests require an API key passed via the <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">Authorization</code> header:</p>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:0.75rem;font-family:monospace;font-size:0.85rem;color:var(--text)">Authorization: Bearer sk-glt_&lt;your_api_key&gt;</div>
+    <p style="font-size:0.85rem;color:var(--text-muted)">Generate your first API key from the <a href="dashboard.html" style="color:var(--primary)">Dashboard</a> after signing up.</p>
+  </div>
+
+  <!-- Available Models -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🤖 Available Models</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">List all available models with pricing:</p>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
+      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/models \
+  -H <span style="color:var(--text-muted)">"Authorization: Bearer sk-glt_..."</span></pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-muted)">Or browse all models on the <a href="models.html" style="color:var(--primary)">AI Models</a> page.</p>
+  </div>
+
+  <!-- Chat Completions -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">💬 Chat Completions</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Send a chat completion request (OpenAI-compatible):</p>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
+      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/v1/chat/completions \
+  -H <span style="color:var(--text-muted)">"Content-Type: application/json"</span> \
+  -H <span style="color:var(--text-muted)">"Authorization: Bearer sk-glt_..."</span> \
+  -d '{
+    <span style="color:var(--text-muted)">"model"</span>: <span style="color:var(--text-muted)">"gpt-4o-mini"</span>,
+    <span style="color:var(--text-muted)">"messages"</span>: [
+      {<span style="color:var(--text-muted)">"role"</span>: <span style="color:var(--text-muted)">"system"</span>, <span style="color:var(--text-muted)">"content"</span>: <span style="color:var(--text-muted)">"You are a helpful assistant."</span>},
+      {<span style="color:var(--text-muted)">"role"</span>: <span style="color:var(--text-muted)">"user"</span>, <span style="color:var(--text-muted)">"content"</span>: <span style="color:var(--text-muted)">"What is GlbTOKEN?"</span>}
+    ],
+    <span style="color:var(--text-muted)">"temperature"</span>: 0.7,
+    <span style="color:var(--text-muted)">"max_tokens"</span>: 1000
+  }'</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-muted)">All parameters from the OpenAI API are supported: <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">stream</code>, <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">frequency_penalty</code>, <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">top_p</code>, etc.</p>
+  </div>
+
+  <!-- Streaming -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">⚡ Streaming</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Server-Sent Events (SSE) streaming is fully supported:</p>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
+      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">from</span> openai <span style="color:var(--primary)">import</span> OpenAI
+
+client = OpenAI(
+  api_key=<span style="color:var(--text-muted)">"sk-glt_..."</span>,
+  base_url=<span style="color:var(--text-muted)">"https://glbtoken-api.onrender.com/api/proxy"</span>
+)
+
+stream = client.chat.completions.create(
+  model=<span style="color:var(--text-muted)">"gpt-4o-mini"</span>,
+  messages=[{<span style="color:var(--text-muted)">"role"</span>: <span style="color:var(--text-muted)">"user"</span>, <span style="color:var(--text-muted)">"content"</span>: <span style="color:var(--text-muted)">"Tell me a story"</span>}],
+  stream=<span style="color:var(--primary)">True</span>
+)
+<span style="color:var(--primary)">for</span> chunk <span style="color:var(--primary)">in</span> stream:
+    <span style="color:var(--primary)">if</span> chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end=<span style="color:var(--text-muted)">""</span>)</pre>
+    </div>
+  </div>
+
+  <!-- Node.js Example -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🟩 Node.js Example</h3>
+    <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem">
+      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">import</span> OpenAI <span style="color:var(--primary)">from</span> <span style="color:var(--text-muted)">"openai"</span>;
+
+<span style="color:var(--primary)">const</span> client = <span style="color:var(--primary)">new</span> OpenAI({
+  apiKey: <span style="color:var(--text-muted)">"sk-glt_..."</span>,
+  baseURL: <span style="color:var(--text-muted)">"https://glbtoken-api.onrender.com/api/proxy"</span>
+});
+
+<span style="color:var(--primary)">const</span> completion = <span style="color:var(--primary)">await</span> client.chat.completions.create({
+  model: <span style="color:var(--text-muted)">"gpt-4o-mini"</span>,
+  messages: [{ role: <span style="color:var(--text-muted)">"user"</span>, content: <span style="color:var(--text-muted)">"Hello!"</span> }]
+});
+console.log(completion.choices[0].message.content);</pre>
+    </div>
+  </div>
+
+  <!-- Pricing Info -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">💰 Token Pricing</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Each API call consumes GlbTOKENs based on the model used. Prices vary by model capability:</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);color:var(--text-muted)">
+            <th style="text-align:left;padding:0.625rem 0.75rem">Model</th>
+            <th style="text-align:right;padding:0.625rem 0.75rem">Price per 1K tokens</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">GPT-4o Mini</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">0.5 GT</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">GPT-4o</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">5 GT</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">Claude 3.5 Sonnet</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">6 GT</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">DeepSeek V3</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">1 GT</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">Llama 4 Maverick</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">0.8 GT</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.75rem">Full pricing: <a href="pricing.html" style="color:var(--primary)">Pricing page</a> | 1,000 GT = $1 USD</p>
+  </div>
+
+  <!-- Error Codes -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">⚠️ Error Codes</h3>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);color:var(--text-muted)">
+            <th style="text-align:left;padding:0.625rem 0.75rem">Code</th>
+            <th style="text-align:left;padding:0.625rem 0.75rem">Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--destructive)">401</td>
+            <td style="padding:0.5rem 0.75rem;color:var(--text-secondary)">Invalid or missing API key</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--destructive)">402</td>
+            <td style="padding:0.5rem 0.75rem;color:var(--text-secondary)">Insufficient token balance</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--destructive)">404</td>
+            <td style="padding:0.5rem 0.75rem;color:var(--text-secondary)">Model not found or not available</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem 0.75rem;color:var(--destructive)">429</td>
+            <td style="padding:0.5rem 0.75rem;color:var(--text-secondary)">Rate limited — slow down requests</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Best Practices -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">✅ Best Practices</h3>
+    <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.8;padding-left:1.25rem">
+      <li><strong style="color:var(--text)">Rotate keys regularly</strong> — Generate new API keys from your Dashboard and revoke old ones.</li>
+      <li><strong style="color:var(--text)">Use separate keys per project</strong> — Helps track usage and limit blast radius.</li>
+      <li><strong style="color:var(--text)">Set max tokens</strong> — Always set <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">max_tokens</code> to control costs.</li>
+      <li><strong style="color:var(--text)">Monitor usage</strong> — Check your Dashboard for real-time token consumption.</li>
+      <li><strong style="color:var(--text)">Handle 402 errors</strong> — Top up before your balance runs out to avoid service interruption.</li>
+    </ul>
+  </div>
+
+  <!-- Rate Limits -->
+  <div class="dash-card" style="margin-bottom:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">📊 Rate Limits</h3>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Rate limits depend on your account tier:</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);color:var(--text-muted)">
+            <th style="text-align:left;padding:0.625rem 0.75rem">Tier</th>
+            <th style="text-align:right;padding:0.625rem 0.75rem">RPM</th>
+            <th style="text-align:right;padding:0.625rem 0.75rem">TPM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">Free (25K GT)</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">10</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">10,000</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">Starter</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">60</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">100,000</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem 0.75rem;color:var(--text)">Pro</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">300</td>
+            <td style="padding:0.5rem 0.75rem;text-align:right;color:var(--text-secondary)">1,000,000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Next Steps -->
+  <div class="dash-card" style="margin-bottom:2rem;text-align:center;padding:2rem">
+    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:1rem">Ready to Build?</h3>
+    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn-primary" onclick="window.location.href='register.html'" style="padding:0.75rem 2rem">Create Free Account →</button>
+      <button class="btn-secondary" onclick="window.location.href='dashboard.html'" style="padding:0.75rem 2rem">Go to Dashboard</button>
+    </div>
+  </div>
+</div></div>
+
 <footer><div class="container">
     <div class="footer-grid">
       <div class="footer-brand"><a href="/glbtoken/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a><p>Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges"><span class="trust-badge">💳 Stripe</span><span class="trust-badge">🔶 Paystack</span><span class="trust-badge">₿ USDT</span><span class="trust-badge">₿ BTC</span></div></div>
@@ -132,5 +364,27 @@
       <div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">Hi! I'm the GlbTOKEN assistant. Ask me about buying tokens, AI models, payments, or API keys.</div></div>
 
 <script src="script.js"></script>
+<script>
+// Auth check on page load
+document.addEventListener('DOMContentLoaded',function(){
+  const token=localStorage.getItem('gt_token');
+  const loginPrompt=document.getElementById('loginPrompt');
+  const keyList=document.getElementById('keyList');
+  if(token){
+    if(loginPrompt)loginPrompt.style.display='none';
+    // Show existing keys from localStorage
+    const keys=JSON.parse(localStorage.getItem('gt_api_keys')||'[]');
+    if(keyList){
+      if(keys.length===0){
+        keyList.innerHTML='<p style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.85rem">No API keys yet. Create one from your Dashboard.</p>';
+      }else{
+        keyList.innerHTML=keys.map(k=>'<div class="api-key-card"><div class="key-info"><div class="key-name">'+k.name+'</div><div class="key-val">'+k.key.slice(0,12)+'...'+k.key.slice(-4)+'</div><div class="meta">Created: '+new Date(k.created).toLocaleDateString()+'</div></div><div class="key-actions"><button class="sort-btn" onclick="navigator.clipboard.writeText(\''+k.key+'\');showToast(\'Copied!\',\'success\')">📋 Copy</button></div></div>').join('');
+      }
+    }
+  }else{
+    if(keyList)keyList.style.display='none';
+  }
+});
+</script>
 </body>
 </html>
