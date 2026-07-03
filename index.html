@@ -47,6 +47,7 @@
     .dropdown a{display:flex;align-items:center;gap:8px;padding:0.5rem 0.75rem;border-radius:6px;font-size:0.85rem;color:var(--text-secondary);transition:all 0.15s;cursor:pointer}
     .dropdown a:hover{background:var(--primary-subtle);color:var(--text)}
     .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none}
+.mobile-actions{display:none}
     .hamburger span{width:24px;height:2px;background:var(--text);border-radius:2px;transition:all 0.3s}
     .hero{min-height:85vh;display:flex;align-items:center;background:var(--hero-grad);position:relative;overflow:hidden}
     .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 50%,hsla(44 96% 52% / 0.07) 0%,transparent 60%),radial-gradient(ellipse at 70% 30%,hsla(44 96% 52% / 0.04) 0%,transparent 50%);pointer-events:none}
@@ -249,22 +250,6 @@
     .modal-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;position:relative}
     .modal-box h3{font-size:1.15rem;font-weight:600;margin-bottom:1rem}
     .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:4px;line-height:1}
-    .confirm-overlay{position:fixed;inset:0;z-index:200;background:hsla(224 44% 5% / 0.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;animation:fadeIn 0.2s ease}
-    .confirm-overlay.open{display:flex}
-    .confirm-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;max-width:420px;width:90%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.5);animation:scaleIn 0.25s ease}
-    .confirm-header{background:linear-gradient(135deg,var(--primary-subtle),transparent);padding:1.5rem 1.5rem 0.75rem;display:flex;align-items:center;gap:0.75rem}
-    .confirm-header .icon{width:40px;height:40px;border-radius:50%;background:rgba(244,180,0,0.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-    .confirm-header h3{font-size:1.05rem;font-weight:600;margin:0;color:var(--text)}
-    .confirm-body{padding:0.25rem 1.5rem 1.25rem}
-    .confirm-body p{color:var(--text-secondary);font-size:0.9rem;line-height:1.5;margin:0}
-    .confirm-footer{display:flex;gap:0.75rem;padding:1rem 1.5rem;border-top:1px solid var(--border);justify-content:flex-end}
-    .confirm-btn{display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.25rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.2s;border:none}
-    .confirm-btn.primary{background:var(--destructive);color:#fff}
-    .confirm-btn.primary:hover{background:#dc2626;transform:translateY(-1px)}
-    .confirm-btn.secondary{background:var(--bg-alt);color:var(--text-secondary);border:1px solid var(--border)}
-    .confirm-btn.secondary:hover{background:var(--border);color:var(--text)}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
     .sort-btn{display:flex;align-items:center;gap:6px;padding:0.5rem 0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text-secondary);font-size:0.8rem;cursor:pointer;transition:all 0.2s}
     .sort-btn:hover{border-color:var(--primary)}
     .badge{display:inline-flex;align-items:center;gap:4px;padding:0.15rem 0.5rem;border-radius:20px;font-size:0.7rem;font-weight:500}
@@ -273,21 +258,77 @@
     @media(max-width:900px){
       .hero-grid,.dash-grid,.vp-grid,.pricing-grid,.steps-grid{grid-template-columns:1fr}
       .hero h1{font-size:2.5rem}.hero-stats{gap:1.5rem}
-      .model-grid{grid-template-columns:1fr}
+      .model-grid{grid-template-columns:repeat(2,1fr)}
       .footer-grid{grid-template-columns:1fr 1fr}
       .nav-center{display:none}.hamburger{display:flex}
-      .nav-center.open{display:flex;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--border);padding:1rem;gap:0.75rem;z-index:100}
+      .nav-right .theme-toggle,.nav-right #navGuest,.nav-right #navUser{display:none!important}
+      .nav-center.open{display:flex;flex-direction:column;position:fixed;top:64px;left:0;right:0;bottom:0;background:var(--bg);border-bottom:1px solid var(--border);padding:1.5rem;gap:0.5rem;z-index:200;overflow-y:auto}
+      .nav-center.open a{font-size:1rem;padding:0.75rem;border-radius:var(--radius-sm);border-bottom:1px solid var(--border-light)}
+      .nav-center.open a:last-of-type{border-bottom:none}
+      .nav-center.open a:hover{background:var(--primary-subtle)}
+      .nav-center.open .mobile-actions{display:flex;flex-direction:column;gap:0.75rem;margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border)}
+      .nav-center.open .mobile-actions .mobile-theme{display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border)}
+      .nav-center.open .mobile-actions .mobile-theme span{font-size:0.9rem;font-weight:500;color:var(--text-secondary)}
+      .nav-center.open .mobile-actions .mobile-theme .toggle-switch{width:48px;height:28px;background:var(--border);border-radius:14px;position:relative;cursor:pointer;transition:background 0.3s;border:none;flex-shrink:0}
+      .nav-center.open .mobile-actions .mobile-theme .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--text);transition:transform 0.3s}
+      html.light .nav-center.open .mobile-actions .mobile-theme .toggle-switch{background:var(--primary)}
+      html.light .nav-center.open .mobile-actions .mobile-theme .toggle-switch::after{transform:translateX(20px)}
+      .nav-center.open .mobile-actions .mobile-login{display:flex;gap:0.75rem}
+      .nav-center.open .mobile-actions .mobile-login a{flex:1;text-align:center;padding:0.85rem;border-radius:var(--radius-sm);font-weight:600;font-size:0.95rem;transition:all 0.2s;border:none!important}
+      .nav-center.open .mobile-actions .mobile-login .m-btn-outline{background:transparent;border:1px solid var(--border)!important;color:var(--text)}
+      .nav-center.open .mobile-actions .mobile-login .m-btn-primary{background:var(--primary);color:#0A0B14;box-shadow:var(--primary-glow)}
+      .nav-center.open .mobile-actions .mobile-logged{display:flex;flex-direction:column;gap:0.5rem}
+      .nav-center.open .mobile-actions .mobile-logged .m-user{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border)}
+      .nav-center.open .mobile-actions .mobile-logged .m-user .m-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),hsl(44 96% 40%));display:flex;align-items:center;justify-content:center;font-weight:700;color:#0A0B14;flex-shrink:0}
+      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info{flex:1}
+      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info .m-name{font-size:0.9rem;font-weight:600}
+      .nav-center.open .mobile-actions .mobile-logged .m-user .m-info .m-email{font-size:0.75rem;color:var(--text-muted)}
+      .nav-center.open .mobile-actions .mobile-logged .m-user .m-bal{font-size:0.8rem;font-weight:600;color:var(--primary);padding:0.3rem 0.6rem;background:var(--primary-subtle);border-radius:6px}
+      .nav-center.open .mobile-actions .mobile-logged .m-btn-danger{width:100%;padding:0.85rem;text-align:center;border-radius:var(--radius-sm);background:var(--destructive);color:#fff;font-weight:600;font-size:0.9rem;border:none;transition:all 0.2s;cursor:pointer}
       .topup-grid{grid-template-columns:1fr}
       .chat-window{width:calc(100vw - 2rem);height:60vh;bottom:5rem;right:1rem}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
     }
     @media(max-width:600px){
       .hero h1{font-size:2rem}.hero-stats{flex-wrap:wrap;gap:1rem}
-      .hero-actions{flex-direction:column}
-      .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;text-align:center}
-      .footer-grid,.dash-stats{grid-template-columns:1fr}
-      .auth-card{padding:1.5rem}
+      .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+      .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;text-align:center;padding:0.75rem 1rem;font-size:0.9rem}
+      .model-grid{grid-template-columns:1fr}
+      .model-card{padding:1rem}
+      .model-card h4{font-size:0.85rem}
+      .model-card .meta{font-size:0.7rem;gap:0.5rem}
+      .footer-grid{grid-template-columns:1fr;gap:1.5rem}
+      .footer-grid .footer-col h4{margin-bottom:0.5rem}
+      .footer-grid .footer-col span{margin-bottom:0.35rem}
+      .footer-bottom{flex-direction:column;gap:0.75rem;text-align:center}
+      .footer-brand p{max-width:100%}
+      .dash-stats{grid-template-columns:1fr 1fr}
+      .dash-grid{grid-template-columns:1fr}
+      .dash-balance{padding:1.25rem}
+      .dash-balance .amount{font-size:2rem}
+      .section-title{font-size:1.75rem}
+      .vp-card{padding:1.25rem}
+      .pricing-card{padding:1.25rem}
+      .auth-card{padding:1.5rem;margin:0 0.5rem}
+      .auth-oauth{grid-template-columns:1fr}
+      .models-toolbar{flex-direction:column;gap:0.75rem}
+      .models-toolbar input,.models-toolbar select{width:100%}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr!important}
+      .hero-calc{max-width:100%}
+      .hero-calc{padding:1.25rem}
+      .calc-result .big{font-size:1.35rem}
+      .container{padding:0 1rem}
+      section{padding:3rem 0}
+      .nav-center.open .mobile-actions .mobile-login{flex-direction:column}
+    }
+    @media(max-width:400px){
+      .hero h1{font-size:1.65rem}
+      .hero-actions{grid-template-columns:1fr}
+      .hero-stats{flex-direction:column;gap:0.75rem}
+      .model-grid{grid-template-columns:1fr}
+      .dash-stats{grid-template-columns:1fr}
+      .trust-badges{gap:0.4rem}
+      .trust-badge{font-size:0.7rem;padding:0.25rem 0.5rem}
     }
   </style>
 </head>
@@ -300,6 +341,28 @@
       <a onclick="showPage('how')">How It Works</a>
       <a onclick="showPage('models')">AI Models</a>
       <a onclick="showPage('apikeys')">API / Dev</a>
+    </div>
+    <div class="mobile-actions" id="mobileActions">
+      <div class="mobile-theme"><span>🌙 Dark Mode</span><button class="toggle-switch" onclick="toggleTheme()"></button></div>
+      <div id="mobileGuest">
+        <div class="mobile-login">
+          <a class="m-btn-outline" onclick="showPage('login');toggleMobile()">Login</a>
+          <a class="m-btn-primary" onclick="showPage('register');toggleMobile()">Get Started</a>
+        </div>
+      </div>
+      <div id="mobileUser" style="display:none">
+        <div class="mobile-logged">
+          <div class="m-user">
+            <div class="m-avatar" id="mobileAvatar">U</div>
+            <div class="m-info">
+              <div class="m-name" id="mobileName">User</div>
+              <div class="m-email" id="mobileEmail">user@email.com</div>
+            </div>
+            <div class="m-bal" id="mobileBalance">0</div>
+          </div>
+          <button class="m-btn-danger" onclick="logoutUser()">🚪 Sign Out</button>
+        </div>
+      </div>
     </div>
     <div class="nav-right">
         <a class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</a>
@@ -721,6 +784,9 @@
       h.className=isDark?'light':'dark';
       localStorage.setItem('gt_theme',h.className);
       document.getElementById('themeBtn').textContent=h.className==='dark'?'🌙':'☀️';
+      // Sync mobile theme text
+      const mobileThemeEl = document.querySelector('.mobile-theme span');
+      if(mobileThemeEl) mobileThemeEl.textContent = h.className==='dark'?'🌙 Dark Mode':'☀️ Light Mode';
     }
 
     // ── API Helper (with demo fallback) ──
@@ -940,6 +1006,9 @@
       const loggedIn=!!token;
       document.getElementById('navGuest').style.display=loggedIn?'none':'flex';
       document.getElementById('navUser').style.display=loggedIn?'flex':'none';
+      // Mobile menu sync
+      document.getElementById('mobileGuest').style.display=loggedIn?'none':'block';
+      document.getElementById('mobileUser').style.display=loggedIn?'block':'none';
       if(loggedIn&&userData.name){
         document.getElementById('dashUserName').textContent=userData.name||'User';
         const initial=(userData.name||'U')[0].toUpperCase();
@@ -952,12 +1021,17 @@
         if (dropdown) av.appendChild(dropdown);
         document.getElementById('dropName').textContent=userData.name||'User';
         document.getElementById('dropEmail').textContent=userData.email||'';
+        // Mobile sync
+        document.getElementById('mobileAvatar').textContent=initial;
+        document.getElementById('mobileName').textContent=userData.name||'User';
+        document.getElementById('mobileEmail').textContent=userData.email||'';
       }
       updateBalance();
     }
     function updateBalance(){
       const b=userData.token_balance||0;
       document.getElementById('navBalance').textContent=b.toLocaleString()+' Tokens';
+      document.getElementById('mobileBalance').textContent=b.toLocaleString();
       const db=document.getElementById('dashBalance');
       if(db)db.textContent=b.toLocaleString();
       const du=document.getElementById('dashUsd');
@@ -1160,8 +1234,7 @@
       try{await api('PUT',`/api/keys/${id}`,{is_active:!key.is_active});loadKeys()}catch(e){showToast(e.message,'error')}
     }
     async function deleteKey(id){
-      const confirmed = await showConfirm('Delete API Key', 'Delete this API key? This cannot be undone.', 'Delete Key');
-      if(!confirmed)return;
+      if(!confirm('Delete this API key? This cannot be undone.'))return;
       try{await api('DELETE',`/api/keys/${id}`);loadKeys();showToast('Key deleted','info')}catch(e){showToast(e.message,'error')}
     }
     function sortKeys(mode){
@@ -1202,30 +1275,6 @@
       msgs.scrollTop=msgs.scrollHeight;
     }
 
-    // ── Custom Confirm Modal ──
-    function showConfirm(title, message, okLabel){
-      return new Promise(resolve => {
-        const overlay = document.getElementById('confirmOverlay');
-        document.getElementById('confirmTitle').textContent = title;
-        document.getElementById('confirmMessage').textContent = message;
-        const okBtn = document.getElementById('confirmOkBtn');
-        okBtn.textContent = okLabel || 'Yes, Continue';
-        overlay.classList.add('open');
-        function cleanup(){
-          overlay.classList.remove('open');
-          okBtn.onclick = null;
-          document.getElementById('confirmCancelBtn').onclick = null;
-          overlay.onclick = null;
-        }
-        okBtn.onclick = () => { cleanup(); resolve(true); };
-        document.getElementById('confirmCancelBtn').onclick = () => { cleanup(); resolve(false); };
-        overlay.onclick = (e) => { if(e.target === overlay) { cleanup(); resolve(false); } };
-        document.addEventListener('keydown', function handler(e){
-          if(e.key === 'Escape'){ cleanup(); resolve(false); document.removeEventListener('keydown', handler); }
-        });
-      });
-    }
-
     // ── Toast ──
     function showToast(msg,type){
       const t=document.getElementById('toast');
@@ -1234,23 +1283,12 @@
     }
     function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
     function toggleMobile(){document.getElementById('navCenter').classList.toggle('open')}
+    // Auto-close mobile menu on link click
+    document.getElementById('navCenter').addEventListener('click', function(e){
+      if(e.target.tagName==='A' || e.target.closest('.mobile-login a')) {
+        this.classList.remove('open');
+      }
+    });
   </script>
-  <!-- Confirm Modal -->
-  <div class="confirm-overlay" id="confirmOverlay">
-    <div class="confirm-box">
-      <div class="confirm-header">
-        <div class="icon">⚠️</div>
-        <h3 id="confirmTitle">Confirm</h3>
-      </div>
-      <div class="confirm-body">
-        <p id="confirmMessage">Are you sure?</p>
-      </div>
-      <div class="confirm-footer">
-        <button class="confirm-btn secondary" id="confirmCancelBtn">Cancel</button>
-        <button class="confirm-btn primary" id="confirmOkBtn">Yes, Continue</button>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
