@@ -476,7 +476,7 @@ function switchLanguage(lang) {
     var n = walker.currentNode;
     if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.lang-selector,.lang-menu,.lang-btn-mobile,.chat-window,.stars-bg,.footer-bottom,script,style,svg,code,pre')) continue;
     var t = n.textContent.trim();
-    if(!t || t.length <= 1 || /^[\d\s\W]+$/.test(t) || /GlbTOKEN|Glb[^a-z]|TOKEN[^a-z]|^[A-Z\s]{3,}$/.test(t) || n.parentNode.closest('[data-gt-old]')) continue;
+    if(!t || t.length <= 1 || /^[\d\s\W]+$/.test(t) || n.parentNode.closest('[data-gt-old]')) continue;
     texts.push(t);
     els.push(n);
   }
@@ -493,10 +493,15 @@ function switchLanguage(lang) {
       if(d && d[0]){
         for(var i = 0; i < d[0].length && i < batchEls.length; i++){
           if(d[0][i] && d[0][i][0]){
+            var orig = batchEls[i].textContent;
             if(!batchEls[i].parentNode.hasAttribute('data-gt-old')){
-              batchEls[i].parentNode.setAttribute('data-gt-old', batchEls[i].textContent);
+              batchEls[i].parentNode.setAttribute('data-gt-old', orig);
             }
-            batchEls[i].textContent = d[0][i][0];
+            var translated = d[0][i][0];
+            if(/GlbTOKEN/i.test(orig) || /Glb[^a-z]/i.test(orig) || /TOKEN[^a-z]/i.test(orig)){
+              translated = orig;
+            }
+            batchEls[i].textContent = translated;
           }
         }
       }
