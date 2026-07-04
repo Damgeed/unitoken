@@ -420,6 +420,7 @@
       .topup-page{padding:1rem 0 1.5rem}
       .history-page{padding:1rem 0 1.5rem}
       .dash-page .container,.apikey-page .container,.history-page .container,.models-page .container,.topup-page .container{max-width:100%!important;padding:0 1rem!important;margin-top:0!important}
+      .dash-page,.topup-page,.models-page,.history-page,.apikey-page,.auth-page,.pricing-page,.notif-page{overflow-wrap:break-word;word-break:break-word}
       .dash-page .dash-card{padding:1rem}
       .apikey-page .dash-card,.history-page .dash-card{padding:1rem}
       .dash-stats{grid-template-columns:1fr 1fr}
