@@ -134,7 +134,7 @@
           <button class="btn-secondary" onclick="showPage('how')">How It Works</button>
         </div>
         <div class="hero-stats">
-          <div class="hero-stat"><h3>30+</h3><p>Models</p></div>
+          <div class="hero-stat"><h3>100+</h3><p>Models</p></div>
           <div class="hero-stat"><h3>56</h3><p>Providers</p></div>
           <div class="hero-stat"><h3>3</h3><p>Payments</p></div>
         </div>
@@ -330,11 +330,10 @@ function switchLanguage(lang) {
     var n = walker.currentNode;
     if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.lang-selector,.lang-menu,.lang-btn-mobile,.chat-window,.stars-bg,.footer-bottom,script,style,svg,code,pre')) continue;
     var t = n.textContent.trim();
-    if(t && t.length > 1 && !/^[\d\s\W]+$/.test(t) && !n.parentNode.closest('[data-gt-old]')){
-      texts.push(t);
-      els.push(n);
-      if(texts.length >= 50) break;
-    }
+    if(!t || t.length <= 1 || /^[\d\s\W]+$/.test(t) || /GlbTOKEN|Glb[^a-z]|TOKEN[^a-z]|^[A-Z\s]{3,}$/.test(t) || n.parentNode.closest('[data-gt-old]')) continue;
+    texts.push(t);
+    els.push(n);
+    if(texts.length >= 50) break;
   }
   if(!texts.length){ updateLangUI(lang); return; }
   var q = texts.join('\n---GT---\n');

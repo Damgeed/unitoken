@@ -224,11 +224,10 @@ function switchLanguage(lang) {
     var n = walker.currentNode;
     if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.lang-selector,.lang-menu,.lang-btn-mobile,.chat-window,.stars-bg,.footer-bottom,script,style,svg,code,pre')) continue;
     var t = n.textContent.trim();
-    if(t && t.length > 1 && !/^[\d\s\W]+$/.test(t) && !n.parentNode.closest('[data-gt-old]')){
-      texts.push(t);
-      els.push(n);
-      if(texts.length >= 50) break;
-    }
+    if(!t || t.length <= 1 || /^[\d\s\W]+$/.test(t) || /GlbTOKEN|Glb[^a-z]|TOKEN[^a-z]|^[A-Z\s]{3,}$/.test(t) || n.parentNode.closest('[data-gt-old]')) continue;
+    texts.push(t);
+    els.push(n);
+    if(texts.length >= 50) break;
   }
   if(!texts.length){ updateLangUI(lang); return; }
   var q = texts.join('\n---GT---\n');
