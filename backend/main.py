@@ -117,7 +117,7 @@ def send_email(to: str, subject: str, body: str):
     smtp_port = int(os.getenv("SMTP_PORT", "587"))
     smtp_user = os.getenv("SMTP_USER", "")
     smtp_pass = os.getenv("SMTP_PASS", "")
-    from_addr = os.getenv("SMTP_FROM", "noreply@glbtoken.io")
+    from_addr = os.getenv("SMTP_FROM", "noreply@glbtoken.com")
     if not smtp_host:
         print(f"📧 SMTP not configured. Would send email to {to}: {subject}")
         return
@@ -204,7 +204,7 @@ def google_auth_url():
     from urllib.parse import urlencode
     params = urlencode({
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": "https://glbtoken.io/auth/google/callback",
+        "redirect_uri": "https://glbtoken.com/auth/google/callback",
         "response_type": "code",
         "scope": "openid email profile",
     })
@@ -243,7 +243,7 @@ def github_auth_url():
     from urllib.parse import urlencode
     params = urlencode({
         "client_id": GITHUB_CLIENT_ID,
-        "redirect_uri": "https://glbtoken.io/auth/github/callback",
+        "redirect_uri": "https://glbtoken.com/auth/github/callback",
         "scope": "user:email",
     })
     return {"url": f"https://github.com/login/oauth/authorize?{params}"}
@@ -733,7 +733,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
         headers = {
             "Authorization": f"Bearer {fallback_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://glbtoken.io",
+            "HTTP-Referer": "https://glbtoken.com",
             "X-Title": "GlbTOKEN",
         }
         api_endpoint = "https://api.glbtoken.io/v1/chat/completions"

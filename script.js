@@ -234,7 +234,7 @@
     }
     async function oauthLoginFallback(provider){
       try{
-        const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':provider==='github'?'GitHub User':provider==='microsoft'?'Microsoft User':'Apple User',email:provider+'_user@glbtoken.io',password:'oauth_demo_123',country:''});
+        const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':provider==='github'?'GitHub User':provider==='microsoft'?'Microsoft User':'Apple User',email:provider+'_user@glbtoken.com',password:'oauth_demo_123',country:''});
         token=data.token;userData=data.user;
         localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
         applyAuth();showToast('Signed in with '+provider,'success');window.location.href='dashboard.html';
@@ -242,7 +242,7 @@
     }
     async function oauthRegisterFallback(provider){
       try{
-        const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':'GitHub User',email:provider+'_user@glbtoken.io',password:'oauth_demo_123',country:''});
+        const data=await api('POST','/api/auth/register',{name:provider==='google'?'Google User':'GitHub User',email:provider+'_user@glbtoken.com',password:'oauth_demo_123',country:''});
         token=data.token;userData=data.user;
         localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
         applyAuth();showToast('Account created with '+provider,'success');window.location.href='dashboard.html';
