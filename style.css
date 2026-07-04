@@ -453,6 +453,7 @@
       .calc-result .big{font-size:1.35rem}
       .container{padding:0 1rem}
       section{padding:1rem 0}
+      .nowrap{white-space:normal;overflow-wrap:break-word}
       .cta-section{padding:1.5rem 1.25rem}
       .cta-section h2{font-size:1.3rem}
       .cta-section p{margin-bottom:1.25rem}
