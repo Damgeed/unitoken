@@ -355,6 +355,9 @@
       .nav-right #navGuest,.nav-right #navUser{display:none!important}
       .topup-grid{grid-template-columns:1fr}
       .chat-window{width:calc(100vw - 2rem);height:60vh;bottom:5rem;right:1rem}
+      .chat-window .chat-input{padding:0.625rem 0.75rem}
+      .chat-window .chat-input input{font-size:1rem;padding:0.625rem 0.75rem}
+      .chat-window .chat-input button{font-size:1rem;padding:0.625rem 1rem}
       .ai-chat-inner{min-height:400px;max-height:400px}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
     }
@@ -397,6 +400,10 @@
       .auth-oauth{grid-template-columns:1fr 1fr}
       .models-toolbar{flex-direction:column;gap:0.75rem}
       .models-toolbar input,.models-toolbar select{width:100%}
+      .chat-window{width:calc(100vw - 1.5rem);height:65vh;max-height:480px;bottom:4.5rem;right:0.75rem}
+      .chat-window .chat-input{padding:0.5rem 0.625rem}
+      .chat-window .chat-input input{font-size:1rem;padding:0.625rem 0.75rem}
+      .chat-window .chat-input button{font-size:1rem;padding:0.625rem 0.875rem}
       [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr!important}
       .hero-calc{max-width:100%}
       .hero-calc{padding:1.25rem}

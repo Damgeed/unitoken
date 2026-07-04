@@ -780,6 +780,7 @@
       msgs.innerHTML+='<div class="chat-msg user"><div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div></div>';input.value='';
       setTimeout(()=>{const rs=["Great question! Here's how it works...","We support 100+ models from 56 providers!","You can pay with Stripe, Paystack, or crypto.","Tokens never expire. Use across any model.","Check your Dashboard for usage analytics."];msgs.innerHTML+='<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">'+rs[Math.floor(Math.random()*rs.length)]+'</div></div>';msgs.scrollTop=msgs.scrollHeight},600+Math.random()*800);
       msgs.scrollTop=msgs.scrollHeight;
+      setTimeout(()=>input.focus(),50);
     }
 
     // ── Toast ──
