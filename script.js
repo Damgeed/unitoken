@@ -456,12 +456,7 @@
       if(!token){showPage('register');return}
       selectedAmount=amount;showPage('topup');
     }
-    function updateCustomPricing(){
-      const val=parseInt(document.getElementById('customSlider').value||50);
-      document.getElementById('customPriceDisplay').textContent='$'+val;
-      document.getElementById('customTokensDisplay').textContent=(val*1100).toLocaleString()+' Tokens';
-      document.getElementById('customBuyBtn').textContent='Buy $'+val;
-    }
+
     function customCheckout(){
       const amt=parseInt(document.getElementById('customSlider').value||2);
       if(amt<2){showToast('Minimum $2','error');return}
