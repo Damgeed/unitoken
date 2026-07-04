@@ -210,7 +210,8 @@
     @media(max-width:600px){.cat-body{grid-template-columns:1fr}}
     @media(max-width:400px){.cat-body{grid-template-columns:1fr}}
     /* ── Model Cards ── */
-    .model-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.15rem 1.25rem;transition:all 0.2s}
+    .model-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.15rem 1.25rem;transition:all 0.2s;min-width:0}
+    .tm-carousel [style*="overflow-wrap:break-word"]{overflow:hidden}
     .model-card:hover{border-color:hsla(44 96% 52% / 0.3);box-shadow:var(--shadow-hover);transform:translateY(-2px)}
     .mc-top{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;flex-wrap:wrap}
     .mc-badge{font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;padding:0.15rem 0.55rem;border-radius:4px;border:1px solid;line-height:1.4}
