@@ -1,7 +1,7 @@
 """
 GlbTOKEN — New API Integration
 Handles user creation, quota management, and API token generation
-against an OpenRouter-compatible New API gateway instance.
+against a New API gateway instance.
 """
 
 import httpx

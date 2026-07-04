@@ -714,7 +714,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
     if user.token_balance < cost_tokens:
         raise HTTPException(status_code=402, detail=f"Insufficient balance. Need {cost_tokens} tokens, have {user.token_balance}")
     
-    # Route through New API if configured, otherwise fallback to OpenRouter
+    # Route through New API if configured, otherwise fallback to Fallback
     newapi_key = user.newapi_token
     newapi_url = os.getenv("NEW_API_BASE_URL", "")
     
@@ -726,17 +726,17 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
         headers["Authorization"] = f"Bearer {newapi_key}"
         api_endpoint = f"{newapi_url}/v1/chat/completions"
     else:
-        # Fallback: route via OpenRouter directly
-        openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
-        if not openrouter_key:
-            raise HTTPException(status_code=400, detail="No AI routing configured. Set NEW_API_BASE_URL or OPENROUTER_API_KEY")
+        # Fallback: route via Fallback directly
+        fallback_key = os.getenv("FALLBACK_API_KEY", "")
+        if not fallback_key:
+            raise HTTPException(status_code=400, detail="No AI routing configured. Set NEW_API_BASE_URL or FALLBACK_API_KEY")
         headers = {
-            "Authorization": f"Bearer {openrouter_key}",
+            "Authorization": f"Bearer {fallback_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://glbtoken.io",
             "X-Title": "GlbTOKEN",
         }
-        api_endpoint = "https://openrouter.ai/api/v1/chat/completions"
+        api_endpoint = "https://api.glbtoken.io/v1/chat/completions"
     
     async with httpx.AsyncClient(timeout=60) as client:
         resp = await client.post(
@@ -919,22 +919,22 @@ def provider_status(user: User = Depends(get_current_user), db: Session = Depend
 
 # ── Seeding ──
 def auto_pull_models():
-    """Auto-fetch latest models from OpenRouter API and merge into DB."""
+    """Auto-fetch latest models from Fallback API and merge into DB."""
     from database import SessionLocal
     import httpx
-    print("🔄 Auto-pulling models from OpenRouter...")
+    print("🔄 Auto-pulling models from Fallback...")
     try:
         resp = httpx.get(
-            "https://openrouter.ai/api/v1/models",
+            "https://api.glbtoken.io/v1/models",
             headers={"Content-Type": "application/json"},
             timeout=30
         )
         if resp.status_code != 200:
-            print(f"⚠️ OpenRouter API returned {resp.status_code}")
+            print(f"⚠️ Fallback API returned {resp.status_code}")
             return
         data = resp.json()
         if not data.get("data"):
-            print("⚠️ No models data from OpenRouter")
+            print("⚠️ No models data from Fallback")
             return
         db = SessionLocal()
         count = 0
@@ -1075,7 +1075,7 @@ def trigger_model_pull(api_key: str = ""):
     if api_key != os.environ.get("GLBTOKEN_SECRET", "demo"):
         raise HTTPException(status_code=403, detail="Invalid API key")
     auto_pull_models()
-    return {"status": "ok", "message": "Models refreshed from OpenRouter"}
+    return {"status": "ok", "message": "Models refreshed from Fallback"}
 
 @app.get("/api/health")
 async def health():
