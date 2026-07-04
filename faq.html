@@ -260,7 +260,7 @@ function toggleLangMenu() {
 function switchLanguage(lang) {
   function applyLang(){
     var sf = document.querySelector('.goog-te-combo');
-    if(sf){sf.value = lang; sf.dispatchEvent(new Event('change')); return true}
+    if(sf){sf.value = lang; sf.dispatchEvent(new Event('change', {bubbles: true})); return true}
     return false
   }
   if(!applyLang()){
