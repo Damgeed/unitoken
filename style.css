@@ -117,9 +117,9 @@
     .step-num{width:48px;height:48px;border-radius:50%;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.1rem;font-weight:700;color:var(--primary)}
     .step-card h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem}
     .step-card p{font-size:0.85rem;color:var(--text-secondary)}
-    .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+    .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:1.5rem}
     @media(max-width:900px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.pricing-grid{grid-template-columns:1fr;gap:0.75rem}}
+    @media(max-width:600px){.pricing-grid{grid-template-columns:repeat(2,1fr);gap:0.75rem}}
     .pricing-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;transition:all 0.3s;text-align:center;cursor:pointer}
     .pricing-card:hover,.pricing-card.selected{border-color:hsla(44 96% 52% / 0.3);box-shadow:var(--shadow-hover);transform:translateY(-2px)}
     .pricing-card.selected{background:var(--primary-subtle);border-color:var(--primary);box-shadow:0 0 0 1px var(--primary),var(--shadow-card)}
