@@ -886,7 +886,11 @@
       function onEnd(){
         fab.style.transition = '';
         if(moved){
-          localStorage.setItem('fab_pos', parseInt(fab.style.left) + ',' + parseInt(fab.style.top));
+          var l = parseInt(fab.style.left) || 0;
+          var w = window.innerWidth;
+          var snap = l < w / 2 ? 16 : w - fab.offsetWidth - 16;
+          fab.style.left = snap + 'px';
+          localStorage.setItem('fab_pos', snap + ',' + (parseInt(fab.style.top) || window.innerHeight - fab.offsetHeight - 24));
         }
       }
       fab.addEventListener('touchstart', onStart, {passive:true});
