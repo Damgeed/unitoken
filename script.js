@@ -769,8 +769,9 @@
       userDiv.innerHTML = '<div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div>';
       msgs.appendChild(userDiv);
       input.value = '';
-      // Don't reset height style — causes DOM reflow that closes keyboard on mobile
-      // Keyboard refocus is handled by onmousedown on the send button
+      input.style.height = 'auto';
+      // Refocus input to keep keyboard open on mobile
+      setTimeout(function(){ input.focus(); }, 10);
       msgs.scrollTop = msgs.scrollHeight;
       // Disable button
       const btn = document.getElementById('aiSendBtn');
@@ -1012,7 +1013,7 @@ function switchLanguage(lang) {
       batch.push(texts[i]); batchEls.push(els[i]);
     }
     if(!batch.length){ updateLangUI(lang); return; }
-    var q = batch.join('\n---GT---\n');
+    var q = batch.join('\n');
     var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + lang + '&dt=t&q=' + encodeURIComponent(q);
     fetch(url).then(function(r){ return r.json(); }).then(function(d){
       if(d && d[0]){
@@ -1023,7 +1024,7 @@ function switchLanguage(lang) {
               batchEls[i].parentNode.setAttribute('data-gt-old', orig);
             }
             var translated = d[0][i][0];
-            if(/GlbTOKEN/i.test(orig) || /Glb[^a-z]/i.test(orig) || /TOKEN[^a-z]/i.test(orig)){
+            if(/GlbTOKEN/i.test(orig) || /Glb[_-]?[Tt]oken/i.test(orig)){
               translated = orig;
             }
             batchEls[i].textContent = translated;
