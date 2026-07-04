@@ -1020,12 +1020,14 @@ function switchLanguage(lang) {
     els.push(n);
   }
     if(!texts.length){ updateLangUI(lang); return; }
+  var pending = 0, completed = 0;
   function doTranslate(start){
-    var batch = [], batchEls = [], batchSize = 40;
+    var batch = [], batchEls = [], batchSize = 999;
     for(var i = start; i < texts.length && batch.length < batchSize; i++){
       batch.push(texts[i]); batchEls.push(els[i]);
     }
-    if(!batch.length){ updateLangUI(lang); return; }
+    if(!batch.length){ checkDone(); return; }
+    pending++;
     var q = batch.join('\n');
     var cb = 'gt_cb_' + Math.random().toString(36).substr(2, 8);
     window[cb] = function(d){
@@ -1045,12 +1047,18 @@ function switchLanguage(lang) {
           }
         }
       }
-      doTranslate(start + batchSize);
+      completed++;
+      checkDone();
     };
     var s = document.createElement('script');
     s.src = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + lang + '&dt=t&q=' + encodeURIComponent(q) + '&callback=' + cb;
-    s.onerror = function(){ delete window[cb]; document.body.removeChild(s); doTranslate(start + batchSize); };
+    s.onerror = function(){ delete window[cb]; document.body.removeChild(s); completed++; checkDone(); };
     document.body.appendChild(s);
+    // Fire next batch in parallel
+    doTranslate(start + batchSize);
+  }
+  function checkDone(){
+    if(completed >= pending) updateLangUI(lang);
   }
   doTranslate(0);
   localStorage.setItem('gt_lang', lang);
