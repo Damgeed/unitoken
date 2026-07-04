@@ -25,7 +25,7 @@
     }
 
     // ── API Helper (with demo fallback) ──
-    let models = [], selectedAmount = 20, selectedPayment = 'stripe';
+    let models = [], selectedAmount = 5, selectedPayment = 'stripe';
     let chartInst = null, sparkInst = null, sortDir = 'price_asc';
     
     async function api(method, path, body){
@@ -414,10 +414,10 @@
       var el2=document.getElementById('customTokensLabel')||document.getElementById('customTokensDisplay');
       var el3=document.getElementById('customBuyBtn');
       var el4=document.getElementById('topupTotal');
-      if(el1)el1.textContent='$'+val;
+      if(el1)el1.textContent='$'+val.toFixed(2);
       if(el2)el2.textContent=(val*1100).toLocaleString()+' Tokens';
-      if(el3)el3.textContent='Buy $'+val;
-      if(el4)el4.textContent='$'+val+'.00';
+      if(el3)el3.textContent='Buy $'+val.toFixed(2);
+      if(el4)el4.textContent='$'+val.toFixed(2);
       selectedAmount=val;
     }
     function customCheckout(){
@@ -455,13 +455,6 @@
     function startCheckout(amount){
       if(!token){showPage('register');return}
       selectedAmount=amount;showPage('topup');
-    }
-
-    function customCheckout(){
-      const amt=parseInt(document.getElementById('customSlider').value||2);
-      if(amt<2){showToast('Minimum $2','error');return}
-      if(!token){showPage('register');return}
-      selectedAmount=amt;showPage('topup');
     }
 
     // ── Models Grid ──

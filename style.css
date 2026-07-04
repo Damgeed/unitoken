@@ -225,8 +225,8 @@
     .payment-opt .pm-info{flex:1}
     .payment-opt .pm-info h4{font-size:0.95rem;font-weight:600;margin-bottom:0.15rem}
     .payment-opt .pm-info p{font-size:0.8rem;color:var(--text-muted);margin:0}
-    .payment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-bottom:1rem}
-    .payment-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;transition:all 0.2s ease;position:relative}
+    .payment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+    .payment-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;text-align:center;cursor:pointer;transition:all 0.2s ease;position:relative}
     .payment-card:hover,.payment-card.selected{border-color:var(--primary);box-shadow:var(--shadow-hover)}
     .payment-card.selected{background:var(--primary-subtle)}
     .payment-card .pc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto 0.75rem;background:var(--bg-alt);border:1px solid var(--border-light)}
@@ -543,7 +543,7 @@
 .auth-hero-card{width:100%;margin:0 auto}
 @media(min-width:901px){
   .auth-page.auth-hero-wrapper{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:2rem;min-height:calc(100vh - 64px);padding:2rem}
-  .auth-hero{display:block;flex:1.2;max-width:480px;text-align:left;padding-left:3rem}
+  .auth-hero{display:block;flex:1.2;max-width:480px;text-align:left;padding-left:6rem}
   .auth-hero .hero-badge{display:inline-block;padding:0.35rem 1rem;border-radius:20px;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.15);font-size:0.8rem;color:var(--primary);font-weight:600;margin-bottom:1.25rem}
   .auth-hero h1{font-size:3rem;font-weight:800;line-height:1.2;margin-bottom:1rem}
   .auth-hero h1 .logo-glb{color:var(--primary)}
