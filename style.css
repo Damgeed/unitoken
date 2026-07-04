@@ -101,10 +101,9 @@
     .calc-result .big{font-size:1.75rem;font-weight:700;color:var(--primary);display:block}
     .calc-result .small{font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem}
     section{padding:2rem 0}
-    .section-label{display:inline-flex;align-items:center;gap:6px;padding:0.25rem 0.75rem;border-radius:999px;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.2);font-size:0.75rem;font-weight:500;color:var(--primary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.06em}
+    .section-label{display:table;align-items:center;gap:6px;padding:0.25rem 0.75rem;border-radius:999px;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.2);font-size:0.75rem;font-weight:500;color:var(--primary);margin:0 auto 0.75rem;text-transform:uppercase;letter-spacing:0.06em}
     .section-title{font-size:2.25rem;font-weight:700;margin-bottom:0.75rem;text-align:center}
-    .section-sub{font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin-bottom:3rem}
-    .vp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+    .section-sub{font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin:0 auto 3rem}.vp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
     @media(max-width:768px){.vp-grid{grid-template-columns:1fr;max-width:520px;margin:0 auto}}
     .vp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;transition:all 0.3s;text-align:center}
     .vp-card:hover{border-color:hsla(44 96% 52% / 0.2);box-shadow:var(--shadow-hover)}
@@ -542,8 +541,8 @@
 .auth-hero{display:none}
 .auth-hero-card{width:100%;margin:0 auto}
 @media(min-width:901px){
-  .auth-page.auth-hero-wrapper{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:2rem;min-height:calc(100vh - 64px);padding:2rem}
-  .auth-hero{display:block;flex:1.2;max-width:480px;text-align:left;padding-left:6rem}
+  .auth-page.auth-hero-wrapper{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:2rem;min-height:calc(100vh - 64px);max-width:1400px;margin:0 auto;padding:2rem 1.5rem}
+  .auth-hero{display:block;flex:1.2;max-width:480px;text-align:left}
   .auth-hero .hero-badge{display:inline-block;padding:0.35rem 1rem;border-radius:20px;background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.15);font-size:0.8rem;color:var(--primary);font-weight:600;margin-bottom:1.25rem}
   .auth-hero h1{font-size:3rem;font-weight:800;line-height:1.2;margin-bottom:1rem}
   .auth-hero h1 .logo-glb{color:var(--primary)}
@@ -552,7 +551,7 @@
   .auth-hero-stats{display:flex;gap:2rem;margin-bottom:1.5rem}
   .auth-hero-stats h3{font-size:1.5rem;font-weight:700;color:var(--text);margin:0}
   .auth-hero-stats p{font-size:0.8rem;color:var(--text-muted);margin:0}
-  .auth-hero-card{flex:0.85;max-width:420px}
+  .auth-hero-card{flex:0.85;max-width:420px;margin-left:auto}
   .auth-hero-card .auth-card{margin:0;width:100%;max-width:100%;box-shadow:var(--shadow-elevated)}
   .auth-hero-features{margin:1.5rem 0}
   .auth-hero-features .feat{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.85rem;font-size:0.9rem;color:var(--text-secondary)}

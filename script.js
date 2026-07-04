@@ -406,6 +406,7 @@
       if(!canvas)return;
       if(chartInst){chartInst.destroy();chartInst=null}
       const labels=usage&&usage.length?usage.map(u=>u.model):['GPT-4o','Claude','DeepSeek','Llama','Other'];
+    }
     function updateCustomPricing(){
       var slider=document.getElementById('customSlider');
       if(!slider)return;
