@@ -863,33 +863,33 @@
       if(!fab) return;
       var stored = localStorage.getItem('fab_pos');
       if(stored){var p = stored.split(',');fab.style.bottom='auto';fab.style.right='auto';fab.style.left=p[0]+'px';fab.style.top=p[1]+'px'}
-      var startX, startY, startL, startT, dragging = false;
+      var startX, startY, startL, startT, moved = false, THRESHOLD = 10;
       function onStart(e){
-        var t = e.touches ? e.touches[0] : e;
+        var t = e.touches[0];
         startX = t.clientX; startY = t.clientY;
         startL = parseInt(fab.style.left) || window.innerWidth - fab.offsetWidth - 24;
         startT = parseInt(fab.style.top) || window.innerHeight - fab.offsetHeight - 24;
-        dragging = true;
+        moved = false;
         fab.style.transition = 'none';
         fab.style.bottom = 'auto'; fab.style.right = 'auto';
         fab.style.left = startL + 'px'; fab.style.top = startT + 'px';
-        e.preventDefault();
       }
       function onMove(e){
-        if(!dragging) return;
-        var t = e.touches ? e.touches[0] : e;
+        var t = e.touches[0];
         var dx = t.clientX - startX, dy = t.clientY - startY;
+        if(Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) return;
+        moved = true;
+        e.preventDefault();
         fab.style.left = Math.max(0, Math.min(window.innerWidth - fab.offsetWidth, startL + dx)) + 'px';
         fab.style.top = Math.max(0, Math.min(window.innerHeight - fab.offsetHeight, startT + dy)) + 'px';
-        e.preventDefault();
       }
       function onEnd(){
-        if(!dragging) return;
-        dragging = false;
         fab.style.transition = '';
-        localStorage.setItem('fab_pos', parseInt(fab.style.left) + ',' + parseInt(fab.style.top));
+        if(moved){
+          localStorage.setItem('fab_pos', parseInt(fab.style.left) + ',' + parseInt(fab.style.top));
+        }
       }
-      fab.addEventListener('touchstart', onStart, {passive:false});
+      fab.addEventListener('touchstart', onStart, {passive:true});
       fab.addEventListener('touchmove', onMove, {passive:false});
       fab.addEventListener('touchend', onEnd);
     })();
