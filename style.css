@@ -489,10 +489,7 @@
   body{top:0!important;position:inherit!important}
   .goog-te-combo{display:none!important}
   #goog-gt-tt,.goog-tooltip,.goog-te-menu-frame,.goog-te-gadget-simple,.goog-te-banner{display:none!important}
-  /* ── Logo Image ── */
-  .logo-img{display:block;width:36px;height:36px;object-fit:contain}
-  html.dark .logo-img{filter:none}
-  html.light .logo-img{filter:invert(0.85) brightness(0.3)}
+
   /* ── Mobile Carousel Fix ── */
   .tm-carousel{overflow:hidden;border-radius:var(--radius-sm)}
   .tm-track{display:flex;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1)}
