@@ -1,181 +1,204 @@
-     1|<!DOCTYPE html>
-     2|<html lang="en" class="dark">
-     3|<head>
-     4|  <meta charset="UTF-8" />
-     5|  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-     6|  <title>How It Works — GlbTOKEN</title>
-     7|  <meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
-     8|  <meta name="theme-color" content="#0A0B14" id="metaTheme" />
-     9|  <link rel="preconnect" href="https://fonts.googleapis.com" />
-    10|  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    11|  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    12|  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    13|  <link rel="stylesheet" href="style.css" />
-    14|</head>
-    15|<body>
-    16|<div class="stars-bg"><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star white"></div><div class="star white"></div><div class="star white"></div><div class="star trail gold"></div><div class="star trail teal"></div><div class="star trail teal"></div><div class="star trail blue"></div><div class="star trail gold"></div></div>
-    17|<nav class="navbar"><div class="container navbar-inner">
-    18|    <a href="/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a>
-    19|    <div class="nav-center" id="navCenter">
-    20|      <a href="index.html" class="active">Home</a>
-    21|      <a href="pricing.html">Pricing</a>
-    22|      <a href="how.html" class="active">How It Works</a>
-    23|      <a href="models.html">AI Models</a>
-    24|      <a href="apikeys.html" id="navApiLink">API / Dev</a>
-    25|      <a href="dashboard.html" id="navDashLink" style="display:none">Dashboard</a>
-    26|    </div>
-    27|    <div class="nav-right">
-    28|        <a class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</a>
-    29|        <span class="nav-balance-standalone" id="navBalance">0 Tokens</span>
-    30|        <div class="lang-selector">
-    31|    <button class="lang-btn" onclick="toggleLangMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M9.5 17a5 5 0 004-4.5"/><path d="M14.5 17a5 5 0 01-4-4.5"/></svg> <span id="currentLangLabel">EN</span></button>
-    32|    <div class="lang-menu" id="langMenu">
-    33|      <div class="lang-option active" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</div>
-    34|      <div class="lang-option" data-lang="zh-CN" onclick="switchLanguage('zh-CN')">🇨🇳 中文</div>
-    35|      <div class="lang-option" data-lang="ru" onclick="switchLanguage('ru')">🇷🇺 Русский</div>
-    36|      <div class="lang-option" data-lang="ja" onclick="switchLanguage('ja')">🇯🇵 日本語</div>
-    37|      <div class="lang-option" data-lang="de" onclick="switchLanguage('de')">🇩🇪 Deutsch</div>
-    38|    </div>
-    39|  </div>
-    40|        <div id="navGuest">
-    41|          <a class="nav-btn-outline" href="login.html">Login</a>
-    42|          <a class="nav-btn" href="register.html">Get Started</a>
-    43|        </div>
-    44|        <div id="navUser" style="display:none">
-    45|          <div class="nav-avatar" onclick="toggleDropdown()">U<div class="dropdown" id="userDropdown">
-    46|            <div class="dropdown-header">
-    47|              <div class="dd-av" id="ddAvatar">U</div>
-    48|              <div class="dd-info">
-    49|                <div class="dd-name" id="dropName">User</div>
-    50|                <div class="dd-email" id="dropEmail">user@email.com</div>
-    51|              </div>
-    52|            </div>
-    53|            <div class="dd-bal"><span>Token Balance</span><span id="ddBalance">0</span></div>
-    54|            <div class="dd-items">
-    55|              <a href="dashboard.html"><span class="dd-icon">📊</span> Dashboard</a>
-    56|              <a onclick="showPage('topup')"><span class="dd-icon">💰</span> Buy Tokens</a>
-    57|              <a onclick="showPage('history')"><span class="dd-icon">📜</span> History</a>
-    58|              <a href="apikeys.html"><span class="dd-icon">🔑</span> API Keys</a>
-    59|              <a href="models.html"><span class="dd-icon">🤖</span> AI Models</a>
-    60|            </div>
-    61|            <div class="dd-footer">
-    62|              <a onclick="logoutUser()"><span class="dd-icon">🚪</span> Sign Out</a>
-    63|            </div>
-    64|          </div></div>
-    65|        </div>
-    66|    </div>
-    67|    <div class="mobile-right-group">
-    68|    <a class="theme-toggle-mobile" onclick="toggleTheme()" id="themeBtnMobile" title="Toggle theme">🌙</a>
-    69|    <button class="lang-btn-mobile" onclick="toggleLangMenu()" id="langBtnMobile" title="Translate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M9.5 17a5 5 0 004-4.5"/><path d="M14.5 17a5 5 0 01-4-4.5"/></svg></button>
-    70|    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
-    71|    </div>
-    72|    </div></nav>
-    73|  </div></nav>
-    74|  <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobile()"></div>
-    75|  <div class="mobile-overlay" id="mobileOverlay">
-    76|    <div class="m-close"><button onclick="closeMobile()">✕</button></div>
-    77|        <a href="/" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg> Home</a>
-    78|    <a href="pricing.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Pricing</a>
-    79|    <a href="how.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V4a2 2 0 012-2h8.5L20 7.5V20a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg> How It Works</a>
-    80|    <a href="models.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> AI Models</a>
-    81|    <a href="apikeys.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> API / Dev</a>
-    82|    <a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
-    83|    <hr>
-    84|    <div class="m-section-label">Account</div>
-    85|    <div class="mobile-auth-grid">
-    86|      <a href="login.html" onclick="closeMobile()" id="mobileLoginLink" class="mobile-auth-btn mobile-auth-btn-outline">Login</a>
-    87|      <a href="register.html" onclick="closeMobile()" id="mobileRegisterLink" class="mobile-auth-btn mobile-auth-btn-primary">Get Started</a>
-    88|    </div>
-    89|    <div id="mobileUserSection" style="display:none">
-    90|      <a href="dashboard.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
-    91|      <a href="topup.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/></svg> Buy Tokens</a>
-    92|      <a href="#" onclick="logoutUser();closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sign Out</a>
-    93|    </div>
-    94|  </div>
-    95|<section><div class="container" style="text-align:center">
-    96|      <span class="section-label">Guide</span><h2 class="section-title">How GlbTOKEN Works</h2><p class="section-sub" style="margin:0 auto">Four simple steps.</p>
-    97|      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin:2rem auto 6rem">
-    98|        <div class="step-card"><div class="step-num">1</div><h3>Create Account</h3><p>Sign up with email, Google, or GitHub. 30 seconds, no card needed. Select your country for localized payment options.</p></div>
-    99|        <div class="step-card"><div class="step-num">2</div><h3>Buy Tokens</h3><p>💳 Stripe (cards, USD) · 🔶 Paystack (NGN/GHS/KES: bank transfer, USSD, MoMo) · ₿ Crypto (USDT TRC-20/ERC-20, BTC, ETH)</p></div>
-   100|        <div class="step-card"><div class="step-num">3</div><h3>Generate API Key</h3><p>Create an API key from your dashboard. Use our OpenAI-compatible API endpoint to access 100+ models with one integration. Full docs included.</p></div>
-   101|        <div class="step-card"><div class="step-num">4</div><h3>Monitor & Scale</h3><p>Track balance, usage per model, and spending from your dashboard. Top up anytime — tokens never expire.</p></div>
-   102|      </div>
-   103|    </div></section>
-   104|  </div>
-   105|
-   106|  <!-- MODELS (Grid, from backend API) -->
-   107|<footer><div class="container">
-   108|    <div class="footer-grid">
-   109|      <div class="footer-brand"><a href="/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a><p>Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges"><span class="trust-badge">💳 Stripe</span><span class="trust-badge">🔶 Paystack</span><span class="trust-badge">₿ USDT</span><span class="trust-badge">₿ BTC</span></div></div>
-   110|      <div class="footer-col"><h4>Product</h4><a href="pricing.html">Pricing</a><a href="models.html">AI Models</a><a href="apikeys.html">API Docs</a></div>
-   111|      <div class="footer-col"><h4>Company</h4><a href="about.html">About</a><a href="blog.html">Blog</a></div>
-   112|      <div class="footer-col"><h4>Contact</h4><a href="faq.html">FAQ</a><span>Contact support</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="refund.html">Refund</a></div>
-   113|    </div>
-   114|    <div class="footer-bottom"><span>&copy; 2026 GlbTOKEN</span></div>
-   115|  </div></footer>
-   116|<button class="chat-fab" onclick="toggleChat()">💬</button>
-   117|  <div class="chat-window" id="chatWindow">
-   118|    <div class="chat-header"><h3>💬 Support</h3><button onclick="toggleChat()">✕</button></div>
-   119|    <div class="chat-msgs" id="chatMsgs">
-   120|      <div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">Hi! I'm the GlbTOKEN assistant. Ask me about buying tokens, AI models, payments, or API keys.</div>  </div>
-   121|    </div>
-   122|    <div class="chat-input">
-   123|      <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMsg()}">
-   124|      <button onclick="sendChatMsg()" onmousedown="event.preventDefault();setTimeout(function(){document.getElementById('chatInput').focus()},10)">➤</button>
-   125|    </div>
-   126|  </div>
-   127|
-   128|<script src="script.js"></script>
-   129|<div id="google_translate_element" style="display:none"></div>
-   130|<script>
-   131|function googleTranslateElementInit() {
-   132|  new google.translate.TranslateElement({
-   133|    pageLanguage: 'en',
-   134|    includedLanguages: 'en,zh-CN,ru,ja,de',
-   135|    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-   136|    autoDisplay: false
-   137|  }, 'google_translate_element');
-   138|}
-   139|function toggleLangMenu() {
-   140|  var m = document.getElementById('langMenu');
-   141|  if (m) m.classList.toggle('open');
-   142|}
-   143|function switchLanguage(lang) {
-   144|  var selectField = document.querySelector('.goog-te-combo');
-   145|  if (selectField) {
-   146|    selectField.value = lang;
-   147|    selectField.dispatchEvent(new Event('change'));
-   148|  }
-   149|  document.querySelectorAll('.lang-option').forEach(function(el) {
-   150|    el.classList.toggle('active', el.getAttribute('data-lang') === lang);
-   151|  });
-   152|  document.getElementById('currentLangLabel').textContent = lang === 'zh-CN' ? '中文' : lang === 'en' ? 'EN' : lang === 'ru' ? 'RU' : lang === 'ja' ? '日' : 'DE';
-   153|  document.getElementById('langMenu').classList.remove('open');
-   154|  localStorage.setItem('gt_lang', lang);
-   155|}
-   156|(function() {
-   157|  var saved = localStorage.getItem('gt_lang');
-   158|  if (saved && saved !== 'en') {
-   159|    setTimeout(function() {
-   160|      var selectField = document.querySelector('.goog-te-combo');
-   161|      if (selectField) {
-   162|        selectField.value = saved;
-   163|        selectField.dispatchEvent(new Event('change'));
-   164|        document.querySelectorAll('.lang-option').forEach(function(el) {
-   165|          el.classList.toggle('active', el.getAttribute('data-lang') === saved);
-   166|        });
-   167|        document.getElementById('currentLangLabel').textContent = saved === 'zh-CN' ? '中文' : saved === 'ru' ? 'RU' : saved === 'ja' ? '日' : 'DE';
-   168|      }
-   169|    }, 1000);
-   170|  }
-   171|})();
-   172|document.addEventListener('click', function(e) {
-   173|  if (!e.target.closest('.lang-selector') && !e.target.closest('.lang-btn-mobile')) {
-   174|    var m = document.getElementById('langMenu');
-   175|    if (m) m.classList.remove('open');
-   176|  }
-   177|});
-   178|</script>
-   179|<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-   180|</body>
-   181|</html>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>How It Works — GlbTOKEN</title>
+<meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
+<meta name="theme-color" content="#0A0B14" id="metaTheme" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="stars-bg"><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star white"></div><div class="star white"></div><div class="star white"></div><div class="star trail gold"></div><div class="star trail teal"></div><div class="star trail teal"></div><div class="star trail blue"></div><div class="star trail gold"></div></div>
+<nav class="navbar"><div class="container navbar-inner">
+<a href="/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a>
+<div class="nav-center" id="navCenter">
+<a href="index.html" class="active">Home</a>
+<a href="pricing.html">Pricing</a>
+<a href="how.html" class="active">How It Works</a>
+<a href="models.html">AI Models</a>
+<a href="apikeys.html" id="navApiLink">API / Dev</a>
+<a href="dashboard.html" id="navDashLink" style="display:none">Dashboard</a>
+</div>
+<div class="nav-right">
+<a class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</a>
+<span class="nav-balance-standalone" id="navBalance">0 Tokens</span>
+        <div class="lang-selector">
+    <button class="lang-btn" onclick="toggleLangMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M9.5 17a5 5 0 004-4.5"/><path d="M14.5 17a5 5 0 01-4-4.5"/></svg> <span id="currentLangLabel">EN</span></button>
+  </div>
+    <div class="lang-menu" id="langMenu">
+<div class="lang-option active" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</div>
+<div class="lang-option" data-lang="zh-CN" onclick="switchLanguage('zh-CN')">🇨🇳 中文</div>
+<div class="lang-option" data-lang="ru" onclick="switchLanguage('ru')">🇷🇺 Русский</div>
+<div class="lang-option" data-lang="ja" onclick="switchLanguage('ja')">🇯🇵 日本語</div>
+<div class="lang-option" data-lang="de" onclick="switchLanguage('de')">🇩🇪 Deutsch</div>
+
+</div>
+<div id="navGuest">
+<a class="nav-btn-outline" href="login.html">Login</a>
+<a class="nav-btn" href="register.html">Get Started</a>
+</div>
+<div id="navUser" style="display:none">
+<div class="nav-avatar" onclick="toggleDropdown()">U<div class="dropdown" id="userDropdown">
+<div class="dropdown-header">
+<div class="dd-av" id="ddAvatar">U</div>
+<div class="dd-info">
+<div class="dd-name" id="dropName">User</div>
+<div class="dd-email" id="dropEmail">user@email.com</div>
+</div>
+</div>
+<div class="dd-bal"><span>Token Balance</span><span id="ddBalance">0</span></div>
+<div class="dd-items">
+<a href="dashboard.html"><span class="dd-icon">📊</span> Dashboard</a>
+<a onclick="showPage('topup')"><span class="dd-icon">💰</span> Buy Tokens</a>
+<a onclick="showPage('history')"><span class="dd-icon">📜</span> History</a>
+<a href="apikeys.html"><span class="dd-icon">🔑</span> API Keys</a>
+<a href="models.html"><span class="dd-icon">🤖</span> AI Models</a>
+</div>
+<div class="dd-footer">
+<a onclick="logoutUser()"><span class="dd-icon">🚪</span> Sign Out</a>
+</div>
+</div></div>
+</div>
+</div>
+<div class="mobile-right-group">
+<a class="theme-toggle-mobile" onclick="toggleTheme()" id="themeBtnMobile" title="Toggle theme">🌙</a>
+<button class="lang-btn-mobile" onclick="toggleLangMenu()" id="langBtnMobile" title="Translate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M9.5 17a5 5 0 004-4.5"/><path d="M14.5 17a5 5 0 01-4-4.5"/></svg></button>
+<button class="hamburger" id="hamburgerBtn" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+</div>
+</div></nav>
+</div></nav>
+<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobile()"></div>
+<div class="mobile-overlay" id="mobileOverlay">
+<div class="m-close"><button onclick="closeMobile()">✕</button></div>
+<a href="/" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg> Home</a>
+<a href="pricing.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Pricing</a>
+<a href="how.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V4a2 2 0 012-2h8.5L20 7.5V20a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg> How It Works</a>
+<a href="models.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> AI Models</a>
+<a href="apikeys.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> API / Dev</a>
+<a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
+<hr>
+<div class="m-section-label">Account</div>
+<div class="mobile-auth-grid">
+<a href="login.html" onclick="closeMobile()" id="mobileLoginLink" class="mobile-auth-btn mobile-auth-btn-outline">Login</a>
+<a href="register.html" onclick="closeMobile()" id="mobileRegisterLink" class="mobile-auth-btn mobile-auth-btn-primary">Get Started</a>
+</div>
+<div id="mobileUserSection" style="display:none">
+<a href="dashboard.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
+<a href="topup.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/></svg> Buy Tokens</a>
+<a href="#" onclick="logoutUser();closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sign Out</a>
+</div>
+</div>
+<section><div class="container" style="text-align:center">
+<span class="section-label">Guide</span><h2 class="section-title">How GlbTOKEN Works</h2><p class="section-sub" style="margin:0 auto">Four simple steps.</p>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin:2rem auto 6rem">
+<div class="step-card"><div class="step-num">1</div><h3>Create Account</h3><p>Sign up with email, Google, or GitHub. 30 seconds, no card needed. Select your country for localized payment options.</p></div>
+<div class="step-card"><div class="step-num">2</div><h3>Buy Tokens</h3><p>💳 Stripe (cards, USD) · 🔶 Paystack (NGN/GHS/KES: bank transfer, USSD, MoMo) · ₿ Crypto (USDT TRC-20/ERC-20, BTC, ETH)</p></div>
+<div class="step-card"><div class="step-num">3</div><h3>Generate API Key</h3><p>Create an API key from your dashboard. Use our OpenAI-compatible API endpoint to access 100+ models with one integration. Full docs included.</p></div>
+<div class="step-card"><div class="step-num">4</div><h3>Monitor & Scale</h3><p>Track balance, usage per model, and spending from your dashboard. Top up anytime — tokens never expire.</p></div>
+</div>
+</div></section>
+</div>
+<!-- MODELS (Grid, from backend API) -->
+<footer><div class="container">
+<div class="footer-grid">
+<div class="footer-brand"><a href="/" class="nav-logo"><span class="nav-logo-icon">GT</span><span class="logo-full"><span class="logo-glb">Glb</span><span class="logo-token">TOKEN</span></span></a><p>Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges"><span class="trust-badge">💳 Stripe</span><span class="trust-badge">🔶 Paystack</span><span class="trust-badge">₿ USDT</span><span class="trust-badge">₿ BTC</span></div></div>
+<div class="footer-col"><h4>Product</h4><a href="pricing.html">Pricing</a><a href="models.html">AI Models</a><a href="apikeys.html">API Docs</a></div>
+<div class="footer-col"><h4>Company</h4><a href="about.html">About</a><a href="blog.html">Blog</a></div>
+<div class="footer-col"><h4>Contact</h4><a href="faq.html">FAQ</a><span>Contact support</span><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="refund.html">Refund</a></div>
+</div>
+<div class="footer-bottom"><span>&copy; 2026 GlbTOKEN</span></div>
+</div></footer>
+<button class="chat-fab" onclick="toggleChat()">💬</button>
+<div class="chat-window" id="chatWindow">
+<div class="chat-header"><h3>💬 Support</h3><button onclick="toggleChat()">✕</button></div>
+<div class="chat-msgs" id="chatMsgs">
+<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">Hi! I'm the GlbTOKEN assistant. Ask me about buying tokens, AI models, payments, or API keys.</div>  </div>
+</div>
+<div class="chat-input">
+<input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMsg()}">
+<button onclick="sendChatMsg()" onmousedown="event.preventDefault();setTimeout(function(){document.getElementById('chatInput').focus()},10)">➤</button>
+</div>
+</div>
+<script src="script.js"></script>
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+new google.translate.TranslateElement({
+pageLanguage: 'en',
+includedLanguages: 'en,zh-CN,ru,ja,de',
+layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+autoDisplay: false
+}, 'google_translate_element');
+}
+function toggleLangMenu() {
+var m = document.getElementById('langMenu');
+if (m) m.classList.toggle('open');
+}
+function switchLanguage(lang) {
+var selectField = document.querySelector('.goog-te-combo');
+if (selectField) {
+selectField.value = lang;
+selectField.dispatchEvent(new Event('change'));
+}
+document.querySelectorAll('.lang-option').forEach(function(el) {
+el.classList.toggle('active', el.getAttribute('data-lang') === lang);
+});
+document.getElementById('currentLangLabel').textContent = lang === 'zh-CN' ? '中文' : lang === 'en' ? 'EN' : lang === 'ru' ? 'RU' : lang === 'ja' ? '日' : 'DE';
+document.getElementById('langMenu').classList.remove('open');
+localStorage.setItem('gt_lang', lang);
+}
+(function() {
+var saved = localStorage.getItem('gt_lang');
+if (saved && saved !== 'en') {
+setTimeout(function() {
+var selectField = document.querySelector('.goog-te-combo');
+if (selectField) {
+selectField.value = saved;
+selectField.dispatchEvent(new Event('change'));
+document.querySelectorAll('.lang-option').forEach(function(el) {
+el.classList.toggle('active', el.getAttribute('data-lang') === saved);
+});
+document.getElementById('currentLangLabel').textContent = saved === 'zh-CN' ? '中文' : saved === 'ru' ? 'RU' : saved === 'ja' ? '日' : 'DE';
+}
+}, 1000);
+}
+})();
+document.addEventListener('click', function(e) {
+if (!e.target.closest('.lang-selector') && !e.target.closest('.lang-menu') && !e.target.closest('.lang-btn-mobile')) {
+var m = document.getElementById('langMenu');
+if (m) m.classList.remove('open');
+}
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+(function(){
+  var cw = document.getElementById('chatWindow');
+  if(!cw) return;
+  var h = cw.querySelector('.chat-header');
+  if(!h) return;
+  var offX, offY, dragging = false;
+  h.addEventListener('mousedown', function(e){
+    if(e.target.tagName === 'BUTTON') return;
+    dragging = true; cw.classList.add('dragging');
+    var r = cw.getBoundingClientRect();
+    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    cw.style.left = (e.clientX - offX) + 'px';
+    cw.style.top = (e.clientY - offY) + 'px';
+    cw.style.right = 'auto'; cw.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){if(dragging){dragging=false;cw.classList.remove('dragging')}});
+})();
+</script>
+
+</body>
+</html>

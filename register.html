@@ -29,6 +29,7 @@
         <span class="nav-balance-standalone" id="navBalance">0 Tokens</span>
         <div class="lang-selector">
     <button class="lang-btn" onclick="toggleLangMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M9.5 17a5 5 0 004-4.5"/><path d="M14.5 17a5 5 0 01-4-4.5"/></svg> <span id="currentLangLabel">EN</span></button>
+  </div>
     <div class="lang-menu" id="langMenu">
       <div class="lang-option active" data-lang="en" onclick="switchLanguage('en')">🇬🇧 English</div>
       <div class="lang-option" data-lang="zh-CN" onclick="switchLanguage('zh-CN')">🇨🇳 中文</div>
@@ -36,7 +37,6 @@
       <div class="lang-option" data-lang="ja" onclick="switchLanguage('ja')">🇯🇵 日本語</div>
       <div class="lang-option" data-lang="de" onclick="switchLanguage('de')">🇩🇪 Deutsch</div>
     </div>
-  </div>
         <div id="navGuest">
           <a class="nav-btn-outline" href="login.html">Login</a>
           <a class="nav-btn" href="register.html">Get Started</a>
@@ -200,12 +200,36 @@ function switchLanguage(lang) {
   }
 })();
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.lang-selector') && !e.target.closest('.lang-btn-mobile')) {
+  if (!e.target.closest('.lang-selector') && !e.target.closest('.lang-menu') && !e.target.closest('.lang-btn-mobile')) {
     var m = document.getElementById('langMenu');
     if (m) m.classList.remove('open');
   }
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+(function(){
+  var cw = document.getElementById('chatWindow');
+  if(!cw) return;
+  var h = cw.querySelector('.chat-header');
+  if(!h) return;
+  var offX, offY, dragging = false;
+  h.addEventListener('mousedown', function(e){
+    if(e.target.tagName === 'BUTTON') return;
+    dragging = true; cw.classList.add('dragging');
+    var r = cw.getBoundingClientRect();
+    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    cw.style.left = (e.clientX - offX) + 'px';
+    cw.style.top = (e.clientY - offY) + 'px';
+    cw.style.right = 'auto'; cw.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){if(dragging){dragging=false;cw.classList.remove('dragging')}});
+})();
+</script>
+
 </body>
 </html>
