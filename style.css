@@ -214,8 +214,10 @@
     .topup-card .price{font-size:1.5rem;font-weight:700;color:var(--primary)}
     .topup-card .name{font-size:0.8rem;color:var(--text-secondary);margin:0.25rem 0 0.35rem}
     .topup-card .tokens{font-size:0.75rem;color:var(--text-muted)}
-    .topup-custom.selected .custom-input-row{display:flex!important;align-items:center;justify-content:center;gap:4px;margin-top:0.5rem}
-    .topup-custom.selected .custom-input-row input{width:65px;padding:0.35rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem;text-align:center}
+    .topup-custom.selected .custom-input-row{display:block!important;margin-top:0.5rem;padding:0 0.25rem}
+    .topup-custom.selected .custom-input-row input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--border);outline:none;cursor:pointer}
+    .topup-custom.selected .custom-input-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;border:2px solid var(--card);box-shadow:0 0 6px hsla(44 96% 52% / 0.4)}
+    .topup-custom.selected .custom-input-row input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;border:2px solid var(--card);box-shadow:0 0 6px hsla(44 96% 52% / 0.4)}
     .topup-custom.selected .tokens{display:none}
     .topup-custom.selected .custom-input-row~.tokens{display:block}
     @media(max-width:600px){
@@ -364,6 +366,7 @@
       .hero{min-height:40vh;padding:1rem 0}
       section{padding:1rem 0}
       .auth-page{padding:1rem 1rem 1rem}
+      .auth-card{max-width:100%}
       .model-grid{grid-template-columns:repeat(2,1fr)}
       .footer-grid{grid-template-columns:1fr 1fr 1fr 1fr}
       .navbar-inner{height:56px}.nav-center{display:none}.hamburger{display:flex;z-index:202}.nav-right .theme-toggle{display:none!important}.mobile-right-group{display:flex}.theme-toggle-mobile{display:flex}

@@ -100,12 +100,15 @@
           <div class="topup-card selected" onclick="selectPackage(this,20)"><div class="price">$20</div><div class="name">Professional</div><div class="tokens">22,000 Tokens</div></div>
           <div class="topup-card" onclick="selectPackage(this,100)"><div class="price">$100</div><div class="name">Enterprise</div><div class="tokens">120,000 Tokens</div></div>
           <div class="topup-card topup-custom" onclick="selectCustomTopup()" id="customCard">
-            <div class="price" id="customPriceLabel">$</div>
+            <div class="price" id="customPriceLabel">$50</div>
             <div class="name">Custom</div>
-            <div class="tokens" id="customTokensLabel">Enter amount</div>
+            <div class="tokens" id="customTokensLabel">55,000 Tokens</div>
             <div class="custom-input-row" id="customInputRow" style="display:none">
-              <span style="color:var(--primary);font-weight:700;font-size:1.1rem">$</span>
-              <input type="number" id="topupCustom" placeholder="0" min="2" oninput="customTopupAmount(this.value)" autofocus>
+              <input type="range" id="customSlider" min="2" max="500" value="50" step="1" oninput="updateCustomPricing()">
+              <div style="display:flex;justify-content:space-between;width:100%;margin-top:4px">
+                <span style="font-size:0.65rem;color:var(--text-muted)">$2</span>
+                <span style="font-size:0.65rem;color:var(--text-muted)">$500</span>
+              </div>
             </div>
           </div>
         </div>
