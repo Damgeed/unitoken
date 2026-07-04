@@ -1000,7 +1000,7 @@ function switchLanguage(lang) {
   var walker = document.createTreeWalker(document.body, 4, null, false);
   while(walker.nextNode()){
     var n = walker.currentNode;
-    if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.lang-selector,.lang-menu,.lang-btn-mobile,.chat-window,.stars-bg,.footer-bottom,script,style,svg,code,pre')) continue;
+    if(n.parentNode && n.parentNode.closest && n.parentNode.closest('.lang-selector,.lang-menu,.lang-btn-mobile,.chat-window,.stars-bg,.footer-bottom,.logo-full,.logo-glb,.logo-token,script,style,svg,code,pre')) continue;
     var t = n.textContent.trim();
     if(!t || t.length <= 1 || /^[\d\s\W]+$/.test(t) || n.parentNode.closest('[data-gt-old]')) continue;
     texts.push(t);
@@ -1024,7 +1024,7 @@ function switchLanguage(lang) {
               batchEls[i].parentNode.setAttribute('data-gt-old', orig);
             }
             var translated = d[0][i][0];
-            if(/GlbTOKEN/i.test(orig) || /Glb[_-]?[Tt]oken/i.test(orig)){
+            if(/GlbTOKEN/i.test(orig) || /Glb[_-]?[Tt]oken/i.test(orig) || /Glb[_-]?TOKEN/i.test(orig)){
               translated = orig;
             }
             batchEls[i].textContent = translated;
