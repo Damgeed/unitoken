@@ -977,6 +977,13 @@ function toggleLangMenu() {
   var m = document.getElementById('langMenu');
   if (m) m.classList.toggle('open');
 }
+// Delegate clicks on language options (works on all devices)
+document.addEventListener('click', function(e) {
+  var opt = e.target.closest('.lang-option');
+  if (opt && opt.closest('#langMenu')) {
+    switchLanguage(opt.getAttribute('data-lang'));
+  }
+});
 function switchLanguage(lang) {
   if(lang === 'en'){
     document.querySelectorAll('[data-gt-old]').forEach(function(el){
