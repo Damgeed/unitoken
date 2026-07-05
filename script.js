@@ -970,13 +970,20 @@ var GT_LANG = 'en';
 var PROTECTED_WORDS = ['GPT','OpenAI','Claude','Gemini','Llama','Mistral','DeepSeek','Perplexity','Cohere','Stripe','Paystack','USDT','BTC','ETH','BNB','SOL','USDC','DAI','NGN','EUR','GBP','JPY','CNY','KRW','GHS','KES','ZAR','USD','API','VPN','SSL','CORS','JSON','ChatGPT','Anthropic','Starter','Professional','Enterprise','Pay-as-You-Go','Multi-Model','Local Payments','GlbTOKEN','Glb','TOKEN','AIEX','KAI'];
 
 function googleTranslateElementInit() {
-  if (sessionStorage.getItem('gt_disable')) return;
   new google.translate.TranslateElement({
     pageLanguage: 'en',
     autoDisplay: false,
     includedLanguages: 'en,zh-CN,ru,ja,de'
   }, 'google_translate_element');
 }
+
+// ── Dynamically load Google Translate JS only when needed ──
+(function(){
+  if (sessionStorage.getItem('gt_disable')) return;
+  var s = document.createElement('script');
+  s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  document.head.appendChild(s);
+})();
 
 function toggleLangMenu() {
   var m = document.getElementById('langMenu');
