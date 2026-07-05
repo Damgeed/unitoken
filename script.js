@@ -986,12 +986,8 @@ function switchLanguage(lang) {
   localStorage.setItem('gt_lang', lang);
   GT_LANG = lang;
   updateLangUI(lang);
-  // Always set a valid googtrans cookie - never leave it unset
-  // (/en/en means "English to English" = no translation)
+  // Always set a valid googtrans cookie
   document.cookie = 'googtrans=/en/' + lang + '; path=/;';
-  if (lang === 'en') {
-    localStorage.removeItem('gt_lang');
-  }
   location.reload();
 }
 
@@ -1014,11 +1010,11 @@ document.addEventListener('click', function(e) {
 
 function restoreSavedLanguage() {
   var saved = localStorage.getItem('gt_lang');
-  if (!saved || saved === 'en') return;
+  if (!saved) return;
   GT_LANG = saved;
   updateLangUI(saved);
   // Programmatically set the hidden Google Translate combo box
-  // This is more reliable than cookie-only for some languages
+  // (even for 'en' — some browsers need explicit combo box change to revert)
   function setComboBox() {
     var cb = document.querySelector('.goog-te-combo');
     if (!cb) return false;
