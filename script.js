@@ -17,13 +17,15 @@
 
     function toggleTheme(){
       const h=document.documentElement;
-      const isDark=h.className==='dark';
-      h.className=isDark?'light':'dark';
+      const isDark=h.classList.contains('dark');
+      h.classList.remove('dark','light');
+      h.classList.add(isDark?'light':'dark');
       localStorage.setItem('gt_theme',h.className);
-      document.getElementById('themeBtn').textContent=h.className==='dark'?'🌙':'☀️';
-      // Mobile theme toggle now uses the navbar button — no overlay sync needed
+      document.getElementById('themeBtn').textContent=h.classList.contains('dark')?'🌙':'☀️';
+      var m=document.getElementById('themeBtnMobile');
+      if(m)m.textContent=h.classList.contains('dark')?'🌙':'☀️';
     }
-
+    
     // ── API Helper (with demo fallback) ──
     let models = [], selectedAmount = 5, selectedPayment = 'stripe';
     let chartInst = null, sparkInst = null, sortDir = 'price_asc';
