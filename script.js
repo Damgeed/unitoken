@@ -983,11 +983,17 @@ function toggleLangMenu() {
 }
 
 function switchLanguage(lang) {
-  localStorage.setItem('gt_lang', lang);
   GT_LANG = lang;
   updateLangUI(lang);
-  // Always set a valid googtrans cookie
-  document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+  if (lang === 'en') {
+    // English = default. Delete cookie + localStorage so Google Translate
+    // has zero stored state — fresh page load, no translation.
+    localStorage.removeItem('gt_lang');
+    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+  } else {
+    localStorage.setItem('gt_lang', lang);
+    document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+  }
   location.reload();
 }
 
