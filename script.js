@@ -975,11 +975,12 @@ function googleTranslateElementInit() {
     autoDisplay: false,
     includedLanguages: 'en,zh-CN,ru,ja,de'
   }, 'google_translate_element');
+  // After widget loads, restore previously saved language
+  restoreAfterGTLoad();
 }
 
-// ── Dynamically load Google Translate JS only when needed ──
+// ── Load Google Translate JS on every page (cookie controls translation, not script loading) ──
 (function(){
-  if (sessionStorage.getItem('gt_disable')) return;
   var s = document.createElement('script');
   s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
   document.head.appendChild(s);
@@ -994,18 +995,16 @@ function switchLanguage(lang) {
   GT_LANG = lang;
   updateLangUI(lang);
   if (lang === 'en') {
-    // Nuclear: prevent Google Translate from initializing at all
-    sessionStorage.setItem('gt_disable', '1');
-    localStorage.removeItem('gt_lang');
+    // Clear cookie → GT has no translation instruction → stays at pageLanguage 'en'
     document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie = 'googtrans=; path=/; domain=.glbtoken.com; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    location.href = location.pathname + '?_=' + Date.now();
-    return;
+    localStorage.removeItem('gt_lang');
+  } else {
+    // Set cookie → GT translates page to target language
+    document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+    localStorage.setItem('gt_lang', lang);
   }
-  sessionStorage.removeItem('gt_disable');
-  localStorage.setItem('gt_lang', lang);
-  document.cookie = 'googtrans=/en/' + lang + '; path=/;';
-  location.reload();
+  location.href = location.pathname + '?_=' + Date.now();
 }
 
 function updateLangUI(lang) {
@@ -1025,56 +1024,16 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function restoreSavedLanguage() {
+function restoreAfterGTLoad() {
   var saved = localStorage.getItem('gt_lang');
-  if (!saved || sessionStorage.getItem('gt_disable')) return;
+  if (!saved || saved === 'en') return;
   GT_LANG = saved;
   updateLangUI(saved);
-  // Programmatically set the hidden Google Translate combo box
-  function setComboBox() {
-    var cb = document.querySelector('.goog-te-combo');
-    if (!cb) return false;
-    // For EN: set to empty string ("Select Language") to disable translation
-    // For other languages: set to the language code to trigger translation
-    var val = saved === 'en' ? '' : saved;
-    var opt = cb.querySelector('option[value="' + val + '"]');
-    if (!opt) return false;
-    if (cb.value === val) return true;
-    cb.value = val;
-    // Temporarily make combo box AND its parent visible for Google's handler
-    var parent = document.getElementById('google_translate_element');
-    if (parent) parent.style.cssText = 'display:block!important;position:fixed;top:-9999px;left:0';
-    cb.style.cssText = 'display:block!important;visibility:visible!important';
-    cb.dispatchEvent(new Event('change', {bubbles: true}));
-    // Re-hide after a tick
-    setTimeout(function(){
-      cb.style.cssText = '';
-      if (parent) parent.style.cssText = 'display:none';
-    }, 50);
-    return true;
-  }
-  // Try at increasing intervals until widget is fully loaded
-  if (!setComboBox()) {
-    setTimeout(function(){ setComboBox(); }, 800);
-    setTimeout(function(){ setComboBox(); }, 2000);
-    setTimeout(function(){ setComboBox(); }, 4000);
-  }
+  // Let Google Translate read the cookie — it auto-applies translation on init
   setTimeout(protectTerms, 500);
   setTimeout(protectTerms, 1500);
   setTimeout(protectTerms, 3000);
 }
-
-// ── Fix bfcache (back/forward): restore translations when page comes from cache ──
-window.addEventListener('pageshow', function(e){
-  if(!e.persisted) return;
-  var saved = localStorage.getItem('gt_lang');
-  if(saved && saved !== 'en'){
-    // Page was restored from bfcache — Google Translate didn't re-run
-    // Re-set cookie and reload to trigger fresh translation
-    document.cookie = 'googtrans=/en/' + saved + '; path=/;';
-    location.reload();
-  }
-});
 
 // ── Protect terms from translation ──
 function protectTerms() {
