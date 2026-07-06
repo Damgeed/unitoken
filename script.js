@@ -63,8 +63,16 @@
       const confirm=document.getElementById('regConfirm').value;
       const country='';
       const errEl=document.getElementById('regError');
-      if(errEl)errEl.style.display='none';
-      if(!name||!email||!pass){const m='Fill all fields';showToast(m,'error');if(errEl){errEl.textContent=m;errEl.style.display='block'}return}
+      if(errEl){errEl.style.display='none';errEl.textContent=''}
+      // Per-field validation
+      var fieldErrors = [];
+      if(!name){fieldErrors.push('Name'); document.getElementById('regName').classList.add('field-error')}
+      else document.getElementById('regName').classList.remove('field-error');
+      if(!email){fieldErrors.push('Email'); document.getElementById('regEmail').classList.add('field-error')}
+      else document.getElementById('regEmail').classList.remove('field-error');
+      if(!pass){fieldErrors.push('Password'); document.getElementById('regPassword').classList.add('field-error')}
+      else document.getElementById('regPassword').classList.remove('field-error');
+      if(fieldErrors.length){const m='Please fill in: ' + fieldErrors.join(', ');showToast(m,'error');if(errEl){errEl.textContent=m;errEl.style.display='block'}return}
       if(pass!==confirm){const m='Passwords do not match';showToast(m,'error');if(errEl){errEl.textContent=m;errEl.style.display='block'}return}
       if(pass.length<6){const m='Password must be at least 6 characters';showToast(m,'error');if(errEl){errEl.textContent=m;errEl.style.display='block'}return}
       try{
@@ -88,8 +96,14 @@
       const email=document.getElementById('loginEmail').value;
       const pass=document.getElementById('loginPassword').value;
       const errEl=document.getElementById('loginError');
-      if(errEl)errEl.style.display='none';
-      if(!email||!pass){showToast('Enter email and password','error');if(errEl){errEl.textContent='Enter email and password';errEl.style.display='block'}return}
+      if(errEl){errEl.style.display='none';errEl.textContent=''}
+      // Per-field validation
+      var fieldErrors = [];
+      if(!email){fieldErrors.push('Email'); document.getElementById('loginEmail').classList.add('field-error')}
+      else document.getElementById('loginEmail').classList.remove('field-error');
+      if(!pass){fieldErrors.push('Password'); document.getElementById('loginPassword').classList.add('field-error')}
+      else document.getElementById('loginPassword').classList.remove('field-error');
+      if(fieldErrors.length){const m='Please enter: ' + fieldErrors.join(', ');showToast(m,'error');if(errEl){errEl.textContent=m;errEl.style.display='block'}return}
       try{
         const data=await api('POST','/api/auth/login',{email,password:pass});
         token=data.token;userData=data.user;
@@ -161,7 +175,7 @@
         '<div class="auth-field"><label>Email</label><input type="email" id="resetEmail" placeholder="you@example.com"></div>' +
         '<div id="resetError" style="color:#ff4444;font-size:0.85rem;margin-bottom:1rem;text-align:center;display:none"></div>' +
         '<div style="display:flex;gap:0.75rem;margin-top:1rem">' +
-        '<button class="btn-primary" style="flex:1" id="resetSendBtn" onclick="sendResetLink()">Send Reset Link</button>' +
+        '<button class="btn-primary" style="flex:1;font-size:0.8rem;white-space:nowrap" id="resetSendBtn" onclick="sendResetLink()">Send Reset Link</button>' +
         '<button style="flex:1;padding:0.75rem 1.5rem;background:var(--card-bg-alt,#2a2a3e);color:var(--text,#e0e0e0);border:1px solid var(--border,#3a3a4e);border-radius:12px;cursor:pointer" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>' +
         '</div></div>';
       document.body.appendChild(overlay);
