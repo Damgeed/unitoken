@@ -761,7 +761,7 @@
       userDiv.innerHTML = '<div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div>';
       msgs.appendChild(userDiv);
       input.value = '';
-      input.style.height = 'auto';
+      // DON'T reset input.style.height — that triggers layout reflow and dismisses keyboard on mobile
       // Refocus input to keep keyboard open on mobile
       setTimeout(function(){ input.focus(); }, 10);
       msgs.scrollTop = msgs.scrollHeight;
@@ -930,15 +930,17 @@
     async function refreshTopModels(){
       var container=document.getElementById('tmModelsView');
       if(!container)return;
+      // Save current HTML to restore on API failure
+      var fallbackHtml = container.innerHTML;
       container.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-muted);font-size:0.8rem">Loading models...</div>';
       try{
         var all=await api('GET','/api/models');
-        if(!all||!all.length){container.innerHTML='';return;}
+        if(!all||!all.length){container.innerHTML=fallbackHtml;return;}
         var featured=all.filter(function(m){return m.category==='Flagship'||m.category==='Flash';});
         var top4=featured.length>=4?featured.slice(0,4):all.slice(0,4);
         var html='';
         top4.forEach(function(m){
-          var price='$'+(m.prompt_price*1000).toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'/1k';
+          var price='$'+(m.prompt_price*1000).toFixed(4).replace(/0+$/,'').replace(/\\.$/,'')+'/1k';
           var ctx=m.context_length>=1000000?(m.context_length/1000000).toFixed(0)+'M':m.context_length>=1000?(m.context_length/1000).toFixed(0)+'K':m.context_length;
           html+='<div style="background:var(--bg-alt);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:0.75rem;overflow-wrap:break-word;word-break:break-word;overflow:hidden;width:100%;box-sizing:border-box">'
             +'<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.2rem;overflow-wrap:break-word;word-break:break-word">'+m.provider+'</div>'
@@ -948,7 +950,8 @@
         });
         container.innerHTML=html;
       }catch(e){
-        container.innerHTML='';
+        // API failed (backend down) — restore original HTML so carousel doesn't go blank
+        container.innerHTML=fallbackHtml;
       }
     }
 
