@@ -1081,20 +1081,12 @@ function restoreAfterGTLoad() {
   if (!saved || saved === 'en') return;
   GT_LANG = saved;
   updateLangUI(saved);
-  // Check if GT combo box already reflects the saved language
-  var cb = document.querySelector('.goog-te-combo');
-  if (cb && cb.value === saved) {
-    // Already translated — just protect terms
-    setTimeout(protectTerms, 500);
-    setTimeout(protectTerms, 1500);
-    setTimeout(protectTerms, 3000);
-    return;
-  }
-  // Combo box doesn't match — set cookie and reload to let GT pick it up
-  clearGoogTransCookie();
-  document.cookie = 'googtrans=/en/' + saved + '; path=/;';
-  localStorage.setItem('gt_lang', saved);
-  setTimeout(function(){ location.href = location.pathname + '?_=' + Date.now(); }, 200);
+  // Don't touch cookies or combo box — switchLanguage() already set the
+  // googtrans cookie correctly. GT reads it on initialization. Just protect
+  // brand names from being translated.
+  setTimeout(protectTerms, 1000);
+  setTimeout(protectTerms, 2500);
+  setTimeout(protectTerms, 4000);
 }
 
 function clearGoogTransCookie(){
