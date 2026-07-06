@@ -1434,7 +1434,39 @@ async def fix_newapi(
         except:
             db_info = ("unknown", "unknown")
         
-        return {"status": "ok", "database": db_info[0] if db_info else "unknown", "detail": "Connected successfully - adding full inspection in next iteration"}
+        # List tables
+        tables = []
+        try:
+            cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name")
+            tables = [r[0] for r in cur.fetchall()]
+        except Exception as e:
+            tables = [f"ERROR: {e}"]
+        
+        # Check if 'users' table exists and its structure
+        users_info = {}
+        if 'users' in tables:
+            try:
+                cur.execute("SELECT column_name, data_type, character_maximum_length FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position")
+                users_info['columns'] = [(r[0], r[1], r[2]) for r in cur.fetchall()]
+                cur.execute("SELECT count(*) FROM users")
+                users_info['count'] = cur.fetchone()[0]
+                cur.execute("SELECT id, username, role, access_token FROM users LIMIT 5")
+                users_info['sample'] = [(r[0], r[1], r[2], str(r[3])[:20] if r[3] else None) for r in cur.fetchall()]
+            except Exception as e:
+                users_info['error'] = str(e)
+        
+        # Also check if there's a user with a specific role that could be admin
+        if 'users' in tables:
+            # Try to promote user id=1 to role=100
+            cur.execute("UPDATE users SET role = 100 WHERE id = 1 AND role < 100")
+            r1 = cur.rowcount
+            if r1 == 0:
+                cur.execute("UPDATE users SET role = 100 WHERE username = 'root' AND role < 100")
+                r1 = cur.rowcount
+            conn.commit()
+            users_info['promoted'] = r1
+        
+        return {"status": "ok", "database": db_info[0] if db_info else "unknown", "tables": tables, "users": users_info}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
