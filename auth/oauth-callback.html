@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Signing in — GlbTOKEN</title>
+<style>
+body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f0f1a;color:#e0e0e0;font-family:system-ui,-apple-system,sans-serif}
+.loader{width:40px;height:40px;border:3px solid #2a2a3e;border-top-color:#00D68F;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+p{text-align:center;color:#888;font-size:.9rem}
+.error{color:#ff4444;margin-top:1rem;font-size:.85rem}
+</style></head><body>
+<div>
+  <div class="loader" id="spinner"></div>
+  <p id="statusText">Signing you in...</p>
+  <p class="error" id="errorText" style="display:none"></p>
+</div>
+<script>
+(function(){
+  var BASE_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000' : 'https://glbtoken-backend-production.up.railway.app';
+  var params = new URLSearchParams(window.location.search);
+  var provider = params.get('provider') || 'google';
+  var code = params.get('code');
+  var error = params.get('error');
+
+  if(error){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('statusText').textContent='Authorization failed';
+    document.getElementById('errorText').textContent=error;
+    document.getElementById('errorText').style.display='block';
+    return;
+  }
+
+  if(!code){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('statusText').textContent='No authorization code received';
+    return;
+  }
+
+  // Send code to backend
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', BASE_URL + '/api/auth/' + provider + '/callback', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function(){
+    if(xhr.status >= 200 && xhr.status < 300){
+      var data = JSON.parse(xhr.responseText);
+      localStorage.setItem('gt_token', data.token);
+      localStorage.setItem('gt_user', JSON.stringify(data.user));
+      // Clean URL params
+      window.location.href = '/dashboard.html';
+    }else{
+      var errMsg = 'Login failed';
+      try{ var d = JSON.parse(xhr.responseText); errMsg = d.detail || errMsg; }catch(e){}
+      document.getElementById('spinner').style.display='none';
+      document.getElementById('statusText').textContent='Sign in failed';
+      document.getElementById('errorText').textContent=errMsg;
+      document.getElementById('errorText').style.display='block';
+    }
+  };
+  xhr.onerror = function(){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('statusText').textContent='Network error';
+    document.getElementById('errorText').textContent='Could not reach the server. Try again.';
+    document.getElementById('errorText').style.display='block';
+  };
+  xhr.send(JSON.stringify({
+    token: code,
+    code: code
+  }));
+})();
+</script>
+</body></html>
