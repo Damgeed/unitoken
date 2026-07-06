@@ -13,24 +13,29 @@ ADMIN_TOKEN = os.getenv("NEW_API_ADMIN_TOKEN", "")
 
 HEADERS = {"Authorization": f"Bearer {ADMIN_TOKEN}"} if ADMIN_TOKEN else {}
 
-async def _post(path: str, data: dict = None) -> dict:
+# For admin operations, New API also requires the user ID header
+ADMIN_HEADERS = {**HEADERS, "New-Api-User": "1"} if ADMIN_TOKEN else {}
+
+async def _post(path: str, data: dict = None, admin: bool = False) -> dict:
     """Make a POST request to New API."""
     if not NEW_API_BASE or not ADMIN_TOKEN:
         return {"error": "New API not configured"}
     url = f"{NEW_API_BASE.rstrip('/')}{path}"
+    headers = ADMIN_HEADERS if admin else HEADERS
     async with httpx.AsyncClient(timeout=15) as client:
-        r = await client.post(url, json=data, headers=HEADERS)
+        r = await client.post(url, json=data, headers=headers)
         if r.status_code >= 400:
             return {"error": "New API request failed", "status": r.status_code}
         return r.json()
 
-async def _get(path: str) -> dict:
+async def _get(path: str, admin: bool = False) -> dict:
     """Make a GET request to New API."""
     if not NEW_API_BASE or not ADMIN_TOKEN:
         return {"error": "New API not configured"}
     url = f"{NEW_API_BASE.rstrip('/')}{path}"
+    headers = ADMIN_HEADERS if admin else HEADERS
     async with httpx.AsyncClient(timeout=15) as client:
-        r = await client.get(url, headers=HEADERS)
+        r = await client.get(url, headers=headers)
         if r.status_code >= 400:
             return {"error": "New API request failed", "status": r.status_code}
         return r.json()
@@ -49,31 +54,36 @@ async def health_check() -> bool:
 async def create_newapi_user(email: str, name: str, quota: int = 25000) -> dict:
     """
     Create a user in New API.
-    Returns user dict with 'id' and 'key' fields on success.
+    The /api/user/register endpoint is public (no auth needed).
+    Returns user dict with 'id' field on success.
     """
     if not NEW_API_BASE or not ADMIN_TOKEN:
         # Fall back to local-only mode
         return {"id": 0, "email": email, "name": name, "quota": quota}
     import secrets
     auto_password = "GlbToken_" + secrets.token_hex(12)
+    # New API uses 'username' not 'email' for registration
+    username = email.split("@")[0] + "_" + secrets.token_hex(4)
+    # Truncate to avoid overly long usernames
+    username = username[:32]
     return await _post("/api/user/register", {
-        "email": email,
-        "name": name,
+        "username": username,
         "password": auto_password,
-        "quota": quota
+        "display_name": name,
+        "email": email,
     })
 
 async def update_user_quota(user_id: int, quota: int) -> dict:
     """Set a user's remaining quota in New API."""
-    return await _post(f"/api/user/{user_id}", {"quota": quota})
+    return await _post(f"/api/user/{user_id}", {"quota": quota}, admin=True)
 
 async def add_user_quota(user_id: int, tokens: int) -> dict:
     """Add tokens to a user's quota in New API."""
-    return await _post(f"/api/user/{user_id}", {"add_quota": tokens})
+    return await _post(f"/api/user/{user_id}", {"add_quota": tokens}, admin=True)
 
 async def get_usage_today(user_id: int) -> dict:
     """Get today's usage for a user from New API."""
-    result = await _get(f"/api/user/{user_id}/usage")
+    result = await _get(f"/api/user/{user_id}/usage", admin=True)
     if "error" in result:
         return {"total": 0, "models": {}}
     return result
@@ -85,4 +95,4 @@ async def create_api_token(user_id: int, name: str = "GlbTOKEN") -> dict:
     """
     if not NEW_API_BASE or not ADMIN_TOKEN:
         return {"key": "", "name": name}
-    return await _post(f"/api/user/{user_id}/key", {"name": name})
+    return await _post(f"/api/user/{user_id}/key", {"name": name}, admin=True)
