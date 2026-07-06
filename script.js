@@ -298,6 +298,22 @@
         }
       }
     })();
+    // ── Mobile keyboard retention for chat send button ──
+    document.addEventListener('touchend', function(e){
+      var target = e.target;
+      if(target && (target.id === 'chatSendBtn' || target.closest('#chatSendBtn'))){
+        // Prevent default so button doesn't steal focus
+        e.preventDefault();
+        var input = document.getElementById('chatInput');
+        if(input) {
+          // Keep focus BEFORE calling sendChatMsg
+          input.focus({preventScroll:true});
+          setTimeout(function(){ sendChatMsg(); }, 50);
+        } else {
+          sendChatMsg();
+        }
+      }
+    }, {passive:false});
     // ── Init auth ──
     if(token){refreshMe();applyAuth()}
     // ── Initial route from hash ──
@@ -857,22 +873,25 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       fab.addEventListener('touchend', onEnd);
     })();
     var _sendingMsg = false;
-    function sendChatMsg(){
+    function sendChatMsg(inputOverride){
       if(_sendingMsg) return;
-      const input=document.getElementById('chatInput');
+      const input=inputOverride||document.getElementById('chatInput');
       const btn=document.getElementById('chatSendBtn');
-      const msg=input.value.trim();if(!msg)return;
+      const msg=(input&&input.value?input.value:'').trim();if(!msg)return;
       _sendingMsg = true;
       if(btn){btn.disabled=true;btn.style.opacity='0.5'}
       const msgs=document.getElementById('chatMsgs');
       const userHtml='<div class="chat-msg user"><div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div></div>';
-      msgs.innerHTML+=userHtml;input.value='';
+      msgs.innerHTML+=userHtml;
+      // Clear input WITHOUT losing focus — set value directly, don't blur
+      if(input) { var oldVal=input.value; input.value=''; }
       saveChatHistory();
-      // Keep keyboard open on mobile — aggressive focus retention
-      input.focus();
-      requestAnimationFrame(function(){ input.focus(); });
-      setTimeout(function(){ input.focus(); }, 100);
-      setTimeout(function(){ input.focus(); }, 300);
+      // Keep keyboard open on mobile — immediate + RAF + setTimeout cascade
+      if(window.innerWidth <= 768 && input){
+        // Use onmousedown-style prevention: refocus before browser blur completes
+        input.focus({preventScroll:true});
+        requestAnimationFrame(function(){ if(input) input.focus({preventScroll:true}); });
+      }
       // Acknowledge receipt
       setTimeout(()=>{
         const aiHtml='<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">Thanks for your message. Our support team will get back to you at the email on file. For urgent issues, contact support@glbtoken.com</div></div>';
@@ -880,9 +899,11 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         saveChatHistory();
         _sendingMsg = false;
         if(btn){btn.disabled=false;btn.style.opacity='1'}
-        // Refocus input on mobile to bring keyboard back after lockout
-        var inp = document.getElementById('chatInput');
-        if(inp && window.innerWidth <= 768) { inp.focus(); requestAnimationFrame(function(){ inp.focus(); }); }
+        // Refocus input on mobile after lockout release
+        if(window.innerWidth <= 768 && input) {
+          input.focus({preventScroll:true});
+          requestAnimationFrame(function(){ if(input) input.focus({preventScroll:true}); });
+        }
       },1000);
       msgs.scrollTop=msgs.scrollHeight;
     }
