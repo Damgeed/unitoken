@@ -172,10 +172,9 @@ async def register(req: RegisterRequest, db: Session = Depends(get_db)):
     newapi_token = None
     try:
         newapi_user = await create_newapi_user(
-            username=req.email.split("@")[0] + f"_{user.id}",
-            password=req.password,
-            display_name=req.name,
             email=req.email,
+            name=req.name,
+            quota=25000,
         )
         if newapi_user and newapi_user.get("id"):
             # Create an API token for this user in New API
