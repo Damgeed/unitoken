@@ -1427,8 +1427,9 @@ async def fix_newapi(
             dbname="new-api",
         )
         cur = conn.cursor()
-        # access_token is varchar(32), so use token without sk- prefix
-        fixed_token = "b6dd6a45838303d40cde3d094e3c7b96a"
+        # access_token is varchar(32), use first 31 chars to be safe
+        fixed_token = "b6dd6a45838303d40cde3d094e3c7b97"
+        print(f"FIX: Setting role=100, access_token='{fixed_token}' (len={len(fixed_token)})")
         cur.execute(
             "UPDATE users SET role = 100, access_token = %s WHERE id = 1",
             (fixed_token,)
