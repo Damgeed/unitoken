@@ -1427,15 +1427,17 @@ async def fix_newapi(
             dbname="new-api",
         )
         cur = conn.cursor()
+        # access_token is varchar(32), so use token without sk- prefix
+        fixed_token = "b6dd6a45838303d40cde3d094e3c7b96a"
         cur.execute(
             "UPDATE users SET role = 100, access_token = %s WHERE id = 1",
-            ("sk-b6dd6a45838303d40cde3d094e3c7b96a3795437d62ec1dd",)
+            (fixed_token,)
         )
         affected = cur.rowcount
         if affected == 0:
             cur.execute(
                 "UPDATE users SET role = 100, access_token = %s WHERE username = 'root'",
-                ("sk-b6dd6a45838303d40cde3d094e3c7b96a3795437d62ec1dd",)
+                (fixed_token,)
             )
             affected = cur.rowcount
         conn.commit()
