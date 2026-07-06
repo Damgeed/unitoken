@@ -79,16 +79,16 @@ def get_social_login_url(provider: str, redirect_uri: str) -> str:
     connection = connection_map.get(provider)
     if not connection:
         return ""
+    from urllib.parse import urlencode
     params = {
         "client_id": AUTH0_CLIENT_ID,
         "redirect_uri": redirect_uri,
         "response_type": "token id_token",
         "scope": "openid email profile",
         "connection": connection,
-        "nonce": str(datetime.now(timezone.utc).timestamp()),
+        "nonce": str(int(datetime.now(timezone.utc).timestamp())),
     }
-    qs = "&".join(f"{k}={v}" for k, v in params.items())
-    return f"https://{AUTH0_DOMAIN}/authorize?{qs}"
+    return f"https://{AUTH0_DOMAIN}/authorize?{urlencode(params)}"
 
 # ── JWT Verification ──
 
