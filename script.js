@@ -1059,9 +1059,7 @@ function switchLanguage(lang) {
   // Save carousel position before reload
   var carousel = document.querySelector('.tm-carousel, .carousel, .slider, .testimonial-carousel');
   if (carousel) {
-    // tm-carousel uses tmIndex; other carousels use .active class
     var idx = -1;
-    // Check for tm-carousel first: active dot index
     var tmDots = carousel.querySelectorAll('.tm-dot');
     if (tmDots.length) {
       tmDots.forEach(function(d, i) { if (d.classList.contains('active')) idx = i; });
@@ -1077,19 +1075,33 @@ function switchLanguage(lang) {
     if (idx >= 0) sessionStorage.setItem('gt_carousel_idx', idx);
   }
   
+  // Helper: clear googtrans cookies at ALL known domain/path combos
+  function clearGoogTrans() {
+    var paths = ['/', '/glbtoken'];
+    var domains = ['', '.glbtoken.com', 'glbtoken.com', '.github.io', 'damgeed.github.io'];
+    var expiry = 'expires=Thu, 01 Jan 1970 00:00:00 UTC';
+    for (var pi = 0; pi < paths.length; pi++) {
+      for (var di = 0; di < domains.length; di++) {
+        var c = 'googtrans=; path=' + paths[pi] + '; ' + expiry;
+        if (domains[di]) c += '; domain=' + domains[di];
+        document.cookie = c;
+      }
+    }
+  }
+  
   if (lang === 'en') {
-    // Nuclear clear: remove googtrans at every path/domain level
-    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'googtrans=; path=/; domain=.glbtoken.com; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'googtrans=; path=/; domain=glbtoken.com; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'googtrans=; path=/; domain=.glbtoken.com; max-age=0;';
-    document.cookie = 'googtrans=; path=/; domain=.github.io; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'googtrans=; path=/; domain=damgeed.github.io; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-    document.cookie = 'googtrans=; domain=.glbtoken.com; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    clearGoogTrans();
     localStorage.removeItem('gt_lang');
     sessionStorage.setItem('gt_disable', '1');
   } else {
+    // Clear ALL previous googtrans cookies first (GT may have set its own domain-scoped version)
+    clearGoogTrans();
+    // Then set the new cookie at every domain/path level
     document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=.glbtoken.com;';
+    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=glbtoken.com;';
+    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=.github.io;';
+    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=damgeed.github.io;';
     localStorage.setItem('gt_lang', lang);
     sessionStorage.removeItem('gt_disable');
   }
@@ -1122,22 +1134,30 @@ function restoreAfterGTLoad() {
   function setComboBox() {
     var cb = document.querySelector('.goog-te-combo');
     if (!cb) return false;
-    if (cb.value === saved) return true;
-    cb.value = saved;
-    // Make combo box visible for GT's change handler
-    var parent = document.getElementById('google_translate_element');
-    if (parent) parent.style.cssText = 'display:block!important;position:fixed;top:-9999px;left:0';
-    cb.style.cssText = 'display:block!important;visibility:visible!important';
-    cb.dispatchEvent(new Event('change', {bubbles: true}));
+    // Always dispatch — don't skip if value matches, GT may have cached stale state
+    // Toggle through EN first to clear GT's internal cache, then go to target
+    if (cb.value !== 'en') {
+      cb.value = 'en';
+      cb.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+    // Small delay then set to target language
     setTimeout(function(){
-      cb.style.cssText = '';
-      if (parent) parent.style.cssText = 'display:none';
-    }, 50);
+      cb.value = saved;
+      var parent = document.getElementById('google_translate_element');
+      if (parent) parent.style.cssText = 'display:block!important;position:fixed;top:-9999px;left:0';
+      cb.style.cssText = 'display:block!important;visibility:visible!important';
+      cb.dispatchEvent(new Event('change', {bubbles: true}));
+      setTimeout(function(){
+        cb.style.cssText = '';
+        if (parent) parent.style.cssText = 'display:none';
+      }, 50);
+    }, 100);
     return true;
   }
   if (!setComboBox()) {
     setTimeout(function(){ setComboBox(); }, 800);
     setTimeout(function(){ setComboBox(); }, 2000);
+    setTimeout(function(){ setComboBox(); }, 4000);
   }
   setTimeout(protectTerms, 500);
   setTimeout(protectTerms, 1500);
