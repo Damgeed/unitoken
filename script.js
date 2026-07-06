@@ -65,46 +65,28 @@
       if(!name||!email||!pass){showToast('Fill all fields','error');return}
       if(pass!==confirm){showToast('Passwords dont match','error');return}
       try{
-        // Route through Auth0 signup (falls back to custom auth if Auth0 not configured)
-        const data = await api('POST','/api/auth/auth0/signup',{name,email,password:pass,country});
+        const data=await api('POST','/api/auth/register',{name,email,password:pass,country});
         token=data.token;userData=data.user;
         localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
+        if(data.newapi_token){
+          newapiToken=data.newapi_token;
+          newapiEndpoint=data.newapi_endpoint||'';
+          localStorage.setItem('gt_newapi_token',newapiToken);
+          localStorage.setItem('gt_newapi_endpoint',newapiEndpoint);
+        }
         applyAuth();showToast('Account created! Welcome.','success');showPage('dashboard');
-      }catch(e){
-        // Fallback to custom auth
-        try{
-          const data=await api('POST','/api/auth/register',{name,email,password:pass,country});
-          token=data.token;userData=data.user;
-          localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
-          if(data.newapi_token){
-            newapiToken=data.newapi_token;
-            newapiEndpoint=data.newapi_endpoint||'';
-            localStorage.setItem('gt_newapi_token',newapiToken);
-            localStorage.setItem('gt_newapi_endpoint',newapiEndpoint);
-          }
-          applyAuth();showToast('Account created! Welcome.','success');showPage('dashboard');
-        }catch(e2){showToast(e2.message,'error')}
-      }
+      }catch(e){showToast(e.message,'error')}
     }
     async function loginUser(){
       const email=document.getElementById('loginEmail').value;
       const pass=document.getElementById('loginPassword').value;
       if(!email||!pass){showToast('Enter email and password','error');return}
       try{
-        // Route through Auth0 password grant
-        const data = await api('POST','/api/auth/auth0/password-login',{email,password:pass});
+        const data=await api('POST','/api/auth/login',{email,password:pass});
         token=data.token;userData=data.user;
         localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
         applyAuth();showToast('Welcome back!','success');showPage('dashboard');
-      }catch(e){
-        // Fallback to custom auth if Auth0 not configured
-        try{
-          const data=await api('POST','/api/auth/login',{email,password:pass});
-          token=data.token;userData=data.user;
-          localStorage.setItem('gt_token',token);localStorage.setItem('gt_user',JSON.stringify(userData));
-          applyAuth();showToast('Welcome back!','success');showPage('dashboard');
-        }catch(e2){showToast(e2.message,'error')}
-      }
+      }catch(e){showToast(e.message,'error')}
     }
     function oauthLogin(provider){
       // Redirect to Auth0 social login
