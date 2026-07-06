@@ -109,7 +109,7 @@
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🚀 Quick Start</h3>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem">
       <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Use the OpenAI Python SDK with your GlbTOKEN API key:</p>
-      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--text-muted)"># pip install openai</span>
+      <pre translate="no" style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--text-muted)"># pip install openai</span>
 <span style="color:var(--primary)">from</span> openai <span style="color:var(--primary)">import</span> OpenAI
 
 client = OpenAI(
@@ -131,13 +131,13 @@ print(response.choices[0].message.content)</pre>
   <div class="dash-card" style="margin-bottom:2rem">
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🌐 Base URL</h3>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:0.75rem;font-family:monospace;font-size:0.9rem;color:var(--primary);word-break:break-all">https://glbtoken-api.onrender.com/api/proxy</div>
-    <p style="font-size:0.85rem;color:var(--text-secondary)">This endpoint is fully compatible with the OpenAI SDK. Just change the <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">base_url</code> and your <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">api_key</code>.</p>
+    <p style="font-size:0.85rem;color:var(--text-secondary)">This endpoint is fully compatible with the OpenAI SDK. Just change the <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">base_url</code> and your <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85rem">api_key</code>.</p>
   </div>
 
   <!-- Authentication -->
   <div class="dash-card" style="margin-bottom:2rem">
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🔐 Authentication</h3>
-    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">All API requests require an API key passed via the <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">Authorization</code> header:</p>
+    <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">All API requests require an API key passed via the <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">Authorization</code> header:</p>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:0.75rem;font-family:monospace;font-size:0.85rem;color:var(--text)">Authorization: Bearer sk-glt_&lt;your_api_key&gt;</div>
     <p style="font-size:0.85rem;color:var(--text-muted)">Generate your first API key from the <a href="dashboard.html" style="color:var(--primary)">Dashboard</a> after signing up.</p>
   </div>
@@ -147,7 +147,7 @@ print(response.choices[0].message.content)</pre>
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🤖 Available Models</h3>
     <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">List all available models with pricing:</p>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
-      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/models \
+      <pre translate="no" style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/models \
   -H <span style="color:var(--text-muted)">"Authorization: Bearer sk-glt_..."</span></pre>
     </div>
     <p style="font-size:0.85rem;color:var(--text-muted)">Or browse all models on the <a href="models.html" style="color:var(--primary)">Models</a> page.</p>
@@ -158,7 +158,7 @@ print(response.choices[0].message.content)</pre>
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">💬 Chat Completions</h3>
     <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Send a chat completion request (OpenAI-compatible):</p>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
-      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/v1/chat/completions \
+      <pre translate="no" style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)">curl https://glbtoken-api.onrender.com/api/proxy/v1/chat/completions \
   -H <span style="color:var(--text-muted)">"Content-Type: application/json"</span> \
   -H <span style="color:var(--text-muted)">"Authorization: Bearer sk-glt_..."</span> \
   -d '{
@@ -171,7 +171,7 @@ print(response.choices[0].message.content)</pre>
     <span style="color:var(--text-muted)">"max_tokens"</span>: 1000
   }'</pre>
     </div>
-    <p style="font-size:0.85rem;color:var(--text-muted)">All parameters from the OpenAI API are supported: <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">stream</code>, <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">frequency_penalty</code>, <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">top_p</code>, etc.</p>
+    <p style="font-size:0.85rem;color:var(--text-muted)">All parameters from the OpenAI API are supported: <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">stream</code>, <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">frequency_penalty</code>, <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">top_p</code>, etc.</p>
   </div>
 
   <!-- Streaming -->
@@ -179,7 +179,7 @@ print(response.choices[0].message.content)</pre>
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">⚡ Streaming</h3>
     <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.75rem">Server-Sent Events (SSE) streaming is fully supported:</p>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
-      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">from</span> openai <span style="color:var(--primary)">import</span> OpenAI
+      <pre translate="no" style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">from</span> openai <span style="color:var(--primary)">import</span> OpenAI
 
 client = OpenAI(
   api_key=<span style="color:var(--text-muted)">"sk-glt_..."</span>,
@@ -201,7 +201,7 @@ stream = client.chat.completions.create(
   <div class="dash-card" style="margin-bottom:2rem">
     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.75rem">🟩 Node.js Example</h3>
     <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem">
-      <pre style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">import</span> OpenAI <span style="color:var(--primary)">from</span> <span style="color:var(--text-muted)">"openai"</span>;
+      <pre translate="no" style="font-family:monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--text)"><span style="color:var(--primary)">import</span> OpenAI <span style="color:var(--primary)">from</span> <span style="color:var(--text-muted)">"openai"</span>;
 
 <span style="color:var(--primary)">const</span> client = <span style="color:var(--primary)">new</span> OpenAI({
   apiKey: <span style="color:var(--text-muted)">"sk-glt_..."</span>,
@@ -295,7 +295,7 @@ console.log(completion.choices[0].message.content); // demo output
     <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.8;padding-left:1.25rem">
       <li><strong style="color:var(--text)">Rotate keys regularly</strong> — Generate new API keys from your Dashboard and revoke old ones.</li>
       <li><strong style="color:var(--text)">Use separate keys per project</strong> — Helps track usage and limit blast radius.</li>
-      <li><strong style="color:var(--text)">Set max tokens</strong> — Always set <code style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">max_tokens</code> to control costs.</li>
+      <li><strong style="color:var(--text)">Set max tokens</strong> — Always set <code translate="no" style="background:var(--bg-alt);padding:0.15rem 0.4rem;border-radius:4px">max_tokens</code> to control costs.</li>
       <li><strong style="color:var(--text)">Monitor usage</strong> — Check your Dashboard for real-time token consumption.</li>
       <li><strong style="color:var(--text)">Handle 402 errors</strong> — Top up before your balance runs out to avoid service interruption.</li>
     </ul>
