@@ -895,6 +895,8 @@
       const msg=input.value.trim();if(!msg)return;
       const msgs=document.getElementById('chatMsgs');
       msgs.innerHTML+='<div class="chat-msg user"><div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div></div>';input.value='';
+      // Refocus input to keep keyboard open on mobile
+      setTimeout(function(){ input.focus(); }, 10);
       setTimeout(()=>{const rs=["Great question! Here's how it works...","We support 100+ models from 56 providers!","You can pay with Stripe, Paystack, or crypto.","Tokens never expire. Use across any model.","Check your Dashboard for usage analytics."];msgs.innerHTML+='<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">'+rs[Math.floor(Math.random()*rs.length)]+'</div></div>';msgs.scrollTop=msgs.scrollHeight},600+Math.random()*800);
       msgs.scrollTop=msgs.scrollHeight;
       setTimeout(()=>input.focus(),50);
@@ -1026,12 +1028,23 @@ function toggleLangMenu() {
   if (m) m.classList.toggle('open');
 }
 
+// ── Bfcache: reload page if non-EN language was active (back/forward nav) ──
+(function(){
+  var saved = localStorage.getItem('gt_lang');
+  if (saved && saved !== 'en') {
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) location.reload();
+    });
+  }
+})();
+
 // ── Save carousel slide index before language reload ──
 (function(){
   var saved = sessionStorage.getItem('gt_carousel_idx');
   if (saved !== null) {
     setTimeout(function(){
-      var dots = document.querySelectorAll('.carousel-dot, .slider-dot');
+      // Try all dot types (tm-carousel uses .tm-dot, others might use .carousel-dot, .slider-dot)
+      var dots = document.querySelectorAll('.tm-dot, .carousel-dot, .slider-dot');
       var idx = parseInt(saved, 10);
       if (dots.length > idx && dots[idx]) dots[idx].click();
       sessionStorage.removeItem('gt_carousel_idx');
@@ -1044,18 +1057,24 @@ function switchLanguage(lang) {
   updateLangUI(lang);
   
   // Save carousel position before reload
-  var carousel = document.querySelector('.carousel, .slider, .testimonial-carousel');
+  var carousel = document.querySelector('.tm-carousel, .carousel, .slider, .testimonial-carousel');
   if (carousel) {
-    var active = carousel.querySelector('.active, .slide-active');
-    if (active) {
-      var slides = carousel.querySelectorAll('.slide, .carousel-item, .testimonial-slide');
-      for (var si = 0; si < slides.length; si++) {
-        if (slides[si] === active) {
-          sessionStorage.setItem('gt_carousel_idx', si);
-          break;
+    // tm-carousel uses tmIndex; other carousels use .active class
+    var idx = -1;
+    // Check for tm-carousel first: active dot index
+    var tmDots = carousel.querySelectorAll('.tm-dot');
+    if (tmDots.length) {
+      tmDots.forEach(function(d, i) { if (d.classList.contains('active')) idx = i; });
+    } else {
+      var active = carousel.querySelector('.active, .slide-active');
+      if (active) {
+        var slides = carousel.querySelectorAll('.slide, .carousel-item, .testimonial-slide');
+        for (var si = 0; si < slides.length; si++) {
+          if (slides[si] === active) { idx = si; break; }
         }
       }
     }
+    if (idx >= 0) sessionStorage.setItem('gt_carousel_idx', idx);
   }
   
   if (lang === 'en') {
