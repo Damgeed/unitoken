@@ -1123,10 +1123,11 @@ function switchLanguage(lang) {
     localStorage.removeItem('gt_lang');
     sessionStorage.setItem('gt_disable', '1');
   } else {
-    // Clear ALL previous googtrans cookies first (GT may have set its own domain-scoped version)
+    // Clear ALL previous googtrans cookies first
     clearGoogTransCookie();
-    // Then set the new cookie for the current domain
-    document.cookie = 'googtrans=/en/' + lang + '; path=/;';
+    // Set cookie with 1-year expiry so it persists across sessions
+    var expiry = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+    document.cookie = 'googtrans=/en/' + lang + '; path=/; expires=' + expiry;
     localStorage.setItem('gt_lang', lang);
     sessionStorage.removeItem('gt_disable');
   }
@@ -1153,11 +1154,19 @@ document.addEventListener('click', function(e) {
 function restoreAfterGTLoad() {
   var saved = localStorage.getItem('gt_lang');
   if (!saved || saved === 'en') return;
+  // Check if the googtrans cookie actually matches the saved language
+  var cookies = document.cookie.split(';').map(function(c){return c.trim()});
+  var hasCookie = cookies.some(function(c){return c.indexOf('googtrans=/en/' + saved) === 0 || c.indexOf('googtrans=' + saved) >= 0});
+  if (!hasCookie) {
+    // Cookie was lost (e.g. expired, new tab) — re-set it and reload
+    var expiry = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+    document.cookie = 'googtrans=/en/' + saved + '; path=/; expires=' + expiry;
+    location.reload();
+    return;
+  }
   GT_LANG = saved;
   updateLangUI(saved);
-  // Don't touch cookies or combo box — switchLanguage() already set the
-  // googtrans cookie correctly. GT reads it on initialization. Just protect
-  // brand names from being translated.
+  // Protect brand names from being translated
   setTimeout(protectTerms, 1000);
   setTimeout(protectTerms, 2500);
   setTimeout(protectTerms, 4000);
