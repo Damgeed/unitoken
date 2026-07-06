@@ -24,6 +24,7 @@ from newapi_integration import (
     create_newapi_user, update_user_quota, add_user_quota,
     get_usage_today, create_api_token, health_check
 )
+from auth0 import is_configured as is_auth0_configured, get_config as get_auth0_config, verify_token as verify_auth0_token, get_user_info, password_login as auth0_password_login, signup as auth0_signup, get_social_login_url
 
 # ── Lifespan (replaces deprecated on_event) ──
 from contextlib import asynccontextmanager
@@ -315,6 +316,163 @@ async def github_callback(req: GithubAuthRequest, db: Session = Depends(get_db))
         db.commit()
     token = create_access_token({"sub": str(user.id)})
     return {"user": {"id": user.id, "name": user.name, "email": user.email, "token_balance": user.token_balance}, "token": token}
+
+# ── Auth0 Routes (production-grade auth) ──
+class Auth0LoginRequest(BaseModel):
+    token: str
+
+@app.get("/api/auth/auth0/config")
+def auth0_config():
+    """Return Auth0 public config for frontend. Gracefully disabled if unconfigured."""
+    return get_auth0_config()
+
+@app.post("/api/auth/auth0/login")
+async def auth0_login(req: Auth0LoginRequest, db: Session = Depends(get_db)):
+    """Verify Auth0 ID token, create/link user, return GlbTOKEN JWT."""
+    if not is_auth0_configured():
+        raise HTTPException(status_code=400, detail="Auth0 not configured")
+
+    try:
+        payload = verify_auth0_token(req.token)
+        info = get_user_info(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+    # Find or create user by Auth0 sub
+    user = db.query(User).filter(
+        (User.email == info["email"]) | (User.email == "" and 1 == 0)
+    ).first()
+
+    if not user and info.get("sub"):
+        user = db.query(User).filter(User.google_id == info["sub"]).first()
+
+    if not user and info["email"]:
+        user = db.query(User).filter(User.email == info["email"]).first()
+
+    if user:
+        if not user.google_id:
+            user.google_id = info["sub"]
+        user.email_verified = user.email_verified or info["email_verified"]
+        db.commit()
+    else:
+        user = User(
+            name=info["name"],
+            email=info["email"],
+            google_id=info["sub"],
+            token_balance=25000,
+            email_verified=info["email_verified"],
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        try:
+            await create_newapi_user(email=info["email"], name=info["name"], quota=25000)
+        except Exception as e:
+            print(f"⚠️ New API sync failed for Auth0 user: {e}")
+
+    token = create_access_token({"sub": str(user.id)})
+    return {
+        "user": {
+            "id": user.id, "name": user.name, "email": user.email,
+            "token_balance": user.token_balance, "picture": info.get("picture", ""),
+        },
+        "token": token,
+    }
+
+@app.post("/api/auth/auth0/password-login")
+async def auth0_password_login_endpoint(req: Request, db: Session = Depends(get_db)):
+    """Email/password login via Auth0 Resource Owner Password Grant."""
+    if not is_auth0_configured():
+        raise HTTPException(status_code=400, detail="Auth0 not configured")
+    body = await req.json()
+    email = body.get("email", "")
+    password = body.get("password", "")
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password required")
+    try:
+        tokens = auth0_password_login(email, password)
+        payload = verify_auth0_token(tokens["id_token"])
+        info = get_user_info(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+    user = db.query(User).filter(User.email == info["email"]).first()
+    if user:
+        if not user.google_id:
+            user.google_id = info["sub"]
+        db.commit()
+    else:
+        user = User(
+            name=info["name"], email=info["email"],
+            google_id=info["sub"], token_balance=25000,
+            email_verified=info["email_verified"],
+        )
+        db.add(user); db.commit(); db.refresh(user)
+        try:
+            await create_newapi_user(email=info["email"], name=info["name"], quota=25000)
+        except Exception as e:
+            print(f"⚠️ New API sync failed for Auth0 password user: {e}")
+
+    jwt_token = create_access_token({"sub": str(user.id)})
+    return {
+        "user": {"id": user.id, "name": user.name, "email": user.email,
+                 "token_balance": user.token_balance, "picture": info.get("picture", "")},
+        "token": jwt_token,
+    }
+
+@app.post("/api/auth/auth0/signup")
+async def auth0_signup_endpoint(req: Request, db: Session = Depends(get_db)):
+    """Register via Auth0 Database Connection, then auto-login."""
+    if not is_auth0_configured():
+        raise HTTPException(status_code=400, detail="Auth0 not configured")
+    body = await req.json()
+    name = body.get("name", "")
+    email = body.get("email", "")
+    password = body.get("password", "")
+    if not name or not email or not password:
+        raise HTTPException(status_code=400, detail="Name, email, and password required")
+
+    try:
+        auth0_signup(email, password, name)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    try:
+        tokens = auth0_password_login(email, password)
+        payload = verify_auth0_token(tokens["id_token"])
+        info = get_user_info(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=f"Account created but login failed: {e}")
+
+    user = User(
+        name=info["name"], email=info["email"],
+        google_id=info["sub"], token_balance=25000,
+        email_verified=info["email_verified"],
+    )
+    db.add(user); db.commit(); db.refresh(user)
+    try:
+        await create_newapi_user(email=info["email"], name=info["name"], quota=25000)
+    except Exception as e:
+        print(f"⚠️ New API sync failed for Auth0 signup user: {e}")
+
+    jwt_token = create_access_token({"sub": str(user.id)})
+    return {
+        "user": {"id": user.id, "name": user.name, "email": user.email,
+                 "token_balance": user.token_balance, "picture": info.get("picture", "")},
+        "token": jwt_token,
+    }
+
+@app.get("/api/auth/auth0/social-url")
+def auth0_social_url(provider: str = Query(...)):
+    """Get the Auth0 authorize URL for a social login provider."""
+    if not is_auth0_configured():
+        raise HTTPException(status_code=400, detail="Auth0 not configured")
+    redirect_uri = "https://glbtoken.com/auth/callback.html"
+    url = get_social_login_url(provider, redirect_uri)
+    if not url:
+        raise HTTPException(status_code=400, detail=f"Unsupported provider: {provider}")
+    return {"url": url, "redirect_uri": redirect_uri}
 
 # ── User Profile ──
 @app.get("/api/auth/me")
