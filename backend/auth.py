@@ -66,7 +66,7 @@ async def get_optional_user(
         user_id = payload.get("sub")
         if user_id:
             return db.query(User).filter(User.id == int(user_id)).first()
-    except:
+    except Exception:
         pass
     return None
 

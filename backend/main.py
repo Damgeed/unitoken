@@ -301,7 +301,7 @@ async def github_callback(req: GithubAuthRequest, db: Session = Depends(get_db))
     try:
         github_user = await verify_github_code(req.code)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="GitHub login failed. Please try again.")
     user = db.query(User).filter(
         (User.github_id == github_user["id"]) | (User.email == github_user["email"])
     ).first()
@@ -341,8 +341,7 @@ async def auth0_login(req: Auth0LoginRequest, db: Session = Depends(get_db)):
         payload = verify_auth0_token(req.token)
         info = get_user_info(payload)
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
-
+        raise HTTPException(status_code=401, detail="Auth0 login failed. Invalid token.")
     # Find or create user by Auth0 sub
     user = db.query(User).filter(
         (User.email == info["email"]) | (User.email == "" and 1 == 0)
@@ -400,7 +399,7 @@ async def auth0_password_login_endpoint(req: Request, db: Session = Depends(get_
         payload = verify_auth0_token(tokens["id_token"])
         info = get_user_info(payload)
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=401, detail="Auth0 login failed. Invalid token.")
 
     user = db.query(User).filter(User.email == info["email"]).first()
     if user:
@@ -441,7 +440,7 @@ async def auth0_signup_endpoint(req: Request, db: Session = Depends(get_db)):
     try:
         auth0_signup(email, password, name)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Signup failed. Please try again.")
 
     try:
         tokens = auth0_password_login(email, password)
@@ -976,7 +975,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
             },
         )
         if resp.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"AI API error: {resp.text[:200]}")
+            raise HTTPException(status_code=502, detail="AI API error. Please try again later.")
         result = resp.json()
     
     # Deduct tokens
@@ -1312,7 +1311,8 @@ def seed_models():
 # ── Auto-Pull Models (manual trigger) ──
 @app.post("/api/models/pull")
 def trigger_model_pull(api_key: str = ""):
-    if api_key != os.environ.get("GLBTOKEN_SECRET", "demo"):
+    glbtoken_secret = os.environ.get("GLBTOKEN_SECRET")
+    if not glbtoken_secret or api_key != glbtoken_secret:
         raise HTTPException(status_code=403, detail="Invalid API key")
     auto_pull_models()
     return {"status": "ok", "message": "Models refreshed from Fallback"}

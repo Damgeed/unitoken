@@ -137,6 +137,8 @@
     function logoutUser(){
       token='';userData={};
       localStorage.removeItem('gt_token');localStorage.removeItem('gt_user');
+      localStorage.removeItem('gt_newapi_token');localStorage.removeItem('gt_newapi_endpoint');
+      localStorage.removeItem('gt_keys');
       applyAuth();showToast('Signed out','info');showPage('home');
     }
     async function refreshMe(){
@@ -245,7 +247,7 @@
           if(guest && guest.parentNode) guest.parentNode.insertBefore(so, guest.nextSibling);
         }
         so.style.display = 'flex';
-        so.innerHTML = '<a onclick="logoutUser()" style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;color:var(--text,#e0e0e0);text-decoration:none;font-size:0.85rem;font-weight:500;white-space:nowrap;padding:0.35rem 0.6rem;border:1px solid var(--border,#3a3a4e);border-radius:8px;transition:all 0.2s">Sign Out ' + displayName + ' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></a>';
+        so.innerHTML = '<a onclick="logoutUser()" style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;color:var(--text,#e0e0e0);text-decoration:none;font-size:0.85rem;font-weight:500;white-space:nowrap;padding:0.35rem 0.6rem;border:1px solid var(--border,#3a3a4e);border-radius:8px;transition:all 0.2s">Sign Out ' + escapeHtml(displayName) + ' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></a>';
         var soMobile = document.getElementById('navSignedInMobile');
         if(!soMobile && document.querySelector('.mobile-right-group')){
           soMobile = document.createElement('div');
@@ -256,7 +258,7 @@
         }
         if(soMobile && window.innerWidth <= 768){
           soMobile.style.display = 'flex';
-          soMobile.innerHTML = '<span style="color:var(--text,#e0e0e0);font-size:0.75rem;font-weight:500;white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis">' + displayName + '</span>';
+          soMobile.innerHTML = '<span style="color:var(--text,#e0e0e0);font-size:0.75rem;font-weight:500;white-space:nowrap;max-width:60px;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(displayName) + '</span>';
         } else if(soMobile) {
           soMobile.style.display = 'none';
         }
@@ -335,8 +337,6 @@
       // Multi-page mode - active page is determined by the current file
       const pageId = location.pathname.split('/').pop().replace('.html','') || 'home';
       if (pageId === 'index' || pageId === '') window.location = '/';
-      // Apply auth state on every page
-      if(token){refreshMe();applyAuth()}
       // Load page-specific data
       if(pageId==='dashboard'){loadDashboard();refreshMe()}
       if(pageId==='apikeys'&&token)loadKeys();

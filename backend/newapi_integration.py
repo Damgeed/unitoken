@@ -21,7 +21,7 @@ async def _post(path: str, data: dict = None) -> dict:
     async with httpx.AsyncClient(timeout=15) as client:
         r = await client.post(url, json=data, headers=HEADERS)
         if r.status_code >= 400:
-            return {"error": f"New API error: {r.status_code}", "detail": r.text[:200]}
+            return {"error": "New API request failed", "status": r.status_code}
         return r.json()
 
 async def _get(path: str) -> dict:
@@ -32,7 +32,7 @@ async def _get(path: str) -> dict:
     async with httpx.AsyncClient(timeout=15) as client:
         r = await client.get(url, headers=HEADERS)
         if r.status_code >= 400:
-            return {"error": f"New API error: {r.status_code}", "detail": r.text[:200]}
+            return {"error": "New API request failed", "status": r.status_code}
         return r.json()
 
 async def health_check() -> bool:
@@ -84,5 +84,5 @@ async def create_api_token(user_id: int, name: str = "GlbTOKEN") -> dict:
     Returns dict with 'key' field on success.
     """
     if not NEW_API_BASE or not ADMIN_TOKEN:
-        return {"key": "sk-local-demo-mode", "name": name}
+        return {"key": "", "name": name}
     return await _post(f"/api/user/{user_id}/key", {"name": name})
