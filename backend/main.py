@@ -1098,6 +1098,8 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+    import sys
     port = int(os.getenv("PORT", 8000))
-    print(f"🚀 Starting on PORT={port} (from env: {os.getenv('PORT', 'NOT SET')})")
+    print(f"PORT_ENV_CHECK: PORT env = |{os.getenv('PORT', 'NOT_SET')}| -> using port {port}", flush=True)
+    sys.stdout.flush()
     uvicorn.run(app, host="0.0.0.0", port=port)
