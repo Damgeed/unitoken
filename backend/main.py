@@ -1405,6 +1405,46 @@ async def admin_sync_users(
         "message": f"Synced {res.created} user(s), {res.failed} failed." if res else "Sync completed",
     }
 
+# ── TEMPORARY: Fix New API root user ──
+@app.post("/api/admin/fix-newapi")
+@limiter.limit("5/minute")
+async def fix_newapi(
+    request: Request,
+    api_key: str = "",
+):
+    """Fix New API root user: set role=100 and access_token."""
+    glbtoken_secret = os.environ.get("GLBTOKEN_SECRET", "")
+    if api_key != glbtoken_secret:
+        raise HTTPException(status_code=403, detail="Invalid API key")
+    
+    try:
+        import psycopg2
+        conn = psycopg2.connect(
+            host="postgres-newapi.railway.internal",
+            port=5432,
+            user="root",
+            password="123456",
+            dbname="new-api",
+        )
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE users SET role = 100, access_token = %s WHERE id = 1",
+            ("sk-b6dd6a45838303d40cde3d094e3c7b96a3795437d62ec1dd",)
+        )
+        affected = cur.rowcount
+        if affected == 0:
+            cur.execute(
+                "UPDATE users SET role = 100, access_token = %s WHERE username = 'root'",
+                ("sk-b6dd6a45838303d40cde3d094e3c7b96a3795437d62ec1dd",)
+            )
+            affected = cur.rowcount
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "ok", "rows_affected": affected}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
 @app.get("/api/health")
 async def health():
     # Check New API connectivity
