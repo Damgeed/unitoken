@@ -28,6 +28,11 @@ from auth0 import is_configured as is_auth0_configured, get_config as get_auth0_
 
 # ── Lifespan (replaces deprecated on_event) ──
 from contextlib import asynccontextmanager
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+limiter = Limiter(key_func=get_remote_address)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -58,6 +63,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Rate Limiting ──
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ── Root Health ──
 @app.get("/")
@@ -156,7 +165,8 @@ def send_email(to: str, subject: str, body: str):
 
 # ── Auth Routes ──
 @app.post("/api/auth/register")
-async def register(req: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def register(req: RegisterRequest, request: Request, db: Session = Depends(get_db)):
     try:
         if db.query(User).filter(User.email == req.email).first():
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -217,7 +227,8 @@ async def register(req: RegisterRequest, db: Session = Depends(get_db)):
     return result
 
 @app.post("/api/auth/login")
-def login(req: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(req: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if not user or not user.password_hash:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -385,11 +396,12 @@ async def auth0_login(req: Auth0LoginRequest, db: Session = Depends(get_db)):
     }
 
 @app.post("/api/auth/auth0/password-login")
-async def auth0_password_login_endpoint(req: Request, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def auth0_password_login_endpoint(request: Request, db: Session = Depends(get_db)):
     """Email/password login via Auth0 Resource Owner Password Grant."""
     if not is_auth0_configured():
         raise HTTPException(status_code=400, detail="Auth0 not configured")
-    body = await req.json()
+    body = await request.json()
     email = body.get("email", "")
     password = body.get("password", "")
     if not email or not password:
@@ -426,11 +438,12 @@ async def auth0_password_login_endpoint(req: Request, db: Session = Depends(get_
     }
 
 @app.post("/api/auth/auth0/signup")
-async def auth0_signup_endpoint(req: Request, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def auth0_signup_endpoint(request: Request, db: Session = Depends(get_db)):
     """Register via Auth0 Database Connection, then auto-login."""
     if not is_auth0_configured():
         raise HTTPException(status_code=400, detail="Auth0 not configured")
-    body = await req.json()
+    body = await request.json()
     name = body.get("name", "")
     email = body.get("email", "")
     password = body.get("password", "")
@@ -494,7 +507,8 @@ def get_me(user: User = Depends(get_current_user)):
 
 # ── Email Verification ──
 @app.post("/api/auth/send-verification")
-def send_verification(req: SendVerificationRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def send_verification(request: Request, req: SendVerificationRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     email = req.email or user.email
     otp = f"{secrets.randbelow(900000) + 100000}"  # 6-digit
     user.email_otp = otp
@@ -529,7 +543,8 @@ def change_password(req: ChangePasswordRequest, user: User = Depends(get_current
     return {"status": "password_updated"}
 
 @app.post("/api/auth/forgot-password")
-def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def forgot_password(request: Request, req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if not user:
         return {"status": "sent"}  # Don't reveal if email exists

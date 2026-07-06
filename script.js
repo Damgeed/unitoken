@@ -1080,7 +1080,7 @@ var PROTECTED_WORDS = ['GPT','OpenAI','Claude','Gemini','Llama','Mistral','DeepS
     return; 
   }
   // Set the cookie with 1-year expiry BEFORE GT initializes
-  clearGoogTransCookie();
+  // Overwrite directly — clearing before setting creates a race window
   var expiry = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
   document.cookie = 'googtrans=/en/' + saved + '; path=/; expires=' + expiry;
   // Reload ONCE per session to force GT to read the fresh cookie
@@ -1134,7 +1134,6 @@ function switchLanguage(lang) {
     sessionStorage.setItem('gt_disable', '1');
     sessionStorage.removeItem('gt_lang_ready');
   } else {
-    clearGoogTransCookie();
     var expiry = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
     document.cookie = 'googtrans=/en/' + lang + '; path=/; expires=' + expiry;
     localStorage.setItem('gt_lang', lang);
