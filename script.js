@@ -894,12 +894,57 @@
       const input=document.getElementById('chatInput');
       const msg=input.value.trim();if(!msg)return;
       const msgs=document.getElementById('chatMsgs');
-      msgs.innerHTML+='<div class="chat-msg user"><div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div></div>';input.value='';
+      const userHtml='<div class="chat-msg user"><div class="av">U</div><div class="bubble">'+escapeHtml(msg)+'</div></div>';
+      msgs.innerHTML+=userHtml;input.value='';
+      // Save chat history
+      saveChatHistory();
       // Refocus input to keep keyboard open on mobile
       setTimeout(function(){ input.focus(); }, 10);
-      setTimeout(()=>{const rs=["Great question! Here's how it works...","We support 100+ models from 56 providers!","You can pay with Stripe, Paystack, or crypto.","Tokens never expire. Use across any model.","Check your Dashboard for usage analytics."];msgs.innerHTML+='<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">'+rs[Math.floor(Math.random()*rs.length)]+'</div></div>';msgs.scrollTop=msgs.scrollHeight},600+Math.random()*800);
+      setTimeout(()=>{
+        const rs=["Great question! Here's how it works...","We support 100+ models from 56 providers!","You can pay with Stripe, Paystack, or crypto.","Tokens never expire. Use across any model.","Check your Dashboard for usage analytics."];
+        const aiHtml='<div class="chat-msg ai"><div class="av">🤖</div><div class="bubble">'+rs[Math.floor(Math.random()*rs.length)]+'</div></div>';
+        msgs.innerHTML+=aiHtml;msgs.scrollTop=msgs.scrollHeight;
+        // Save chat history again after AI responds
+        saveChatHistory();
+      },600+Math.random()*800);
       msgs.scrollTop=msgs.scrollHeight;
       setTimeout(()=>input.focus(),50);
+    }
+
+    // ── Chat History Persistence (localStorage) ──
+    function saveChatHistory(){
+      var msgs=document.getElementById('chatMsgs');
+      if(!msgs)return;
+      var history=[];
+      msgs.querySelectorAll('.chat-msg').forEach(function(el){
+        var role=el.classList.contains('user')?'user':'ai';
+        var bubble=el.querySelector('.bubble');
+        if(bubble) history.push({role:role,text:bubble.textContent});
+      });
+      try{localStorage.setItem('gt_chat_history',JSON.stringify(history))}catch(e){}
+    }
+    function loadChatHistory(){
+      var msgs=document.getElementById('chatMsgs');
+      if(!msgs)return;
+      try{
+        var data=localStorage.getItem('gt_chat_history');
+        if(!data)return;
+        var history=JSON.parse(data);
+        if(!history||!history.length)return;
+        msgs.innerHTML='';
+        history.forEach(function(h){
+          var cls=h.role==='user'?'user':'ai';
+          var av=h.role==='user'?'U':'🤖';
+          msgs.innerHTML+='<div class="chat-msg '+cls+'"><div class="av">'+av+'</div><div class="bubble">'+escapeHtml(h.text)+'</div></div>';
+        });
+        msgs.scrollTop=msgs.scrollHeight;
+      }catch(e){}
+    }
+    // Load history on page load
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',loadChatHistory);
+    } else {
+      loadChatHistory();
     }
 
     // ── Toast ──
