@@ -657,3 +657,7 @@
 .blog-title{font-size:1.05rem;font-weight:600;margin-bottom:0.35rem}
 .blog-date{font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem}
 .blog-desc{font-size:0.85rem;color:var(--text-secondary)}
+
+/* Copy button animation */
+.copying{animation:copyPulse 0.3s ease}
+@keyframes copyPulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}

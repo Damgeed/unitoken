@@ -1054,8 +1054,20 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       if(!container) return;
       var text = container.textContent || container.innerText;
       text = text.replace(/^# .+\n/mg,'').replace(/^REQUEST\n|^RESPONSE\n/gm,'').trim();
-      if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){showToast('Copied!','success')}).catch(function(){})}
-      else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied!','success')}
+      if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){
+        animateCopyBtn(btn);
+        showToast('Copied!','success');
+      }).catch(function(){})}
+      else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);animateCopyBtn(btn);showToast('Copied!','success')}
+    }
+    function animateCopyBtn(btn){
+      btn.classList.add('copying');
+      var orig = btn.innerHTML;
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(function(){
+        btn.innerHTML = orig;
+        btn.classList.remove('copying');
+      },1500);
     }
     function tmDragStart(clientX){
       clearInterval(tmInterval);
