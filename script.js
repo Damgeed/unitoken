@@ -1166,7 +1166,7 @@ var PROTECTED_WORDS = ['GPT','OpenAI','Claude','Gemini','Llama','Mistral','DeepS
   // Reload ONCE per session to force GT to read the fresh cookie
   if (!sessionStorage.getItem('gt_lang_ready')) {
     sessionStorage.setItem('gt_lang_ready', '1');
-    location.reload();
+    location.href = location.pathname + '?_=' + Date.now();
   }
 })();
 
@@ -1224,7 +1224,7 @@ function switchLanguage(lang) {
     sessionStorage.removeItem('gt_disable');
     sessionStorage.setItem('gt_lang_ready', '1');
   }
-  location.reload();
+  location.href = location.pathname + '?_=' + Date.now();
 }
 
 function updateLangUI(lang) {
