@@ -1028,23 +1028,54 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     function slideTopView(dir){
       var track=document.getElementById('tmTrack');
       if(!track)return;
+      var slides=track.children;
+      var sc=slides.length;
+      if(sc<3)return;
       tmIndex=(tmIndex+dir+tmTotal)%tmTotal;
-      track.style.transform='translateX(-'+(tmIndex*100)+'%)';
-      const title=document.getElementById('tmTitle');
+      var vi=tmIndex+1; // visual position in cloned track (offset by 1 for first clone)
+      track.style.transition='transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+      track.style.transform='translateX(-'+(vi*100)+'%)';
+      // Infinite loop: if we animated onto a clone, jump to the real slide
+      if(vi===0){tmIndex=tmTotal-1;setTimeout(function(){track.style.transition='none';track.style.transform='translateX(-'+((tmTotal-1+1)*100)+'%)';},500);}
+      if(vi===sc-1){tmIndex=0;setTimeout(function(){track.style.transition='none';track.style.transform='translateX(-100%)';},500);}
+      updateSlideUI();
+      clearInterval(tmInterval);tmInterval=setInterval(function(){slideTopView(1);},5000);
+    }
+    function goToSlide(i){
+      var track=document.getElementById('tmTrack');
+      if(!track||i===tmIndex)return;
+      tmIndex=i;
+      var vi=tmIndex+1;
+      track.style.transition='transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+      track.style.transform='translateX(-'+(vi*100)+'%)';
+      updateSlideUI();
+      clearInterval(tmInterval);tmInterval=setInterval(function(){slideTopView(1);},5000);
+    }
+    function updateSlideUI(){
+      var title=document.getElementById('tmTitle');
       if(title)title.textContent=tmTitles[tmIndex];
-      // Auto-refresh models when sliding to slide 0
       if(tmIndex===0)refreshTopModels();
-      document.querySelectorAll('.tm-dot').forEach((d,i)=>{
+      document.querySelectorAll('.tm-dot').forEach(function(d,i){
         d.style.background=i===tmIndex?'var(--primary)':'var(--text-muted)';
         d.style.width=i===tmIndex?'10px':'8px';
         d.style.height=i===tmIndex?'10px':'8px';
       });
-      clearInterval(tmInterval);tmInterval=setInterval(()=>slideTopView(1),5000);
     }
-    function goToSlide(i){tmIndex=i-1;slideTopView(1)}
     document.addEventListener('DOMContentLoaded',()=>{
       const track=document.getElementById('tmTrack');
       if(!track)return;
+      // Clone for infinite circular carousel
+      (function(){
+        var slides=track.children;
+        if(slides.length>=2){
+          var fc=slides[0].cloneNode(true);
+          var lc=slides[slides.length-1].cloneNode(true);
+          track.appendChild(fc);
+          track.insertBefore(lc,slides[0]);
+          track.style.transition='none';
+          track.style.transform='translateX(-100%)';
+        }
+      })();
       track.addEventListener('touchstart',e=>{tmTouchStartX=e.touches[0].clientX;tmTouchStartY=e.touches[0].clientY},{passive:true});
       track.addEventListener('touchmove',e=>{
         const dx=Math.abs(e.touches[0].clientX-tmTouchStartX);
