@@ -9,6 +9,30 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./glbtoken.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+# Auto-create database if using PostgreSQL and it doesn't exist
+if DATABASE_URL.startswith("postgresql://"):
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(DATABASE_URL)
+        db_name = parsed.path.lstrip("/")
+        # Connect to 'postgres' default database to create our database
+        import psycopg2
+        admin_url = DATABASE_URL.replace(f"/{db_name}", "/postgres")
+        admin_conn = psycopg2.connect(admin_url, connect_timeout=5)
+        admin_conn.autocommit = True
+        admin_cur = admin_conn.cursor()
+        admin_cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
+        if not admin_cur.fetchone():
+            # Need to quote the db name for the CREATE DATABASE statement
+            safe_db = db_name.replace("'", "''")
+            admin_cur.execute(f"CREATE DATABASE \"{safe_db}\"")
+            print(f"✅ Created PostgreSQL database: {db_name}")
+        admin_cur.close()
+        admin_conn.close()
+    except Exception as e:
+        print(f"⚠️ Could not auto-create database: {e}")
+        # Don't block startup
+
 is_sqlite = DATABASE_URL.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
