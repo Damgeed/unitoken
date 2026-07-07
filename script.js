@@ -1074,8 +1074,6 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       tmDragStartX=clientX;
       tmDragOffset=0;
       tmIsDragging=true;
-      document.body.style.userSelect='none';
-      document.body.style.webkitUserSelect='none';
       var track=document.getElementById('tmTrack');
       if(track) track.style.transition='none';
     }
@@ -1084,6 +1082,8 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       tmDragOffset=clientX-tmDragStartX;
       var track=document.getElementById('tmTrack');
       if(!track)return;
+      // Only block text selection once actual drag movement starts
+      if(Math.abs(tmDragOffset)>3){document.body.style.userSelect='none';document.body.style.webkitUserSelect='none'}
       track.style.transform='translateX(calc(-'+(tmIndex*100)+'% + '+tmDragOffset+'px))';
     }
     function tmDragEnd(clientX){
@@ -1118,7 +1118,6 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       track.addEventListener('mousedown',e=>{
         tmTouchStartX=e.clientX;tmTouchStartY=e.clientY;
         tmDragStart(e.clientX);
-        e.preventDefault();
       });
       document.addEventListener('mousemove',e=>{
         if(!tmIsDragging)return;
