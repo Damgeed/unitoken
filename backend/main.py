@@ -516,7 +516,7 @@ def get_me(user: User = Depends(get_current_user)):
 # ── Email Verification ──
 @app.post("/api/auth/send-verification")
 @limiter.limit("5/minute")
-def send_verification(req: OptionalEmailRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def send_verification(req: OptionalEmailRequest, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     email = req.email or user.email
     if not email:
         raise HTTPException(status_code=400, detail="Email required")
