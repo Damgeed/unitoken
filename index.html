@@ -162,19 +162,19 @@
 <pre translate="no" style="margin:0;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:0.75rem;line-height:1.7;color:#e6edf3;white-space:pre-wrap;word-break:break-word"><code translate="no" style="background:none;padding:0;color:#e6edf3"><span style="color:#8b949e"># POST /v1/chat/completions</span></code></pre>
 <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0.5rem 0">
 <pre translate="no" style="margin:0;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:0.75rem;line-height:1.7;color:#e6edf3;white-space:pre-wrap;word-break:break-word"><code translate="no" style="background:none;padding:0;color:#e6edf3"><span style="color:#8b949e">REQUEST</span>
-<span style="color:#7ee787">curl</span> <span style="color:#79c0ff">-X</span> <span style="color:#ffa657">POST</span> <span style="color:#e6cc77">"/v1/chat/completions"</span> \
-  <span style="color:#79c0ff">-H</span> <span style="color:#a5d6ff">"Authorization: Bearer sk-••••"</span> \
-  <span style="color:#79c0ff">-d</span> <span style="color:#a5d6ff">'{
-    "<span style="color:#79c0ff">model</span>": "<span style="color:#a5d6ff">your-model</span>",
-    "<span style="color:#79c0ff">messages</span>": [
-      { "<span style="color:#79c0ff">role</span>": "<span style="color:#a5d6ff">user</span>", "<span style="color:#79c0ff">content</span>": "<span style="color:#a5d6ff">...</span>" }
+<span style="color:#7ee787">curl</span> <span style="color:#79c0ff">-X</span> <span style="color:#ffa657">POST</span> <span style="color:#e6cc77">"/v1/chat/completions"</span> <span style="color:#ffa657">\</span>
+  <span style="color:#79c0ff">-H</span> <span style="color:#a5d6ff">"Authorization: Bearer sk-••••"</span> <span style="color:#ffa657">\</span>
+  <span style="color:#79c0ff">-d</span> <span style="color:#a5d6ff">'{</span>
+    <span style="color:#a5d6ff">"</span><span style="color:#79c0ff">model</span><span style="color:#a5d6ff">"</span>: <span style="color:#a5d6ff">"your-model"</span>,
+    <span style="color:#a5d6ff">"</span><span style="color:#79c0ff">messages</span><span style="color:#a5d6ff">"</span>: [
+      { <span style="color:#a5d6ff">"</span><span style="color:#79c0ff">role</span><span style="color:#a5d6ff">"</span>: <span style="color:#a5d6ff">"user"</span>, <span style="color:#a5d6ff">"</span><span style="color:#79c0ff">content</span><span style="color:#a5d6ff">"</span>: <span style="color:#a5d6ff">"..."</span> }
     ]
-  }'</span></code></pre>
+  <span style="color:#a5d6ff">}'</span></code></pre>
 <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0.5rem 0">
 <pre translate="no" style="margin:0;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:0.75rem;line-height:1.7;color:#e6edf3;white-space:pre-wrap;word-break:break-word"><code translate="no" style="background:none;padding:0;color:#e6edf3"><span style="color:#8b949e">RESPONSE</span>
 {
   <span style="color:#79c0ff">"choices"</span>: [{ <span style="color:#79c0ff">"message"</span>: { <span style="color:#79c0ff">"content"</span>: <span style="color:#a5d6ff">"Chat request routed."</span> } }],
-  <span style="color:#79c0ff">"usage"</span>: { <span style="color:#79c0ff">"total_tokens"</span>: 27 }
+  <span style="color:#79c0ff">"usage"</span>: { <span style="color:#79c0ff">"total_tokens"</span>: <span style="color:#e6cc77">27</span> }
 }</code></pre>
 </div>
 </div>
