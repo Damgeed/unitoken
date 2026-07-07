@@ -58,6 +58,21 @@
     }
 
     // ── Auth (Passwordless Email via Auth0) ──
+    function validateEmailInput(prefix){
+      const email=document.getElementById(prefix+'Email').value.trim();
+      const warn=document.getElementById(prefix+'EmailWarning');
+      if(!warn)return;
+      if(!email){
+        warn.style.display='none';
+        return;
+      }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        warn.textContent='Please enter a valid email address';
+        warn.style.display='block';
+      }else{
+        warn.style.display='none';
+      }
+    }
     async function sendLoginCode(){
       const email=document.getElementById('loginEmail').value.trim();
       const errEl=document.getElementById('loginError');
