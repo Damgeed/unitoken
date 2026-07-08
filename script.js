@@ -352,7 +352,6 @@
       document.getElementById('mUser').style.display=loggedIn?'block':'none';
       // Toggle Dashboard vs API/Dev in nav
       document.getElementById('navApiLink').style.display=loggedIn?'none':'inline-block';
-      document.getElementById('navDashLink').style.display=loggedIn?'inline-block':'none';
       document.getElementById('mNavApiLink').style.display=loggedIn?'none':'block';
       document.getElementById('mNavDashLink').style.display=loggedIn?'block':'none';
       // API doc page: show Go to Dashboard button when logged in
@@ -995,7 +994,45 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       if(fab)fab.style.display='';if(win)win.style.display='';
     }
     // ── Support Chat (floating) ──
-    function toggleChat(){document.getElementById('chatWindow').classList.toggle('open')}
+    function toggleChat(){
+      var win = document.getElementById('chatWindow');
+      if(!win) return;
+      if(window.innerWidth > 768){
+        win.classList.toggle('open');
+        return;
+      }
+      // Mobile: use focused popup like AI chat
+      var isOpen = win.classList.contains('chat-focused');
+      if(isOpen){
+        win.classList.remove('chat-focused');
+        document.body.style.overflow='';
+        var fab=document.querySelector('.chat-fab');
+        if(fab)fab.style.display='';
+        var cb=document.querySelector('.chat-focused-close');
+        if(cb)cb.remove();
+      }else{
+        win.classList.add('chat-focused');
+        // Hide FAB
+        var fab=document.querySelector('.chat-fab');
+        if(fab)fab.style.display='none';
+        // Add close button
+        if(!document.querySelector('.chat-focused-close')){
+          var header = win.querySelector('.chat-header');
+          if(header){
+            var btn=document.createElement('button');
+            btn.className='chat-focused-close';
+            btn.innerHTML='✕';
+            btn.onclick=toggleChat;
+            header.appendChild(btn);
+          }
+        }
+        document.body.style.overflow='hidden';
+        requestAnimationFrame(function(){
+          var msgs=document.getElementById('chatMsgs');
+          if(msgs)msgs.scrollTop=msgs.scrollHeight;
+        });
+      }
+    }
     // ── Draggable Chat FAB (mobile touch) ──
     (function(){
       var fab = document.querySelector('.chat-fab');
