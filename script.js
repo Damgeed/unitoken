@@ -1011,7 +1011,7 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       // Backdrop wraps the window (same flexbox centering as AI chat)
       const backdrop = document.createElement('div');
       backdrop.className = 'support-chat-backdrop';
-      backdrop.onclick = closeMobileSupportChat;
+      backdrop.onclick = function(e){ if(e.target===backdrop) closeMobileSupportChat(); };
       win.parentNode.insertBefore(backdrop, win);
       backdrop.appendChild(win);
       addCloseBtn(win.querySelector('.chat-header'), closeMobileSupportChat);
