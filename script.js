@@ -918,24 +918,40 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         btn.textContent = '➤';
       })();
     }
-    // Auto-resize textarea
+    // ── Shared helpers ──
+    function setupTextareaResize(id){
+      const ta = document.getElementById(id);
+      if(!ta) return;
+      ta.addEventListener('input', function(){
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+    }
+    function addCloseBtn(container, onClose){
+      if(container.querySelector('.chat-focused-close')) return;
+      const btn = document.createElement('button');
+      btn.className = 'chat-focused-close';
+      btn.innerHTML = '✕';
+      btn.onclick = onClose;
+      container.appendChild(btn);
+    }
+    function removeCloseBtn(container){
+      const btn = container.querySelector('.chat-focused-close');
+      if(btn) btn.remove();
+    }
+    function lockBodyScroll(hide){
+      document.body.style.overflow = hide ? 'hidden' : '';
+      const fab = document.querySelector('.chat-fab');
+      const win = document.getElementById('chatWindow');
+      if(fab) fab.style.display = hide ? 'none' : '';
+      if(win && window.innerWidth <= 768) win.style.display = hide ? 'none' : '';
+    }
+    // Auto-resize textareas
     document.addEventListener('DOMContentLoaded',function(){
+      setupTextareaResize('aiChatInput');
+      setupTextareaResize('chatInput');
       const ta = document.getElementById('aiChatInput');
-      if(ta){
-        ta.addEventListener('input',function(){
-          this.style.height = 'auto';
-          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        });
-        ta.addEventListener('focus',openMobileChat);
-      }
-      // Support chat textarea auto-resize (mirrors AI chat behavior)
-      const supportTa = document.getElementById('chatInput');
-      if(supportTa){
-        supportTa.addEventListener('input',function(){
-          this.style.height = 'auto';
-          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        });
-      }
+      if(ta) ta.addEventListener('focus',openMobileChat);
       // Auto-init for this page
       const pageId = location.pathname.split('/').pop().replace('.html','') || 'home';
       if(token){refreshMe();applyAuth()}
@@ -950,53 +966,35 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       const err = params.get('error');
       if(err) showToast(decodeURIComponent(err), 'error');
     })();
-    // ── Mobile Chat: floating popup on focus ──
+    // ── Mobile AI Chat popup ──
     function openMobileChat(){
       if(window.innerWidth>768)return;
       const section=document.querySelector('.ai-chat-section');
-      if(section){
-        section.classList.add('chat-focused');
-        // Force reflow so browser recomputes flex layout inside fixed container
-        void section.offsetHeight;
-        // Add close button if not exists
-        if(!document.querySelector('.chat-focused-close')){
-          const btn=document.createElement('button');
-          btn.className='chat-focused-close';
-          btn.innerHTML='✕';
-          btn.onclick=closeMobileChat;
-          section.querySelector('.chat-header').appendChild(btn);
-        }
-        // Prevent body scroll
-        document.body.style.overflow='hidden';
-        // Hide floating support chat
-        const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
-        if(fab)fab.style.display='none';if(win)win.style.display='none';
-        // RAF: ensures layout is fully committed before scrolling
-        requestAnimationFrame(()=>{
-          const msgs=document.getElementById('aiChatMsgs');
-          if(msgs)msgs.scrollTop=msgs.scrollHeight;
-        });
-      }
+      if(!section) return;
+      section.classList.add('chat-focused');
+      void section.offsetHeight; // force reflow
+      addCloseBtn(section.querySelector('.chat-header'), closeMobileChat);
+      lockBodyScroll(true);
+      requestAnimationFrame(()=>{
+        const msgs=document.getElementById('aiChatMsgs');
+        if(msgs) msgs.scrollTop=msgs.scrollHeight;
+      });
     }
     function closeMobileChat(){
       const section=document.querySelector('.ai-chat-section');
-      if(section)section.classList.remove('chat-focused');
-      document.body.style.overflow='';
-      const btn=document.querySelector('.chat-focused-close');
-      if(btn)btn.remove();
-      // Restore floating support chat
-      const fab=document.querySelector('.chat-fab');const win=document.getElementById('chatWindow');
-      if(fab)fab.style.display='';if(win)win.style.display='';
+      if(!section) return;
+      section.classList.remove('chat-focused');
+      lockBodyScroll(false);
+      removeCloseBtn(section.querySelector('.chat-header'));
     }
-    // ── Support Chat (floating) ──
+    // ── Support Chat ──
     function toggleChat(){
-      var win = document.getElementById('chatWindow');
+      const win = document.getElementById('chatWindow');
       if(!win) return;
       if(window.innerWidth > 768){
         win.classList.toggle('open');
         return;
       }
-      // Mobile: toggle chat-focused class (same pattern as AI chat's openMobileChat)
       if(win.classList.contains('chat-focused')){
         closeMobileSupportChat();
       } else {
@@ -1004,46 +1002,33 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       }
     }
     function openMobileSupportChat(){
-      var win = document.getElementById('chatWindow');
+      const win = document.getElementById('chatWindow');
       win.classList.add('chat-focused');
-      // Create backdrop sibling (blur overlay behind the card)
-      var backdrop = document.createElement('div');
+      // Backdrop
+      const backdrop = document.createElement('div');
       backdrop.className = 'support-chat-backdrop';
       backdrop.onclick = closeMobileSupportChat;
       win.parentNode.insertBefore(backdrop, win);
-      // Add close button (same as AI chat)
-      var header = win.querySelector('.chat-header');
-      if(header && !header.querySelector('.chat-focused-close')){
-        var btn = document.createElement('button');
-        btn.className = 'chat-focused-close';
-        btn.innerHTML = '✕';
-        btn.onclick = closeMobileSupportChat;
-        header.appendChild(btn);
-      }
-      document.body.style.overflow = 'hidden';
-      var fab = document.querySelector('.chat-fab');
-      if(fab) fab.style.display = 'none';
-      // Auto-focus textarea so keyboard pops up (same as AI chat behavior)
-      setTimeout(function(){
-        var input = document.getElementById('chatInput');
+      addCloseBtn(win.querySelector('.chat-header'), closeMobileSupportChat);
+      lockBodyScroll(true);
+      // Auto-focus textarea so keyboard pops up
+      setTimeout(()=>{
+        const input = document.getElementById('chatInput');
         if(input) input.focus();
       }, 200);
-      requestAnimationFrame(function(){
-        var msgs = document.getElementById('chatMsgs');
+      requestAnimationFrame(()=>{
+        const msgs = document.getElementById('chatMsgs');
         if(msgs) msgs.scrollTop = msgs.scrollHeight;
       });
     }
     function closeMobileSupportChat(){
-      var win = document.getElementById('chatWindow');
+      const win = document.getElementById('chatWindow');
       if(!win) return;
       win.classList.remove('chat-focused');
-      var backdrop = document.querySelector('.support-chat-backdrop');
+      const backdrop = document.querySelector('.support-chat-backdrop');
       if(backdrop) backdrop.remove();
-      var btn = win.querySelector('.chat-focused-close');
-      if(btn) btn.remove();
-      document.body.style.overflow = '';
-      var fab = document.querySelector('.chat-fab');
-      if(fab) fab.style.display = '';
+      removeCloseBtn(win.querySelector('.chat-header'));
+      lockBodyScroll(false);
     }
     // ── Draggable Chat FAB (mobile touch) ──
     (function(){
