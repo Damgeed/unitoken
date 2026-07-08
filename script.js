@@ -1002,35 +1002,40 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         win.classList.toggle('open');
         return;
       }
-      // Mobile: use focused popup like AI chat
-      var isOpen = win.classList.contains('chat-focused');
-      if(isOpen){
-        win.classList.remove('chat-focused');
-        document.body.style.overflow='';
-        var fab=document.querySelector('.chat-fab');
-        if(fab)fab.style.display='';
-        var cb=document.querySelector('.chat-focused-close');
-        if(cb)cb.remove();
+      // Mobile: match AI chat behavior exactly
+      var overlay = document.querySelector('.chat-mobile-overlay');
+      if(overlay){
+        // Close - restore chat window to body
+        var fab = document.querySelector('.chat-fab');
+        if(fab) fab.style.display = '';
+        document.body.style.overflow = '';
+        var restore = document.body;
+        restore.appendChild(win);
+        overlay.remove();
       }else{
-        win.classList.add('chat-focused');
-        // Hide FAB
-        var fab=document.querySelector('.chat-fab');
-        if(fab)fab.style.display='none';
+        // Create overlay (matches .ai-chat-section.chat-focused exactly)
+        overlay = document.createElement('div');
+        overlay.className = 'chat-mobile-overlay';
+        var cur = win.parentNode;
+        var ref = win.nextSibling;
+        if(ref) cur.insertBefore(overlay, ref);
+        else cur.appendChild(overlay);
+        overlay.appendChild(win);
         // Add close button
-        if(!document.querySelector('.chat-focused-close')){
-          var header = win.querySelector('.chat-header');
-          if(header){
-            var btn=document.createElement('button');
-            btn.className='chat-focused-close';
-            btn.innerHTML='✕';
-            btn.onclick=toggleChat;
-            header.appendChild(btn);
-          }
+        var header = win.querySelector('.chat-header');
+        if(header && !header.querySelector('.chat-focused-close')){
+          var btn = document.createElement('button');
+          btn.className = 'chat-focused-close';
+          btn.innerHTML = '\u2715';
+          btn.onclick = toggleChat;
+          header.appendChild(btn);
         }
-        document.body.style.overflow='hidden';
+        document.body.style.overflow = 'hidden';
+        var fab = document.querySelector('.chat-fab');
+        if(fab) fab.style.display = 'none';
         requestAnimationFrame(function(){
-          var msgs=document.getElementById('chatMsgs');
-          if(msgs)msgs.scrollTop=msgs.scrollHeight;
+          var msgs = document.getElementById('chatMsgs');
+          if(msgs) msgs.scrollTop = msgs.scrollHeight;
         });
       }
     }
