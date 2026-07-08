@@ -352,6 +352,7 @@
       document.getElementById('mUser').style.display=loggedIn?'block':'none';
       // Toggle Dashboard vs API/Dev in nav
       document.getElementById('navApiLink').style.display=loggedIn?'none':'inline-block';
+      document.getElementById('navDashLink').style.display=loggedIn?'inline-block':'none';
       document.getElementById('mNavApiLink').style.display=loggedIn?'none':'block';
       document.getElementById('mNavDashLink').style.display=loggedIn?'block':'none';
       // API doc page: show Go to Dashboard button when logged in
