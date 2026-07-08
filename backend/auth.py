@@ -52,7 +52,11 @@ async def get_current_user(
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token payload")
-    user = db.query(User).filter(User.id == int(user_id)).first()
+    try:
+        uid = int(user_id)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=401, detail="Invalid user ID in token")
+    user = db.query(User).filter(User.id == uid).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
@@ -68,9 +72,9 @@ async def get_optional_user(
         user_id = payload.get("sub")
         if user_id:
             return db.query(User).filter(User.id == int(user_id)).first()
-    except Exception:
-        pass
-    return None
+    except Exception as e:
+        print(f"⚠️ Optional user auth failed: {e}")
+        return None
 
 def generate_api_key() -> str:
     return "gtk_" + secrets.token_hex(24)

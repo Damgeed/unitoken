@@ -5,6 +5,7 @@ Run: uvicorn main:app --reload
 
 from fastapi import FastAPI, Depends, HTTPException, status, Query, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -63,6 +64,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Security Headers ──
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # ── Rate Limiting ──
 app.state.limiter = limiter
@@ -1565,8 +1579,8 @@ async def health():
     newapi_ok = False
     try:
         newapi_ok = await health_check()
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"⚠️ Health check New API connectivity error: {e}")
     return {
         "status": "ok", "version": "1.0.0", "name": "GlbTOKEN API",
         "newapi_connected": newapi_ok,

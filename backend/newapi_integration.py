@@ -48,7 +48,8 @@ async def health_check() -> bool:
         async with httpx.AsyncClient(timeout=5) as client:
             r = await client.get(f"{NEW_API_BASE.rstrip('/')}/api/status", headers=HEADERS)
             return r.status_code < 500
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ New API health check failed: {e}")
         return False
 
 async def create_newapi_user(email: str, name: str, quota: int = 25000) -> dict:

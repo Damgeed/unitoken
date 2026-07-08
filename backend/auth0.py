@@ -180,8 +180,8 @@ def _fetch_jwks() -> dict:
             resp = requests.get(url, timeout=10)
             if resp.status_code == 200:
                 JWKS_CACHE = resp.json()
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"⚠️ Failed to fetch Auth0 JWKS: {e}")
     return JWKS_CACHE or {}
 
 def verify_token(id_token: str) -> dict:

@@ -115,7 +115,8 @@ def health_check() -> bool:
         with httpx.Client(timeout=5) as client:
             r = client.get(f"{NEW_API_BASE.rstrip('/')}/api/status", headers=HEADERS)
             return r.status_code < 500
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ New API health check failed: {e}")
         return False
 
 

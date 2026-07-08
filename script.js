@@ -31,7 +31,8 @@
     
     async function api(method, path, body, timeoutMs){
       const controller=new AbortController();
-      const timer=timeoutMs?setTimeout(()=>controller.abort(),timeoutMs):null;
+      const ms=timeoutMs||25000;
+      const timer=setTimeout(()=>controller.abort(),ms);
       const opts={method,headers:{'Content-Type':'application/json'},signal:controller.signal};
       if(token) opts.headers['Authorization']='Bearer '+token;
       if(body) opts.body=JSON.stringify(body);
@@ -633,7 +634,7 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         document.getElementById('modelCount').textContent=`${m.length} models loaded`;
         // Populate provider filter
         const provs=[...new Set(m.map(x=>x.provider))].sort();
-        filter.innerHTML='<option value="">All Providers</option>'+provs.map(p=>`<option value="${p}">${p}</option>`).join('');
+        filter.innerHTML='<option value="">All Providers</option>'+provs.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
         // Populate category pills
         const cats = [...new Set(m.map(x => x.category).filter(Boolean))];
         const cpills = document.getElementById('catPills');
@@ -1120,13 +1121,13 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     function saveChatHistory(){
       var msgs=document.getElementById('chatMsgs');
       if(!msgs)return;
-      var history=[];
+      var chatHistory=[];
       msgs.querySelectorAll('.chat-msg').forEach(function(el){
         var role=el.classList.contains('user')?'user':'ai';
         var bubble=el.querySelector('.bubble');
-        if(bubble) history.push({role:role,text:bubble.textContent});
+        if(bubble) chatHistory.push({role:role,text:bubble.textContent});
       });
-      try{localStorage.setItem('gt_chat_history',JSON.stringify(history))}catch(e){}
+      try{localStorage.setItem('gt_chat_history',JSON.stringify(chatHistory))}catch(e){}
     }
     function loadChatHistory(){
       var msgs=document.getElementById('chatMsgs');
@@ -1134,10 +1135,10 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       try{
         var data=localStorage.getItem('gt_chat_history');
         if(!data)return;
-        var history=JSON.parse(data);
-        if(!history||!history.length)return;
+        var chatHistory=JSON.parse(data);
+        if(!chatHistory||!chatHistory.length)return;
         msgs.innerHTML='';
-        history.forEach(function(h){
+        chatHistory.forEach(function(h){
           var cls=h.role==='user'?'user':'ai';
           var av=h.role==='user'?'U':'🤖';
           msgs.innerHTML+='<div class="chat-msg '+cls+'"><div class="av">'+av+'</div><div class="bubble">'+escapeHtml(h.text)+'</div></div>';
