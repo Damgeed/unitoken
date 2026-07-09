@@ -727,7 +727,8 @@
 
 /* Blog article page width consistency */
 .blog-article-page .container{max-width:920px!important}
-@media(max-width:768px){.blog-article-page .container{max-width:100%!important}}
+.blog-article-page .dash-card,.blog-article-page .blog-article{max-width:860px;margin-left:auto;margin-right:auto}
+@media(max-width:768px){.blog-article-page .container{max-width:100%!important}.blog-article-page .dash-card,.blog-article-page .blog-article{max-width:100%}}
 
 /* Copy button animation */
 .copying{animation:copyPulse 0.3s ease}
