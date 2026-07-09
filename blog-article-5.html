@@ -110,7 +110,7 @@
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-2">SOC 2 (Service Organization Control 2) is a rigorous auditing standard developed by the American Institute of CPAs (AICPA). Type II certification goes beyond a simple policy review — it requires demonstrating that security controls have been operating effectively over an extended period, typically six to twelve months. Our certification covers the five trust service criteria that matter most to our users: <strong>security, availability, processing integrity, confidentiality, and privacy</strong>.</p>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">What SOC 2 Type II Means for You</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-1">What SOC 2 Type II Means for You</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-3">If you're a developer building on GlbTOKEN, a CTO evaluating us for your team, or an enterprise customer with compliance requirements, here's what our SOC 2 Type II certification means in practical terms:</p>
 
@@ -120,7 +120,7 @@
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-6"><strong>Streamlined Vendor Reviews</strong>. For enterprise customers, SOC 2 reports are often required before procurement teams can approve a new vendor. Our certification means we can provide your compliance team with our SOC 2 report directly, dramatically shortening the vendor risk assessment process — from weeks to days.</p>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">The Five Trust Service Criteria</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-2">The Five Trust Service Criteria</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-7">SOC 2 Type II evaluates organizations against five trust service criteria. Here's how GlbTOKEN addresses each one:</p>
 
@@ -134,7 +134,7 @@
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-12"><strong>5. Privacy</strong> — Personal information is collected, used, retained, disclosed, and disposed of in conformity with the commitments in our privacy policy. We comply with GDPR, CCPA, and other applicable privacy regulations. Data retention policies are automated: prompt data is purged within 30 days unless a customer explicitly opts into longer retention. We provide data deletion APIs and self-service account deletion through the dashboard.</p>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">Encryption: Defense in Depth</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-3">Encryption: Defense in Depth</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-13">Beyond the SOC 2 framework, we've made significant investments in encryption infrastructure that deserve a closer look.</p>
 
@@ -144,62 +144,62 @@
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-16"><strong>End-to-End Encryption for Sensitive Workloads</strong>. For customers handling particularly sensitive data — such as healthcare, legal, or financial information — we offer an end-to-end encrypted relay option. In this mode, prompts are encrypted on the client side before being sent to our API and are only decrypted inside the model inference environment. This means that even GlbTOKEN's infrastructure never has access to the plaintext content of your requests.</p>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">Data Isolation Architecture</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-4">Data Isolation Architecture</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-17">Multi-tenancy is a common concern for enterprise customers evaluating AI platforms. GlbTOKEN uses a defense-in-depth approach to data isolation with three layers:</p>
 
         <ul style="margin-bottom:1rem;padding-left:1.25rem">
-          <li style="margin-bottom:0.5rem"><strong>Database-Level Isolation.</strong> Each customer's data is stored in a logically isolated database schema with row-level security policies. Database access credentials are scoped per customer and revoked automatically when an account is closed or downgraded.</li>
-          <li style="margin-bottom:0.5rem"><strong>Application-Level Isolation.</strong> The API gateway enforces strict tenant-aware access control on every request. Authentication tokens are scoped to a single customer ID, and the application layer verifies this binding before executing any operation.</li>
-          <li style="margin-bottom:0.5rem"><strong>Infrastructure-Level Isolation.</strong> For Enterprise customers, we offer dedicated inference endpoints on isolated compute resources. No data crosses between customer environments at the infrastructure layer.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-1"><strong>Database-Level Isolation.</strong> Each customer's data is stored in a logically isolated database schema with row-level security policies. Database access credentials are scoped per customer and revoked automatically when an account is closed or downgraded.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-2"><strong>Application-Level Isolation.</strong> The API gateway enforces strict tenant-aware access control on every request. Authentication tokens are scoped to a single customer ID, and the application layer verifies this binding before executing any operation.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-3"><strong>Infrastructure-Level Isolation.</strong> For Enterprise customers, we offer dedicated inference endpoints on isolated compute resources. No data crosses between customer environments at the infrastructure layer.</li>
         </ul>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">Access Control & Audit Logging</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-5">Access Control & Audit Logging</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-18">Every action on the GlbTOKEN platform is authenticated, authorized, and audited. Our access control system supports:</p>
 
         <ul style="margin-bottom:1rem;padding-left:1.25rem">
-          <li style="margin-bottom:0.5rem"><strong>Role-Based Access Control (RBAC).</strong> Team accounts support Admin, Developer, Billing, and Read-Only roles with granular permissions for each.</li>
-          <li style="margin-bottom:0.5rem"><strong>API Key Scoping.</strong> API keys can be restricted by model, by maximum spend, by IP range, and by allowed endpoints. This lets you issue keys to contractors or CI/CD pipelines with confidence.</li>
-          <li style="margin-bottom:0.5rem"><strong>Immutable Audit Logs.</strong> All administrative actions, API key changes, billing operations, and access attempts are recorded in tamper-evident audit logs. These logs are stored in write-once, read-many (WORM) storage and retained for a minimum of 12 months. Enterprise customers receive access to their audit log stream via secure webhook.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-4"><strong>Role-Based Access Control (RBAC).</strong> Team accounts support Admin, Developer, Billing, and Read-Only roles with granular permissions for each.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-5"><strong>API Key Scoping.</strong> API keys can be restricted by model, by maximum spend, by IP range, and by allowed endpoints. This lets you issue keys to contractors or CI/CD pipelines with confidence.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-6"><strong>Immutable Audit Logs.</strong> All administrative actions, API key changes, billing operations, and access attempts are recorded in tamper-evident audit logs. These logs are stored in write-once, read-many (WORM) storage and retained for a minimum of 12 months. Enterprise customers receive access to their audit log stream via secure webhook.</li>
         </ul>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">Vulnerability Management & Penetration Testing</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-6">Vulnerability Management & Penetration Testing</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-19">Security certifications matter, but what matters more is the day-to-day practice of staying secure. GlbTOKEN runs a comprehensive vulnerability management program that includes:</p>
 
         <ul style="margin-bottom:1rem;padding-left:1.25rem">
-          <li style="margin-bottom:0.5rem"><strong>Automated vulnerability scanning</strong> of all infrastructure and dependencies — every 6 hours.</li>
-          <li style="margin-bottom:0.5rem"><strong>Annual third-party penetration testing</strong> by a licensed PCI-qualified assessor. The most recent pentest found zero critical or high-severity findings.</li>
-          <li style="margin-bottom:0.5rem"><strong>A responsible disclosure program</strong> with a published security policy and bug bounty. We commit to a 72-hour initial response time for all verified security reports.</li>
-          <li style="margin-bottom:0.5rem"><strong>Dependency monitoring</strong> with automated patch deployment for critical CVEs — 24-hour SLA for Critical, 72-hour for High.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-7"><strong>Automated vulnerability scanning</strong> of all infrastructure and dependencies — every 6 hours.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-8"><strong>Annual third-party penetration testing</strong> by a licensed PCI-qualified assessor. The most recent pentest found zero critical or high-severity findings.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-9"><strong>A responsible disclosure program</strong> with a published security policy and bug bounty. We commit to a 72-hour initial response time for all verified security reports.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-10"><strong>Dependency monitoring</strong> with automated patch deployment for critical CVEs — 24-hour SLA for Critical, 72-hour for High.</li>
         </ul>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">What Enterprise Customers Need to Know</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-7">What Enterprise Customers Need to Know</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-20">For enterprises evaluating GlbTOKEN, here's a summary of what we can provide to support your compliance and procurement processes:</p>
 
         <ul style="margin-bottom:1rem;padding-left:1.25rem">
-          <li style="margin-bottom:0.5rem"><strong>SOC 2 Type II Report</strong> — available under NDA. Contact <a href="mailto:security@glbtoken.com" style="color:var(--primary)">security@glbtoken.com</a> to request access.</li>
-          <li style="margin-bottom:0.5rem"><strong>Security Whitepaper</strong> — a detailed 20-page document covering our architecture, encryption, access controls, incident response, and compliance posture.</li>
-          <li style="margin-bottom:0.5rem"><strong>Data Processing Agreement (DPA)</strong> — available for signature as part of the Enterprise onboarding process.</li>
-          <li style="margin-bottom:0.5rem"><strong>Business Continuity & Disaster Recovery Plan</strong> — available under NDA, including RTO/RPO commitments.</li>
-          <li style="margin-bottom:0.5rem"><strong>Custom Security Questionnaire Responses</strong> — our team will complete your vendor security assessment within five business days.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-11"><strong>SOC 2 Type II Report</strong> — available under NDA. Contact <a href="mailto:security@glbtoken.com" style="color:var(--primary)">security@glbtoken.com</a> to request access.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-12"><strong>Security Whitepaper</strong> — a detailed 20-page document covering our architecture, encryption, access controls, incident response, and compliance posture.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-13"><strong>Data Processing Agreement (DPA)</strong> — available for signature as part of the Enterprise onboarding process.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-14"><strong>Business Continuity & Disaster Recovery Plan</strong> — available under NDA, including RTO/RPO commitments.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-15"><strong>Custom Security Questionnaire Responses</strong> — our team will complete your vendor security assessment within five business days.</li>
         </ul>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">What's Next on Our Security Roadmap</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-8">What's Next on Our Security Roadmap</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-21">SOC 2 Type II is a major milestone, but it's not the end of our security journey. Here's what we're working on next:</p>
 
         <ul style="margin-bottom:1rem;padding-left:1.25rem">
-          <li style="margin-bottom:0.5rem"><strong>ISO 27001 Certification</strong> — our audit readiness assessment is complete, and we're targeting certification by Q4 2026.</li>
-          <li style="margin-bottom:0.5rem"><strong>SOC 3 Report</strong> — a publicly available summary of our SOC 2 Type II report, expected in Q3 2026.</li>
-          <li style="margin-bottom:0.5rem"><strong>HIPAA BAA</strong> — for healthcare customers who need to process PHI through our API. We're on track to sign BAAs by Q1 2027.</li>
-          <li style="margin-bottom:0.5rem"><strong>FedRAMP Ready</strong> — initial assessment underway for government agency use cases.</li>
-          <li style="margin-bottom:0.5rem"><strong>Zero Trust Architecture</strong> — migrating our internal network to a zero-trust model with micro-segmentation, continuous verification, and just-in-time access.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-16"><strong>ISO 27001 Certification</strong> — our audit readiness assessment is complete, and we're targeting certification by Q4 2026.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-17"><strong>SOC 3 Report</strong> — a publicly available summary of our SOC 2 Type II report, expected in Q3 2026.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-18"><strong>HIPAA BAA</strong> — for healthcare customers who need to process PHI through our API. We're on track to sign BAAs by Q1 2027.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-19"><strong>FedRAMP Ready</strong> — initial assessment underway for government agency use cases.</li>
+          <li style="margin-bottom:0.5rem" data-i18n="article-5-list-20"><strong>Zero Trust Architecture</strong> — migrating our internal network to a zero-trust model with micro-segmentation, continuous verification, and just-in-time access.</li>
         </ul>
 
-        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)">Our Commitment</h3>
+        <h3 style="margin:1.5rem 0 0.75rem;color:var(--text-primary)" data-i18n="article-5-heading-9">Our Commitment</h3>
 
         <p style="margin-bottom:1rem" data-i18n="article-5-para-22">Security is not a feature — it's a practice. SOC 2 Type II certification validates that we have the right practices in place, tested over time, and independently verified. But we don't stop there. Every team member at GlbTOKEN receives security awareness training on day one and annually thereafter. Every code change goes through mandatory peer review with automated security scanning. Every infrastructure change is reviewed through a change advisory board process.</p>
 
