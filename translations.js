@@ -53,31 +53,6 @@ function updateLangUI(lang) {
 }
 
 // Apply on every page load — immediately translate if a saved language exists
-(function() {
-  var saved = localStorage.getItem('gt_lang');
-  if (saved && saved !== 'en') {
-    curLang = saved;
-    function doTranslate() { translatePage(); updateLangUI(saved); }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', doTranslate);
-    } else {
-      doTranslate();
-    }
-  }
-})();
-
-// Also translate after page navigation (bfcache)
-window.addEventListener('pageshow', function(e) {
-  // e.persisted is true when page is served from bfcache
-  var saved = localStorage.getItem('gt_lang');
-  if (saved && saved !== 'en') {
-    curLang = saved;
-    translatePage();
-    updateLangUI(saved);
-
-  }
-});
-
 // ── Group 1: Navigation, Buttons, Auth ──
 
 TRANS["Home"] = {en: "Home", "zh-CN": "首页", ru: "Главная", ja: "ホーム", de: "Startseite"};
@@ -851,3 +826,30 @@ I18N_MIXED["auth-header-text"] = {en: 'All API requests require an API key passe
 I18N_MIXED["read-more"] = {en: "Read more →", "zh-CN": "阅读更多 →", ru: "Читать далее →", ja: "続きを読む →", de: "Weiterlesen →"};
 I18N_MIXED["back-to-blog"] = {en: "← Back to Blog", "zh-CN": "← 返回博客", ru: "← Назад в блог", ja: "← ブログに戻る", de: "← Zurück zum Blog"};
 I18N_MIXED["share-label"] = {en: "Share:", "zh-CN": "分享：", ru: "Поделиться:", ja: "シェア：", de: "Teilen:"};
+
+(function() {
+  var saved = localStorage.getItem('gt_lang');
+  if (saved && saved !== 'en') {
+    curLang = saved;
+    function doTranslate() { translatePage(); updateLangUI(saved); }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', doTranslate);
+    } else {
+      doTranslate();
+    }
+  }
+})();
+
+// Also translate after page navigation (bfcache)
+window.addEventListener('pageshow', function(e) {
+  // e.persisted is true when page is served from bfcache
+  var saved = localStorage.getItem('gt_lang');
+  if (saved && saved !== 'en') {
+    curLang = saved;
+    translatePage();
+    updateLangUI(saved);
+
+  }
+});
+
+
