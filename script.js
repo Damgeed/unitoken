@@ -557,7 +557,7 @@
         var msg = e.message || 'Invalid code';
         showToast(msg,'error');
       }finally{
-        btn.disabled=false; btn.textContent= prefix === 'login' ? 'Verify & Sign In' : 'Verify & Create Account';
+        setBtnLoading(btn, false);
       }
     }
     function oauthLogin(provider, btn){ startOAuth(provider, btn); }
