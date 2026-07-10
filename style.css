@@ -199,6 +199,10 @@
     .auth-oauth-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.65rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.2s}
     .auth-oauth-btn:hover{border-color:var(--primary);background:var(--primary-subtle)}
     .auth-oauth-btn svg{flex-shrink:0}
+    .auth-oauth-btn .btn-spinner,.btn-primary .btn-spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:currentColor;border-radius:50%;animation:btnSpin .6s linear infinite;vertical-align:middle;margin-right:6px;flex-shrink:0}
+    .auth-oauth-btn.btn-loading,.btn-primary.btn-loading{pointer-events:none;opacity:0.7}
+    .auth-oauth-btn.btn-loading .btn-spinner,.btn-primary.btn-loading .btn-spinner{display:inline-block}
+    @keyframes btnSpin{to{transform:rotate(360deg)}}
     .auth-switch{text-align:center;margin-top:1.25rem;font-size:0.85rem;color:var(--text-muted)}
     .auth-switch a{color:var(--primary);cursor:pointer}
     .dash-page{padding:2rem 1.25rem 3rem}

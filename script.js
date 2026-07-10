@@ -272,6 +272,19 @@
     }
 
     // ── Auth (Passwordless Email via Auth0) ──
+    function setBtnLoading(btn, loading, originalText) {
+      if (!btn) return;
+      if (loading) {
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span>' + (originalText || 'Loading...');
+      } else {
+        btn.classList.remove('btn-loading');
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.originalHtml || originalText || '';
+      }
+    }
     async function sendLoginCode(){
       const email=document.getElementById('loginEmail').value.trim();
       if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
@@ -280,7 +293,7 @@
         return
       }
       const btn=document.getElementById('loginSendBtn');
-      btn.disabled=true;btn.textContent='Sending...';
+      setBtnLoading(btn, true, 'Continue');
       try{
         await api('POST','/api/auth/send-code',{email:email});
         document.getElementById('loginEmailGroup').style.display='none';
@@ -326,7 +339,7 @@
         return
       }
       const btn=document.getElementById('regSendBtn');
-      btn.disabled=true;btn.textContent='Sending...';
+      setBtnLoading(btn, true, 'Continue');
       try{
         await api('POST','/api/auth/send-code',{email:email});
         document.getElementById('regEmailGroup').style.display='none';
@@ -445,7 +458,7 @@
         return;
       }
       var btn = document.getElementById(prefix + 'PhoneSendBtn');
-      btn.disabled=true; btn.textContent='Sending...';
+      setBtnLoading(btn, true, 'Send Message');
       try{
         await api('POST','/api/auth/send-sms-code',{phone:phone});
         document.getElementById(prefix + 'SmsCodeGroup').style.display='block';
@@ -489,33 +502,33 @@
       }
     }
     function oauthLogin(provider, btn){
-      // Show loading state on the clicked button
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Connecting...'; }
+      // Show spinner on the clicked button
+      if (btn) { btn.classList.add('btn-loading'); btn.disabled = true; btn.dataset.originalHtml = btn.innerHTML; btn.innerHTML = '<span class=\"btn-spinner\"></span>Connecting...'; }
       // Redirect to Auth0 social login
       api('GET','/api/auth/auth0/social-url?provider='+provider).then(function(cfg){
         if(cfg && cfg.url) window.location.href=cfg.url;
         else {
           showToast('Social login unavailable. Try email.','error');
-          if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.originalText || 'Google'; }
+          if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.innerHTML = btn.dataset.originalHtml || btn.dataset.originalText || 'Google'; }
         }
       }).catch(function(){
         showToast('Social login unavailable. Try email.','error');
-        if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.originalText || 'Google'; }
+        if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.innerHTML = btn.dataset.originalHtml || btn.dataset.originalText || 'Google'; }
       });
     }
     function oauthRegister(provider, btn){
-      // Show loading state on the clicked button
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Connecting...'; }
+      // Show spinner on the clicked button
+      if (btn) { btn.classList.add('btn-loading'); btn.disabled = true; btn.dataset.originalHtml = btn.innerHTML; btn.innerHTML = '<span class=\"btn-spinner\"></span>Connecting...'; }
       // Redirect to Auth0 social signup
       api('GET','/api/auth/auth0/social-url?provider='+provider).then(function(cfg){
         if(cfg && cfg.url) window.location.href=cfg.url;
         else {
           showToast('Social signup unavailable. Try email.','error');
-          if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.originalText || 'Google'; }
+          if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.innerHTML = btn.dataset.originalHtml || btn.dataset.originalText || 'Google'; }
         }
       }).catch(function(){
         showToast('Social signup unavailable. Try email.','error');
-        if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.originalText || 'Google'; }
+        if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.innerHTML = btn.dataset.originalHtml || btn.dataset.originalText || 'Google'; }
       });
     }
     function logoutUser(){
