@@ -19,6 +19,17 @@
     let newapiToken = localStorage.getItem('gt_newapi_token') || '';
     let newapiEndpoint = localStorage.getItem('gt_newapi_endpoint') || '';
 
+    // Clear any stuck spinners from a previous OAuth redirect that was cancelled
+    (function(){
+      if (sessionStorage.getItem('gt_oauth_cancel')) {
+        sessionStorage.removeItem('gt_oauth_cancel');
+        document.querySelectorAll('.btn-loading').forEach(function(el){
+          el.classList.remove('btn-loading'); el.disabled = false;
+          if (el.dataset.originalHtml) el.innerHTML = el.dataset.originalHtml;
+        });
+      }
+    })();
+
     // ── Country Codes for Phone Registration ──
     const COUNTRY_CODES = [
       {flag:'🇦🇫',dial:'+93',name:'Afghanistan'},
@@ -526,7 +537,10 @@
       setBtnLoading(btn, true, 'Connecting...');
       // Redirect to Auth0 social login
       api('GET','/api/auth/auth0/social-url?provider='+provider).then(function(cfg){
-        if(cfg && cfg.url) window.location.href=cfg.url;
+        if(cfg && cfg.url) {
+          sessionStorage.setItem('gt_oauth_cancel','1');
+          window.location.href=cfg.url;
+        }
         else {
           showToast('Social login unavailable. Try email.','error');
           setBtnLoading(btn, false);
@@ -541,7 +555,10 @@
       setBtnLoading(btn, true, 'Connecting...');
       // Redirect to Auth0 social signup
       api('GET','/api/auth/auth0/social-url?provider='+provider).then(function(cfg){
-        if(cfg && cfg.url) window.location.href=cfg.url;
+        if(cfg && cfg.url) {
+          sessionStorage.setItem('gt_oauth_cancel','1');
+          window.location.href=cfg.url;
+        }
         else {
           showToast('Social signup unavailable. Try email.','error');
           setBtnLoading(btn, false);
