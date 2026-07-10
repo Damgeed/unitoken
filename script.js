@@ -314,6 +314,10 @@
       }
       window.addEventListener('pageshow', function(e) { resetStuckButtons(); });
       document.addEventListener('visibilitychange', function() { if (!document.hidden) resetStuckButtons(); });
+      // Kill pending OAuth timeout on page unload (prevents stale timers after navigation)
+      window.addEventListener('beforeunload', function() {
+        if (oauthTimeout) { clearTimeout(oauthTimeout); oauthTimeout = null; }
+      });
     })();
     async function sendLoginCode(){
       const email=document.getElementById('loginEmail').value.trim();
