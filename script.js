@@ -285,6 +285,16 @@
         btn.innerHTML = btn.dataset.originalHtml || originalText || '';
       }
     }
+    // Reset any stuck loading buttons when page is restored from bfcache (back/forward swipe)
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        document.querySelectorAll('.btn-loading').forEach(function(el) {
+          el.classList.remove('btn-loading');
+          el.disabled = false;
+          if (el.dataset.originalHtml) el.innerHTML = el.dataset.originalHtml;
+        });
+      }
+    });
     async function sendLoginCode(){
       const email=document.getElementById('loginEmail').value.trim();
       if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
