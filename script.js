@@ -500,12 +500,37 @@
         document.getElementById(prefix + 'PhoneVerifyBtn').style.display='block';
         document.getElementById(prefix + 'SmsCode').focus();
         showToast('Code sent to ' + phone,'success');
+        // Start 3-min resend countdown
+        startResendTimer(prefix);
       }catch(e){
         var msg = e.message || 'Failed to send code';
         showToast(msg,'error');
       }finally{
         btn.disabled=false; btn.textContent='Send Code';
       }
+    }
+    function startResendTimer(prefix){
+      var existing = document.getElementById(prefix + 'ResendTimer');
+      if(existing) existing.remove();
+      var label = document.createElement('div');
+      label.id = prefix + 'ResendTimer';
+      label.style.cssText = 'text-align:center;font-size:0.8rem;margin-top:0.5rem;color:var(--text-muted)';
+      var codeGroup = document.getElementById(prefix + 'SmsCodeGroup');
+      if (!codeGroup) return;
+      codeGroup.appendChild(label);
+      var seconds = 180;
+      function tick(){
+        if (seconds <= 0) {
+          label.innerHTML = '<a style="color:var(--primary);cursor:pointer;text-decoration:underline" onclick="sendPhoneCode(\'' + prefix + '\')">Resend code</a>';
+          return;
+        }
+        var m = Math.floor(seconds / 60);
+        var s = seconds % 60;
+        label.textContent = 'Resend code in ' + m + ':' + (s < 10 ? '0' : '') + s;
+        seconds--;
+        setTimeout(tick, 1000);
+      }
+      tick();
     }
     async function verifyPhoneCode(prefix){
       var dial = selectedDial[prefix] || '+1';
