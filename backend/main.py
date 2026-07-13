@@ -809,7 +809,48 @@ async def get_dashboard(user: User = Depends(get_current_user), db: Session = De
         Transaction.user_id == user.id,
         Transaction.type == "consumption"
     ).scalar() or 0
-    
+
+    # ── Daily usage for last 7 days ──
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    daily_usage = db.query(
+        func.date(Transaction.created_at),
+        func.sum(Transaction.tokens),
+        func.count(Transaction.id)
+    ).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "consumption",
+        Transaction.created_at >= seven_days_ago
+    ).group_by(func.date(Transaction.created_at)).order_by(func.date(Transaction.created_at)).all()
+
+    daily_labels = []
+    daily_values = []
+    daily_requests = []
+    for i in range(6, -1, -1):
+        d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        daily_labels.append(d)
+        found = None
+        for row in daily_usage:
+            row_date = row[0]
+            if hasattr(row_date, 'strftime'):
+                row_date_str = row_date.strftime("%Y-%m-%d")
+            else:
+                row_date_str = str(row_date)
+            if row_date_str == d:
+                found = row
+                break
+        if found:
+            daily_values.append(float(found[1]))
+            daily_requests.append(int(found[2]))
+        else:
+            daily_values.append(0)
+            daily_requests.append(0)
+
+    # ── Total request count ──
+    total_requests = db.query(func.count(Transaction.id)).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "consumption"
+    ).scalar() or 0
+
     return {
         "token_balance": user.token_balance,
         "total_spent": user.total_spent,
@@ -817,6 +858,8 @@ async def get_dashboard(user: User = Depends(get_current_user), db: Session = De
         "api_keys_active": key_count,
         "days_active": days_active,
         "total_tokens_consumed": float(total_consumption),
+        "total_requests": total_requests,
+        "daily_usage": {"labels": daily_labels, "values": daily_values, "requests": daily_requests},
         "newapi_connected": newapi_connected,
         "usage_by_model": [
             {"model": m[0] or "Unknown", "tokens": float(m[1])} for m in usage

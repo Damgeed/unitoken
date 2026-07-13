@@ -117,6 +117,7 @@
         <div class="dash-stats">
           <div class="dash-stat-card"><div class="num" id="dashTotalSpent">$0.00</div><div class="lbl">Total Spent</div><div class="chg up">↑ Lifetime</div></div>
           <div class="dash-stat-card"><div class="num" id="dashModelsUsed">0</div><div class="lbl">Models Used</div><div class="chg up">↑ All time</div></div>
+          <div class="dash-stat-card"><div class="num" id="dashTotalRequests">0</div><div class="lbl">API Requests</div><div class="chg up">↑ Total calls</div></div>
           <div class="dash-stat-card"><div class="num" id="dashKeyCount">0</div><div class="lbl">API Keys Active</div><div class="chg" style="color:var(--text-muted)" id="dashKeyStatus">-</div></div>
           <div class="dash-stat-card"><div class="num" id="dashDaysActive">0</div><div class="lbl">Days Active</div><div class="chg" style="color:var(--text-muted)" id="dashNewapiStatus">Offline</div></div>
         </div>
@@ -136,6 +137,10 @@
           <div style="font-size:0.8rem;color:var(--text-muted)">⚡ <span id="dashTotalConsumed">0</span> tokens consumed</div>
           <div style="font-size:0.8rem;color:var(--text-muted)">📊 <span id="dashTotalSpentLifetime">$0.00</span> lifetime spend</div>
         </div>
+      </div>
+      <div class="dash-card" style="margin-top:1.25rem">
+        <div class="dash-section-title">Usage (7 Days) <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Daily token consumption</span></div>
+        <div class="chart-container" style="height:180px"><canvas id="dailyChart"></canvas></div>
       </div>
       <div class="dash-grid">
         <div class="dash-card"><div class="dash-section-title">Usage by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">All time</span></div><div class="chart-container"><canvas id="usageChart"></canvas></div><div id="modelRanking" style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.5rem"></div></div>

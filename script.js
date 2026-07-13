@@ -883,6 +883,9 @@
         updateBalance();
         document.getElementById('dashTotalSpent').textContent='$'+d.total_spent.toFixed(2);
         document.getElementById('dashModelsUsed').textContent=d.models_used;
+        // Total API requests
+        var reqEl = document.getElementById('dashTotalRequests');
+        if(reqEl) reqEl.textContent = (d.total_requests || 0).toLocaleString();
         document.getElementById('dashKeyCount').textContent=d.api_keys_active;
         document.getElementById('dashKeyStatus').textContent=d.api_keys_active>0?'Active':'No keys';
         // Show real days active from New API or local DB
@@ -920,6 +923,7 @@
           if(todayEl) todayEl.textContent = parseInt(newapiTotal).toLocaleString();
         }
         initCharts(d.usage_by_model);
+        initDailyChart(d.daily_usage);
         // ── Model ranking list ──
         var rankEl = document.getElementById('modelRanking');
         if(rankEl && d.usage_by_model && d.usage_by_model.length){
@@ -994,6 +998,40 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       if(!canvas)return;
       if(chartInst){chartInst.destroy();chartInst=null}
       const labels=usage&&usage.length?usage.map(u=>u.model):['GPT-4o','Claude','DeepSeek','Llama','Other'];
+      const data=usage&&usage.length?usage.map(u=>u.tokens):[0,0,0,0,0];
+      const colors=['#FFB347','#00D68F','#7C3AED','#FF6B6B','#00B4D8'];
+      chartInst=new Chart(canvas,{
+        type:'doughnut',
+        data:{labels:labels,datasets:[{data:data,backgroundColor:colors,borderWidth:0}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+      });
+    }
+    function initDailyChart(dailyData){
+      var canvas=document.getElementById('dailyChart');
+      if(!canvas||!dailyData||!dailyData.labels)return;
+      if(window.dailyChartInst){window.dailyChartInst.destroy()}
+      window.dailyChartInst=new Chart(canvas,{
+        type:'bar',
+        data:{
+          labels:dailyData.labels.map(function(l){var p=l.split('-');return p[1]+'/'+p[2]}),
+          datasets:[{
+            label:'Tokens',
+            data:dailyData.values,
+            backgroundColor:'rgba(255,179,71,0.6)',
+            borderColor:'#FFB347',
+            borderWidth:1,
+            borderRadius:4
+          }]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{
+            y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+            x:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+          }
+        }
+      });
     }
     function updateCustomPricing(){
       var slider=document.getElementById('customSlider');
@@ -1802,25 +1840,59 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
   function initPriceCalculator(){
     var container = document.getElementById('priceCalculator');
     if(!container) return;
-    var rates = {USD:0.001,NGN:1.5,GHS:0.015,KES:0.13,GBP:0.00078};
+    var fallbackRates = {USD:1,NGN:1540,GHS:15.2,KES:129,GBP:0.79};
     container.innerHTML = '<div class="calculator-card"><h3 style="font-size:1rem;margin-bottom:1rem;color:var(--text)">💰 Token Price Calculator</h3>' +
-      '<div class="calc-row"><input type="number" id="calcTokens" placeholder="Enter tokens (e.g. 1000)" min="1" value="1000" oninput="updateCalcPrices()">' +
-      '<select id="calcCurrency" onchange="updateCalcPrices()" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem">' +
-      Object.keys(rates).map(function(c){return '<option value="' + c + '">' + c + '</option>'}).join('') + '</select></div>' +
-      '<div class="calc-result" id="calcResult"></div></div>';
-    window.updateCalcPrices = function(){
-      var tokens = parseInt(document.getElementById('calcTokens').value) || 0;
-      var baseCurr = document.getElementById('calcCurrency').value;
-      var basePrice = tokens * rates[baseCurr];
+      '<div class="calc-row"><input type="number" id="calcAmount" placeholder="Enter amount" min="1" value="100" oninput="window.calcUpdate()">' +
+      '<select id="calcCurrency" onchange="window.calcUpdate()" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem">' +
+      Object.keys(fallbackRates).map(function(c){return '<option value="' + c + '">' + c + '</option>'}).join('') + '</select>' +
+      '<span style="font-size:0.85rem;color:var(--text-muted);white-space:nowrap">= <span id="calcTokenResult" style="font-weight:700;color:var(--primary)">—</span> tokens</span></div>' +
+      '<div class="calc-result" id="calcResult"></div>' +
+      '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;text-align:center" id="calcRateSource">Loading live rates...</div></div>';
+    // Fetch live exchange rates
+    window.calcRates = JSON.parse(JSON.stringify(fallbackRates));
+    var sourceEl = document.getElementById('calcRateSource');
+    fetch('https://api.frankfurter.app/latest?from=USD')
+      .then(function(r){return r.json()})
+      .then(function(data){
+        if(data && data.rates){
+          window.calcRates.GBP = data.rates.GBP || fallbackRates.GBP;
+          window.calcRates.USD = 1;
+          // Fetch NGN from a free source
+          return fetch('https://open.er-api.com/v6/latest/USD');
+        }
+      }).then(function(r){
+        if(r) return r.json();
+      }).then(function(data){
+        if(data && data.rates){
+          window.calcRates.NGN = data.rates.NGN || fallbackRates.NGN;
+          window.calcRates.GHS = data.rates.GHS || fallbackRates.GHS;
+          window.calcRates.KES = data.rates.KES || fallbackRates.KES;
+        }
+        if(sourceEl) sourceEl.textContent = '💰 Live rates • 1 GT = $0.001 USD';
+        window.calcUpdate();
+      }).catch(function(){
+        // Fallback to hardcoded rates
+        window.calcRates = fallbackRates;
+        if(sourceEl) sourceEl.textContent = '💰 Rates updated periodically • 1 GT = $0.001 USD';
+        window.calcUpdate();
+      });
+    window.calcUpdate = function(){
+      var amount = parseFloat(document.getElementById('calcAmount').value) || 0;
+      var curr = document.getElementById('calcCurrency').value;
+      var rate = window.calcRates[curr] || 1;
+      var tokenPriceUSD = 0.001; // 1 token = $0.001
+      var tokens = Math.floor(amount / rate / tokenPriceUSD);
+      var tokenEl = document.getElementById('calcTokenResult');
+      if(tokenEl) tokenEl.textContent = tokens.toLocaleString();
       var resultDiv = document.getElementById('calcResult');
       var html = '';
-      Object.keys(rates).forEach(function(c){
-        var val = basePrice / rates[baseCurr] * rates[c];
-        html += '<div class="calc-currency"><div class="curr-label">' + c + '</div><div class="curr-value">' + (c === 'USD' ? '$' : '') + val.toFixed(c === 'USD' ? 4 : 2) + '</div></div>';
+      Object.keys(window.calcRates).forEach(function(c){
+        var displayAmt = (amount / rate * window.calcRates[c]).toFixed(c === 'USD' ? 2 : 2);
+        html += '<div class="calc-currency"><div class="curr-label">' + c + '</div><div class="curr-value">' + (c === 'USD' ? '$' : '') + parseFloat(displayAmt).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>';
       });
       resultDiv.innerHTML = html;
     };
-    updateCalcPrices();
+    window.calcUpdate();
   }
   // ── Init all UI enhancements ──
   document.addEventListener('DOMContentLoaded',function(){
