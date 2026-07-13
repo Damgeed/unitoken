@@ -366,6 +366,29 @@ async def github_callback(req: GithubAuthRequest, db: Session = Depends(get_db))
 class Auth0LoginRequest(BaseModel):
     token: str
 
+class SendCodeRequest(BaseModel):
+    email: str
+
+class VerifyCodeRequest(BaseModel):
+    email: str
+    code: str
+
+class SendSmsCodeRequest(BaseModel):
+    phone: str
+
+class VerifySmsCodeRequest(BaseModel):
+    phone: str
+    code: str
+
+class Auth0PasswordLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class Auth0SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
 @app.get("/api/auth/auth0/config")
 def auth0_config():
     """Return Auth0 public config for frontend. Gracefully disabled if unconfigured."""
@@ -373,9 +396,9 @@ def auth0_config():
 
 @app.post("/api/auth/send-code")
 @limiter.limit("5/minute")
-async def send_code(request: Request, body: dict = Body(...), db: Session = Depends(get_db)):
+async def send_code(request: Request, body: SendCodeRequest, db: Session = Depends(get_db)):
     """Send a verification code via Auth0 Passwordless Email to the given email."""
-    email = body.get("email", "").lower().strip()
+    email = body.email.lower().strip()
     if not email or "@" not in email:
         raise HTTPException(status_code=400, detail="Valid email required")
     if not is_auth0_configured():
@@ -388,10 +411,10 @@ async def send_code(request: Request, body: dict = Body(...), db: Session = Depe
 
 @app.post("/api/auth/verify-code")
 @limiter.limit("10/minute")
-async def verify_code(request: Request, body: dict = Body(...), db: Session = Depends(get_db)):
+async def verify_code(request: Request, body: VerifyCodeRequest, db: Session = Depends(get_db)):
     """Verify a code from Auth0 Passwordless Email, create/login user, return JWT."""
-    email = body.get("email", "").lower().strip()
-    code = body.get("code", "").strip()
+    email = body.email.lower().strip()
+    code = body.code.strip()
     if not email or not code:
         raise HTTPException(status_code=400, detail="Email and code required")
     if not is_auth0_configured():
@@ -444,9 +467,9 @@ async def verify_code(request: Request, body: dict = Body(...), db: Session = De
 
 @app.post("/api/auth/send-sms-code")
 @limiter.limit("5/minute")
-async def send_sms_code_endpoint(request: Request, body: dict = Body(...)):
+async def send_sms_code_endpoint(request: Request, body: SendSmsCodeRequest):
     """Send a verification code via SMS using Auth0 Passwordless SMS."""
-    phone = body.get("phone", "").strip()
+    phone = body.phone.strip()
     if not phone:
         raise HTTPException(status_code=400, detail="Phone number required")
     if not is_auth0_configured():
@@ -459,10 +482,10 @@ async def send_sms_code_endpoint(request: Request, body: dict = Body(...)):
 
 @app.post("/api/auth/verify-sms-code")
 @limiter.limit("10/minute")
-async def verify_sms_code_endpoint(request: Request, body: dict = Body(...), db: Session = Depends(get_db)):
+async def verify_sms_code_endpoint(request: Request, body: VerifySmsCodeRequest, db: Session = Depends(get_db)):
     """Verify SMS code, create/login user, return JWT."""
-    phone = body.get("phone", "").strip()
-    code = body.get("code", "").strip()
+    phone = body.phone.strip()
+    code = body.code.strip()
     if not phone or not code:
         raise HTTPException(status_code=400, detail="Phone and code required")
     if not is_auth0_configured():
@@ -568,13 +591,12 @@ async def auth0_login(req: Auth0LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/api/auth/auth0/password-login")
 @limiter.limit("10/minute")
-async def auth0_password_login_endpoint(request: Request, db: Session = Depends(get_db)):
+async def auth0_password_login_endpoint(request: Request, body: Auth0PasswordLoginRequest, db: Session = Depends(get_db)):
     """Email/password login via Auth0 Resource Owner Password Grant."""
     if not is_auth0_configured():
         raise HTTPException(status_code=400, detail="Auth0 not configured")
-    body = await request.json()
-    email = body.get("email", "")
-    password = body.get("password", "")
+    email = body.email.strip()
+    password = body.password
     if not email or not password:
         raise HTTPException(status_code=400, detail="Email and password required")
     try:
@@ -611,14 +633,13 @@ async def auth0_password_login_endpoint(request: Request, db: Session = Depends(
 
 @app.post("/api/auth/auth0/signup")
 @limiter.limit("5/minute")
-async def auth0_signup_endpoint(request: Request, db: Session = Depends(get_db)):
+async def auth0_signup_endpoint(request: Request, body: Auth0SignupRequest, db: Session = Depends(get_db)):
     """Register via Auth0 Database Connection, then auto-login."""
     if not is_auth0_configured():
         raise HTTPException(status_code=400, detail="Auth0 not configured")
-    body = await request.json()
-    name = body.get("name", "")
-    email = body.get("email", "")
-    password = body.get("password", "")
+    name = body.name.strip()
+    email = body.email.strip()
+    password = body.password
     if not name or not email or not password:
         raise HTTPException(status_code=400, detail="Name, email, and password required")
 
@@ -980,6 +1001,9 @@ def paystack_initialize(req: InitiatePaymentRequest, user: User = Depends(get_cu
 def paystack_verify(reference: str = Body(...), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not PAYSTACK_SECRET_KEY:
         raise HTTPException(status_code=400, detail="Paystack not configured")
+    import re
+    if not re.match(r'^[a-zA-Z0-9_-]+$', reference):
+        raise HTTPException(status_code=400, detail="Invalid reference format")
     import httpx
     resp = httpx.get(
         f"https://api.paystack.co/transaction/verify/{reference}",

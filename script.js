@@ -466,7 +466,8 @@
       for(var i=0;i<COUNTRY_CODES.length;i++){
         var c = COUNTRY_CODES[i];
         var sel = c.dial === selectedDial[prefix] ? ' class="country-opt active"' : ' class="country-opt"';
-        html += '<div' + sel + ' onclick="selectCountry(\'' + prefix + '\',\'' + c.dial + '\',\'' + c.flag + '\')"><span>' + c.flag + ' ' + c.name + '</span> <span class="country-dial">' + c.dial + '</span></div>';
+        var safePrefix = prefix.replace(/[^a-zA-Z0-9_-]/g, '');
+        html += '<div' + sel + ' onclick="selectCountry(\'' + safePrefix + '\',\'' + escapeHtml(c.dial) + '\',\'' + escapeHtml(c.flag) + '\')"><span>' + c.flag + ' ' + escapeHtml(c.name) + '</span> <span class="country-dial">' + escapeHtml(c.dial) + '</span></div>';
       }
       list.innerHTML = html;
     }
@@ -521,7 +522,8 @@
       var seconds = 180;
       function tick(){
         if (seconds <= 0) {
-          label.innerHTML = '<a style="color:var(--primary);cursor:pointer;text-decoration:underline" onclick="sendPhoneCode(\'' + prefix + '\')">Resend code</a>';
+          var safePrefix = prefix.replace(/[^a-zA-Z0-9_-]/g, '');
+          label.innerHTML = '<a style="color:var(--primary);cursor:pointer;text-decoration:underline" onclick="sendPhoneCode(\'' + safePrefix + '\')">Resend code</a>';
           return;
         }
         var m = Math.floor(seconds / 60);
@@ -907,7 +909,7 @@
           }).join('');
         }else{
           actCount.textContent='0 items';
-          act.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;padding:1rem;text-align:center">No activity yet</p>';
+          act.innerHTML='<div class="empty-state" style="padding:1.5rem 1rem"><div class="empty-icon" style="font-size:2rem;opacity:0.35">📭</div><div class="empty-title" style="font-size:0.85rem">No activity yet</div><div class="empty-desc" style="font-size:0.75rem">Buy tokens or use AI models to see activity here.</div></div>';
         }
         // Transactions
         loadTxTable();
@@ -1699,16 +1701,94 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);animateCopyBtn(btn);showToast('Copied!','success')}
     }
     function animateCopyBtn(btn){
-      btn.classList.add('copying');
-      var orig = btn.innerHTML;
-      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      setTimeout(function(){
-        btn.innerHTML = orig;
-        btn.classList.remove('copying');
-      },1500);
+    btn.classList.add('copying');
+    var orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(function(){
+      btn.innerHTML = orig;
+      btn.classList.remove('copying');
+    },1000);
+  }
+  // ── Back to Top ──
+  function initBackToTop(){
+    if(document.querySelector('.back-to-top')) return;
+    var btn = document.createElement('button');
+    btn.className = 'back-to-top';
+    btn.innerHTML = '↑';
+    btn.onclick = function(){window.scrollTo({top:0,behavior:'smooth'})};
+    document.body.appendChild(btn);
+    window.addEventListener('scroll',function(){
+      btn.classList.toggle('visible',window.scrollY > 400);
+    });
+  }
+  // ── Page Loading Progress ──
+  function showPageLoader(){
+    var el = document.querySelector('.page-loader');
+    if(!el){el=document.createElement('div');el.className='page-loader';el.innerHTML='<div class="loader-bar"></div>';document.body.appendChild(el)}
+    el.classList.add('active');
+    var bar = el.querySelector('.loader-bar');
+    if(bar){bar.style.width='30%';setTimeout(function(){bar.style.width='70%'},200);setTimeout(function(){bar.style.width='95%'},800)}
+  }
+  function hidePageLoader(){
+    var el = document.querySelector('.page-loader');
+    if(!el) return;
+    var bar = el.querySelector('.loader-bar');
+    if(bar){bar.style.width='100%';setTimeout(function(){el.classList.remove('active');if(bar)bar.style.width='0%'},400)}
+    else{el.classList.remove('active')}
+  }
+  // ── Empty State ──
+  function showEmptyState(container, icon, title, desc){
+    if(!container) return;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">' + icon + '</div><div class="empty-title">' + escapeHtml(title) + '</div><div class="empty-desc">' + escapeHtml(desc) + '</div></div>';
+  }
+  // ── Skeleton Loading ──
+  function showSkeleton(container, count){
+    if(!container) return;
+    var html = '';
+    for(var i=0;i<count;i++) html += '<div class="skeleton skeleton-card"></div>';
+    container.innerHTML = html;
+  }
+  // ── Price Calculator ──
+  function initPriceCalculator(){
+    var container = document.getElementById('priceCalculator');
+    if(!container) return;
+    var rates = {USD:0.001,NGN:1.5,GHS:0.015,KES:0.13,GBP:0.00078};
+    container.innerHTML = '<div class="calculator-card"><h3 style="font-size:1rem;margin-bottom:1rem;color:var(--text)">💰 Token Price Calculator</h3>' +
+      '<div class="calc-row"><input type="number" id="calcTokens" placeholder="Enter tokens (e.g. 1000)" min="1" value="1000" oninput="updateCalcPrices()">' +
+      '<select id="calcCurrency" onchange="updateCalcPrices()" style="padding:0.7rem 1rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem">' +
+      Object.keys(rates).map(function(c){return '<option value="' + c + '">' + c + '</option>'}).join('') + '</select></div>' +
+      '<div class="calc-result" id="calcResult"></div></div>';
+    window.updateCalcPrices = function(){
+      var tokens = parseInt(document.getElementById('calcTokens').value) || 0;
+      var baseCurr = document.getElementById('calcCurrency').value;
+      var basePrice = tokens * rates[baseCurr];
+      var resultDiv = document.getElementById('calcResult');
+      var html = '';
+      Object.keys(rates).forEach(function(c){
+        var val = basePrice / rates[baseCurr] * rates[c];
+        html += '<div class="calc-currency"><div class="curr-label">' + c + '</div><div class="curr-value">' + (c === 'USD' ? '$' : '') + val.toFixed(c === 'USD' ? 4 : 2) + '</div></div>';
+      });
+      resultDiv.innerHTML = html;
+    };
+    updateCalcPrices();
+  }
+  // ── Init all UI enhancements ──
+  document.addEventListener('DOMContentLoaded',function(){
+    initBackToTop();
+    if(document.getElementById('priceCalculator')) initPriceCalculator();
+    hidePageLoader();
+  });
+  // ── Auto-init auth UI on every page load ──
+  (function(){
+    var t = localStorage.getItem('gt_token');
+    if(t){
+      try{var ud = JSON.parse(localStorage.getItem('gt_user') || '{}');}catch(e){ud={};}
+      token = t;
+      userData = ud;
+      if(typeof applyAuth === 'function') applyAuth();
     }
+  })();
     function tmDragStart(clientX){
-      clearInterval(tmInterval);
       tmDragStartX=clientX;
       tmDragOffset=0;
       tmIsDragging=true;
