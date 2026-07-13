@@ -76,6 +76,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://glbtoken-backend-production.up.railway.app; frame-src 'self' https://www.google.com; object-src 'none'"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), midi=(), sync-xhr=(), accelerometer=(), gyroscope=(), magnetometer=(), fullscreen=(self)"
         return response
 
 app.add_middleware(SecurityHeadersMiddleware)
@@ -425,7 +426,8 @@ async def send_code(request: Request, body: SendCodeRequest, db: Session = Depen
         send_passwordless_code(email)
         return {"sent": True, "email": email}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Send code error: {e}")
+        raise HTTPException(status_code=400, detail="Authentication failed. Please try again.")
 
 @app.post("/api/auth/verify-code")
 @limiter.limit("10/minute")
@@ -496,7 +498,8 @@ async def send_sms_code_endpoint(request: Request, body: SendSmsCodeRequest):
         send_sms_code(phone)
         return {"sent": True, "phone": phone}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"❌ Send SMS code error: {e}")
+        raise HTTPException(status_code=400, detail="Authentication failed. Please try again.")
 
 @app.post("/api/auth/verify-sms-code")
 @limiter.limit("10/minute")
@@ -515,7 +518,7 @@ async def verify_sms_code_endpoint(request: Request, body: VerifySmsCodeRequest,
     except Exception as e:
         err_msg = str(e)
         print(f"❌ SMS verify error for {phone}: {err_msg}")
-        raise HTTPException(status_code=400, detail=f"Auth0 error: {err_msg}")
+        raise HTTPException(status_code=400, detail="Verification failed. Please try again.")
     
     email = user_info.get("email", f"{phone}@phone.glbtoken.io")
     user = db.query(User).filter(User.email == email).first()
@@ -554,7 +557,8 @@ async def verify_sms_code_endpoint(request: Request, body: VerifySmsCodeRequest,
     }
 
 @app.post("/api/auth/auth0/login")
-async def auth0_login(req: Auth0LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def auth0_login(request: Request, req: Auth0LoginRequest, db: Session = Depends(get_db)):
     """Verify Auth0 ID token, create/link user, return GlbTOKEN JWT."""
     if not is_auth0_configured():
         raise HTTPException(status_code=400, detail="Auth0 not configured")
@@ -828,7 +832,8 @@ def forgot_password(request: Request, req: ForgotPasswordRequest, db: Session = 
     return {"status": "sent" if sent else "email_unavailable"}
 
 @app.post("/api/auth/reset-password")
-def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def reset_password(request: Request, req: ResetPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.reset_token == req.token).first()
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired reset token")
@@ -1134,7 +1139,10 @@ def paystack_verify(reference: str = Body(...), user: User = Depends(get_current
     data = resp.json()
     if not data.get("status") or data["data"]["status"] != "success":
         raise HTTPException(status_code=400, detail="Payment not successful")
-    tx = db.query(Transaction).filter(Transaction.payment_ref == reference).first()
+    tx = db.query(Transaction).filter(
+        Transaction.payment_ref == reference,
+        Transaction.user_id == user.id
+    ).first()
     if not tx:
         raise HTTPException(status_code=404, detail="Transaction not found")
     if tx.status == "completed":
@@ -1775,7 +1783,6 @@ async def health():
     return {
         "status": "ok", "version": "1.0.0", "name": "GlbTOKEN API",
         "newapi_connected": newapi_ok,
-        "newapi_url": os.getenv("NEW_API_BASE_URL", ""),
     }
 
 # ── New API Request Logs ──
