@@ -14,8 +14,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=186" />
+  <link rel="stylesheet" href="style.css?v=187" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<style>
+/* ── Billing page extras ── */
+.billing-grid{display:grid;gap:1.25rem;margin-top:1.25rem}
+@media(min-width:768px){.billing-grid{grid-template-columns:1fr 1fr}}
+.billing-summary-grid{display:grid;gap:0.75rem;grid-template-columns:1fr}
+@media(min-width:480px){.billing-summary-grid{grid-template-columns:repeat(3,1fr)}}
+.billing-stat-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center}
+.billing-stat-card .num{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.billing-stat-card .lbl{font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem}
+.billing-stat-card .icon{font-size:1.5rem;margin-bottom:0.35rem}
+.billing-empty-state{text-align:center;padding:2rem 1rem;color:var(--text-muted)}
+.billing-empty-state .empty-icon{font-size:2.5rem;margin-bottom:0.5rem;opacity:0.5}
+.billing-empty-state p{font-size:0.85rem;margin:0.25rem 0}
+.payment-card{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--bg-alt);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.payment-card .card-icon{font-size:1.5rem;flex-shrink:0}
+.payment-card .card-info{flex:1}
+.payment-card .card-info .name{font-weight:600;font-size:0.85rem}
+.payment-card .card-info .meta{font-size:0.75rem;color:var(--text-muted)}
+.payment-card .badge{font-size:0.7rem;padding:0.15rem 0.5rem;background:var(--primary-subtle);border-radius:4px;color:var(--primary);font-weight:500;margin-left:auto;flex-shrink:0}
+.status-badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:4px;font-weight:500}
+.status-paid{background:var(--success-subtle,rgba(0,214,143,0.12));color:var(--success,#00D68F)}
+.status-pending{background:rgba(255,183,0,0.12);color:#FFB700}
+.status-failed{background:rgba(255,77,79,0.12);color:#FF4D4F}
+.status-refunded{background:rgba(114,46,209,0.12);color:#722ED1}
+.receipt-link{color:var(--primary);text-decoration:none;font-size:0.8rem;font-weight:500}
+.receipt-link:hover{text-decoration:underline}
+@media(max-width:767px){
+  .billing-page-header h2{font-size:1.4rem}
+  .payment-card{-ms-flex-wrap:wrap;flex-wrap:wrap}
+  .tx-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tx-table-wrap table{min-width:600px}
+}
+</style>
   </head>
 <body>
 <script>if(!localStorage.getItem('gt_token')){window.location.replace('login.html')}window.addEventListener('pageshow',function(e){if(e.persisted&&!localStorage.getItem('gt_token')){window.location.replace('login.html')}})</script>
@@ -101,45 +134,89 @@
       </div>
     </div>
   </div>
-<div class="dash-page"><div class="container">
+
+  <!-- ====== BILLING PAGE ====== -->
+  <div class="dash-page"><div class="container">
+    <div class="billing-page-header" style="margin-bottom:0.5rem">
       <span class="section-label">Payments</span>
-      <h2 class="section-title" style="font-size:1.75rem;margin-bottom:0.5rem">Billing</h2>
-      <div class="billing-grid">
-        <div class="dash-card">
-          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">💳 Payment Methods</h3>
-          <div style="display:flex;flex-direction:column;gap:0.75rem">
-            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--bg-alt);border-radius:var(--radius-sm);border:1px solid var(--primary-subtle)">
-              <span style="font-size:1.5rem">💳</span>
-              <div><div style="font-weight:600;font-size:0.85rem">Visa •••• 4242</div><div style="font-size:0.75rem;color:var(--text-muted)">Expires 12/28</div></div>
-              <span style="margin-left:auto;font-size:0.75rem;padding:0.2rem 0.5rem;background:var(--primary-subtle);border-radius:4px;color:var(--primary)">Default</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--bg-alt);border-radius:var(--radius-sm)">
-              <span style="font-size:1.5rem">🔶</span>
-              <div><div style="font-weight:600;font-size:0.85rem">Paystack</div><div style="font-size:0.75rem;color:var(--text-muted)">Mobile money / Bank transfer</div></div>
-            </div>
-            <button class="btn-secondary" onclick="addPaymentMethod()" style="width:100%;margin-top:0.25rem">+ Add Payment Method</button>
-          </div>
+      <h2 class="section-title" style="font-size:1.75rem;margin-bottom:0.25rem">Billing</h2>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0">Manage invoices, payment methods, and billing summary.</p>
+    </div>
+
+    <!-- ── Billing Summary ── -->
+    <div class="dash-card" id="billingSummaryCard" style="margin-bottom:1.25rem">
+      <div class="dash-section-title">📊 Billing Summary <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="summarySubtitle">Lifetime</span></div>
+      <div class="billing-summary-grid" id="billingSummaryGrid">
+        <div class="billing-stat-card">
+          <div class="icon">💰</div>
+          <div class="num" id="summaryTotalSpent">$0.00</div>
+          <div class="lbl">Total Spent</div>
         </div>
-        <div class="dash-card">
-          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">📄 Recent Invoices</h3>
-          <div style="display:flex;flex-direction:column;gap:0.5rem">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-light)">
-              <div><div style="font-size:0.85rem;font-weight:500">Jun 28, 2026</div><div style="font-size:0.75rem;color:var(--text-muted)">Top-up · $50.00</div></div>
-              <span style="font-size:0.85rem;color:var(--success)">Paid</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-light)">
-              <div><div style="font-size:0.85rem;font-weight:500">Jun 15, 2026</div><div style="font-size:0.75rem;color:var(--text-muted)">Top-up · $20.00</div></div>
-              <span style="font-size:0.85rem;color:var(--success)">Paid</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0">
-              <div><div style="font-size:0.85rem;font-weight:500">Jun 1, 2026</div><div style="font-size:0.75rem;color:var(--text-muted)">Top-up · $100.00</div></div>
-              <span style="font-size:0.85rem;color:var(--success)">Paid</span>
-            </div>
-          </div>
-          <button class="btn-secondary" onclick="viewAllInvoices()" style="width:100%;margin-top:0.75rem">View All Invoices</button>
+        <div class="billing-stat-card">
+          <div class="icon">📅</div>
+          <div class="num" id="summaryLastInvoice">—</div>
+          <div class="lbl">Last Invoice Date</div>
+        </div>
+        <div class="billing-stat-card">
+          <div class="icon">💳</div>
+          <div class="num" id="summaryTopMethod">—</div>
+          <div class="lbl">Top Payment Method</div>
         </div>
       </div>
-    </div></div><footer><div class="container">
+    </div>
+
+    <!-- ── Payment Methods & Invoices grid ── -->
+    <div class="billing-grid">
+      <!-- Payment Methods -->
+      <div class="dash-card" id="paymentMethodsCard">
+        <div class="dash-section-title">💳 Payment Methods</div>
+        <div id="paymentMethodsList">
+          <!-- Populated by JS -->
+          <div class="billing-empty-state" id="paymentMethodsEmpty">
+            <div class="empty-icon">💳</div>
+            <p><strong>No payment methods saved</strong></p>
+            <p style="font-size:0.8rem;margin-top:0.25rem">Add a card or mobile money method to get started.</p>
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="addPaymentMethod()" style="width:100%;margin-top:0.75rem">+ Add Payment Method</button>
+      </div>
+
+      <!-- Invoices -->
+      <div class="dash-card" id="invoicesCard">
+        <div class="dash-section-title">📄 Invoices <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="invoiceCount">0</span></div>
+        <div class="tx-table-wrap">
+          <table class="tx-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Tokens Added</th>
+                <th>Status</th>
+                <th>Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesBody">
+              <tr>
+                <td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">
+                  <div style="font-size:2.5rem;margin-bottom:0.5rem;opacity:0.4">📄</div>
+                  No invoices yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">
+          <button class="btn-primary" onclick="showPage('topup')" style="padding:0.5rem 1.25rem;font-size:0.85rem">+ Top Up Now</button>
+          <button class="btn-secondary" onclick="loadBillingPage()" style="padding:0.5rem 1.25rem;font-size:0.85rem">🔄 Refresh</button>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- ====== FOOTER ====== -->
+<footer><div class="container">
     <div class="footer-grid">
       <div class="footer-brand notranslate"><a href="/" class="nav-logo notranslate"><span class="nav-logo-icon"><img src="logo-nav.png" alt="GlbTOKEN" width="30" height="32" class="nav-logo-img" /></span><span class="logo-full notranslate"><span class="logo-glb notranslate">Glb</span><span class="logo-token notranslate">TOKEN</span></span></a><p data-i18n="footer-tagline">Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges notranslate"><span class="trust-badge notranslate">💳 Stripe</span><span class="trust-badge notranslate">🔶 Paystack</span><span class="trust-badge notranslate">₿ USDT</span><span class="trust-badge notranslate">₿ BTC</span></div></div>
       <div class="footer-col"><h4>Product</h4><a href="pricing.html">Pricing</a><a href="models.html">Models</a><a href="apikeys.html">Docs</a></div>
@@ -160,8 +237,168 @@
     </div>
   </div>
 
-<script src="translations.js?v=186"></script>
-<script data-cfasync="false" src="script.js?v=186"></script>
+<script src="translations.js?v=187"></script>
+<script data-cfasync="false" src="script.js?v=187"></script>
+
+<script>
+/* ── Billing Page Script ── */
+(function(){
+  var loaded = false;
+
+  window.loadBillingPage = function(){
+    if(loaded){ renderInvoices(); return; }
+    loaded = true;
+
+    // ── Invoices ──
+    function renderInvoices(){
+      var tbody = document.getElementById('invoicesBody');
+      if(!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:0.85rem"><div style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:btnSpin .6s linear infinite;vertical-align:middle;margin-right:0.5rem"></div>Loading invoices...</td></tr>';
+
+      fetch('/api/billing/invoices',{
+        method:'GET',
+        headers:{'Authorization':'Bearer '+(localStorage.getItem('gt_token')||''),'Accept':'application/json'}
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var inv = data && data.invoices;
+        if(!inv || !inv.length){
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem"><div style="font-size:2.5rem;margin-bottom:0.5rem;opacity:0.4">📄</div>No invoices found</td></tr>';
+          document.getElementById('invoiceCount').textContent = '0';
+          return;
+        }
+        document.getElementById('invoiceCount').textContent = inv.length;
+        var html = '';
+        for(var i=0;i<inv.length;i++){
+          var invItem = inv[i];
+          var date = escapeHtml(invItem.date || invItem.created_at || '—');
+          var amount = '';
+          if(invItem.amount){
+            var sym = invItem.currency === 'NGN' ? '₦' : '$';
+            amount = sym + parseFloat(invItem.amount).toFixed(2);
+          } else {
+            amount = '—';
+          }
+          var method = escapeHtml(invItem.payment_method || invItem.method || invItem.provider || '—');
+          var tokens = invItem.tokens || invItem.tokens_added || invItem.quantity || 0;
+          tokens = parseInt(tokens).toLocaleString();
+          var status = (invItem.status || 'completed').toLowerCase();
+          var statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+          var statusClass = 'status-' + status;
+          if(status === 'completed') statusClass = 'status-paid';
+          if(status === 'success'){ statusClass = 'status-paid'; statusLabel = 'Paid'; }
+
+          var receiptHtml = '—';
+          if(invItem.receipt_url || invItem.receipt){
+            var rUrl = escapeHtml(invItem.receipt_url || invItem.receipt);
+            receiptHtml = '<a href="' + rUrl + '" target="_blank" rel="noopener" class="receipt-link">📎 View</a>';
+          }
+
+          html += '<tr>';
+          html += '<td style="white-space:nowrap">' + date + '</td>';
+          html += '<td style="white-space:nowrap;font-weight:500">' + amount + '</td>';
+          html += '<td>' + method + '</td>';
+          html += '<td style="white-space:nowrap">' + tokens + ' GT</td>';
+          html += '<td><span class="status-badge ' + statusClass + '">' + escapeHtml(statusLabel) + '</span></td>';
+          html += '<td>' + receiptHtml + '</td>';
+          html += '</tr>';
+        }
+        tbody.innerHTML = html;
+
+        // ── Compute billing summary from invoices ──
+        computeSummary(inv);
+      })
+      .catch(function(err){
+        console.error('Billing fetch error:', err);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem"><div style="font-size:2rem;margin-bottom:0.5rem;opacity:0.5">⚠️</div>Could not load invoices. <a href="javascript:void(0)" onclick="loadBillingPage()" style="color:var(--primary);text-decoration:none">Try again</a></td></tr>';
+      });
+    }
+
+    function computeSummary(inv){
+      var total = 0;
+      var lastDate = '—';
+      var methodCounts = {};
+      var latest = null;
+
+      for(var i=0;i<inv.length;i++){
+        var invItem = inv[i];
+        var amt = parseFloat(invItem.amount) || 0;
+        total += amt;
+
+        var d = invItem.date || invItem.created_at;
+        if(d && (!latest || new Date(d) > new Date(latest))){
+          latest = d;
+          lastDate = d;
+        }
+
+        var m = invItem.payment_method || invItem.method || invItem.provider || 'Unknown';
+        methodCounts[m] = (methodCounts[m] || 0) + 1;
+      }
+
+      // Total spent
+      document.getElementById('summaryTotalSpent').textContent = '$' + total.toFixed(2);
+
+      // Last invoice date
+      if(lastDate !== '—'){
+        try {
+          var dt = new Date(lastDate);
+          if(!isNaN(dt.getTime())){
+            lastDate = dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+          }
+        } catch(_){}
+      }
+      document.getElementById('summaryLastInvoice').textContent = lastDate;
+
+      // Top payment method
+      var topMethod = '—';
+      var topCount = 0;
+      for(var k in methodCounts){
+        if(methodCounts[k] > topCount){
+          topCount = methodCounts[k];
+          topMethod = k;
+        }
+      }
+      document.getElementById('summaryTopMethod').textContent = topMethod;
+    }
+
+    // ── Payment Methods (placeholder) ──
+    function renderPaymentMethods(){
+      var container = document.getElementById('paymentMethodsList');
+      if(!container) return;
+
+      // For now, show the "no methods" empty state.
+      // If the backend provides /api/billing/payment-methods, we can wire it here.
+      // Placeholder: show empty state with add button above.
+      container.innerHTML =
+        '<div class="billing-empty-state">' +
+          '<div class="empty-icon">💳</div>' +
+          '<p><strong>No payment methods saved</strong></p>' +
+          '<p style="font-size:0.8rem;margin-top:0.25rem">Add a card or mobile money method to get started.</p>' +
+        '</div>';
+    }
+
+    renderInvoices();
+    renderPaymentMethods();
+  };
+
+  // ── Handle addPaymentMethod from onclick ──
+  window.addPaymentMethod = function(){
+    // Redirect to topup page where payment methods can be added
+    // or open a modal/overlay. For now, redirect to topup.
+    window.location.href = 'topup.html';
+  };
+
+})();
+
+// Auto-load on page ready
+if(localStorage.getItem('gt_token')){
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded',function(){ setTimeout(loadBillingPage,100); });
+  } else {
+    setTimeout(loadBillingPage,100);
+  }
+}
+</script>
 
 <script>
 (function(){

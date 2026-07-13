@@ -19,6 +19,11 @@
     let newapiToken = localStorage.getItem('gt_newapi_token') || '';
     let newapiEndpoint = localStorage.getItem('gt_newapi_endpoint') || '';
 
+    // ── Usage Analytics State ──
+    let usageDays = 7;
+    let usageModel = '';
+    let usageMode = 'tokens';
+
     let oauthTimeout = null; // tracks iOS safety timeout
 
     // Clear any stuck spinners from bfcache / cancelled OAuth
@@ -653,6 +658,34 @@
         showToast('Password updated','success');
       }catch(e){showToast(e.message||'Failed to update password','error')}
     }
+    // ── Notification Settings ──
+    async function loadSettings(){
+      if(!token)return;
+      try{
+        const d=await api('GET','/api/user/settings');
+        var el=document.getElementById('notifEmail');
+        if(el&&typeof d.email_notifications==='boolean') el.checked=d.email_notifications;
+        var el2=document.getElementById('notifLowBalance');
+        if(el2&&typeof d.low_balance_alert==='boolean') el2.checked=d.low_balance_alert;
+        var el3=document.getElementById('notifLogin');
+        if(el3&&typeof d.login_alerts==='boolean') el3.checked=d.login_alerts;
+      }catch(e){}
+    }
+    async function saveNotificationSettings(){
+      if(!token){showToast('Please sign in first','error');return}
+      var emailEl=document.getElementById('notifEmail');
+      var balEl=document.getElementById('notifLowBalance');
+      var loginEl=document.getElementById('notifLogin');
+      if(!emailEl){showToast('Settings form not found','error');return}
+      try{
+        await api('PUT','/api/user/settings',{
+          email_notifications:emailEl.checked,
+          low_balance_alert:balEl?balEl.checked:false,
+          login_alerts:loginEl?loginEl.checked:false
+        });
+        showToast('Notification preferences saved','success');
+      }catch(e){showToast(e.message||'Failed to save notification settings','error')}
+    }
     // ── History / Transactions ──
     async function loadTransactions(){
       if(!token)return;
@@ -954,10 +987,13 @@
         loadTxTable();
         // Dashboard API Keys
         loadDashKeys();
-        // Request Logs from New API
-        loadRequestLogs();
+        // Activity Timeline (unified feed)
+        loadActivity();
         // Available Models from New API
         loadAvailableModels();
+        // Usage Analytics with filters
+        loadUsageAnalytics(usageDays, usageModel, usageMode);
+        populateModelFilter();
       }catch(e){showToast('Failed to load dashboard','error')}
     }
     async function loadDashKeys(){
@@ -997,36 +1033,152 @@
 body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.created_at).toLocaleDateString():'')+'</td><td>'+escapeHtml(t.type)+'</td><td>'+escapeHtml(t.model_used||t.payment_method||'-')+'</td><td class="amount '+(t.type==='deposit'?'gold':'red')+'">'+(t.type==='deposit'?'+':'')+escapeHtml(String(t.tokens||0))+'</td><td><span style="color:var(--success)">'+escapeHtml(t.status)+'</span></td></tr>').join('');
       }catch(e){}
     }
-    async function loadRequestLogs(){
-      var container=document.getElementById('dashLogs');
+    async function loadActivity(){
+      var container=document.getElementById('dashActivity');
+      var countEl=document.getElementById('activityCount');
       if(!container)return;
       try{
-        var logs=await api('GET','/api/logs?page=1&page_size=20');
-        var countEl=document.getElementById('logCount');
-        if(!logs.items||!logs.items.length){
-          countEl.textContent='0 requests';
-          container.innerHTML='<div class="empty-state" style="padding:1.5rem 1rem"><div class="empty-icon" style="font-size:2rem;opacity:0.35">📋</div><div class="empty-title" style="font-size:0.85rem">No request logs yet</div><div class="empty-desc" style="font-size:0.75rem">Configure New API and make API calls to see logs here.</div></div>';
+        var act=await api('GET','/api/activity');
+        var items=act.items||[];
+        if(!items.length){
+          if(countEl)countEl.textContent='0 events';
+          container.innerHTML='<div class="empty-state" style="padding:1.5rem 1rem"><div class="empty-icon" style="font-size:2rem;opacity:0.35">📭</div><div class="empty-title" style="font-size:0.85rem">No activity yet</div><div class="empty-desc" style="font-size:0.75rem">Buy tokens or make API calls to see activity here.</div></div>';
           return;
         }
-        countEl.textContent=logs.total+' requests';
-        container.innerHTML=logs.items.map(function(l){
-          var dt=l.created_at?new Date(l.created_at).toLocaleString():'';
-          var modelName=l.model||l.model_id||'Unknown';
-          var tokens=l.tokens||l.completion_tokens||0;
-          var status=l.status||200;
-          var statusCls=status>=400?'var(--destructive)':'var(--success)';
-          var cost=l.total_amount?'$'+l.total_amount.toFixed(6):'';
-          return '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem">'+
-            '<span style="width:10px;height:10px;border-radius:50%;background:'+statusCls+';flex-shrink:0"></span>'+
-            '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(modelName)+'</span>'+
-            '<span style="color:var(--text-muted);font-size:0.75rem">'+escapeHtml(tokens.toLocaleString())+' tok</span>'+
-            (cost?'<span style="color:var(--primary);font-size:0.75rem">'+cost+'</span>':'')+
-            '<span style="color:var(--text-muted);font-size:0.7rem">'+escapeHtml(dt)+'</span>'+
-          '</div>';
+        if(countEl)countEl.textContent=items.length+' events';
+        container.innerHTML=items.map(function(a,i){
+          var icon,colorCls,desc,val='';
+          switch(a.type){
+            case 'api_call': icon='🤖'; colorCls='var(--primary-subtle)'; desc=escapeHtml(a.model||'API call')+' · '+parseInt(a.tokens||0).toLocaleString()+' tok'+(a.cost?' · $'+a.cost.toFixed(6):''); break;
+            case 'topup': icon='💰'; colorCls='var(--success-subtle)'; desc='Top-up '+(a.amount?'$'+a.amount.toFixed(2):'')+' · +'+parseInt(a.tokens||0).toLocaleString()+' tokens'; val='+'+parseInt(a.tokens||0); break;
+            case 'key_created': icon='🔑'; colorCls='var(--border)'; desc='Created API key: '+escapeHtml(a.description||''); break;
+            case 'key_deleted': icon='🗑️'; colorCls='var(--border)'; desc='Deleted API key: '+escapeHtml(a.description||''); break;
+            case 'key_paused': icon='⏸️'; colorCls='var(--border)'; desc='Paused API key: '+escapeHtml(a.description||''); break;
+            case 'consumption': icon='⚡'; colorCls='var(--success-subtle)'; desc=escapeHtml(a.model||'Consumption')+' · '+parseInt(a.tokens||0).toLocaleString()+' tokens'; val='-'+parseInt(a.tokens||0); break;
+            default: icon='📋'; colorCls='var(--border)'; desc=escapeHtml(a.description||a.type||''); break;
+          }
+          var dt=a.created_at?new Date(a.created_at).toLocaleString():'';
+          var expandId='act-expand-'+i;
+          var hasLog=a.type==='api_call'&&a.log_id?' data-log-id="'+escapeHtml(String(a.log_id))+'" data-model="'+escapeHtml(a.model||'')+'" data-tokens="'+(a.tokens||0)+'" data-cost="'+(a.cost||0)+'"':'';
+          return '<div class="dash-activity-item" style="cursor:'+(hasLog?'pointer':'default')+'"'+(hasLog?' onclick="toggleLogContent(this,'+"'"+expandId+"'"+')"':'')+'>'+
+            '<div class="icon" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:'+colorCls+'">'+icon+'</div>'+
+            '<div class="info" style="flex:1;min-width:0"><div class="title" style="font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+desc+'</div><div class="time" style="font-size:0.75rem;color:var(--text-muted)">'+escapeHtml(dt)+'</div></div>'+
+            (val?'<div class="val" style="font-size:0.85rem;font-weight:600;color:'+(a.type==='topup'?'var(--primary)':'var(--destructive)')+'">'+val+'</div>':'')+
+            (hasLog?'<span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.25rem">▶</span>':'')+
+            '</div>'+
+            (hasLog?'<div id="'+expandId+'" class="log-content" style="display:none;padding:0.5rem 0.75rem;margin:0 0.5rem 0.5rem 3.5rem;background:var(--bg-alt);border-radius:var(--radius-sm);font-size:0.75rem;max-height:200px;overflow-y:auto"><p style="color:var(--text-muted);text-align:center;padding:0.5rem">Loading...</p></div>':'');
         }).join('');
       }catch(e){
-        container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:1rem">Failed to load request logs.</p>';
+        container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:1rem">Failed to load activity.</p>';
       }
+    }
+    async function toggleLogContent(el,expandId){
+      var expand=document.getElementById(expandId);
+      if(!expand)return;
+      if(expand.style.display!=='none'){
+        expand.style.display='none';
+        var arrow=el.querySelector('span:last-child');
+        if(arrow)arrow.textContent='▶';
+        return;
+      }
+      expand.style.display='block';
+      var arrow=el.querySelector('span:last-child');
+      if(arrow)arrow.textContent='▼';
+      if(expand.getAttribute('data-loaded'))return;
+      expand.setAttribute('data-loaded','true');
+      var logId=el.getAttribute('data-log-id');
+      if(!logId){expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">No log data available</p>';return}
+      try{
+        var content=await api('GET','/api/logs/content?log_id='+logId);
+        if(content.error||(!content.prompt&&!content.completion)){
+          expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">Log content not available</p>';
+          return;
+        }
+        var model=el.getAttribute('data-model')||'';
+        var tokens=el.getAttribute('data-tokens')||'0';
+        var cost=el.getAttribute('data-cost')||'0';
+        expand.innerHTML='<div style="margin-bottom:0.5rem;color:var(--text-muted);font-size:0.7rem">'+
+          escapeHtml(model)+' · '+parseInt(tokens).toLocaleString()+' tok · $'+parseFloat(cost).toFixed(6)+
+          '</div>'+
+          (content.prompt?'<div style="margin-bottom:0.5rem"><div style="font-weight:600;margin-bottom:0.25rem;color:var(--primary);font-size:0.7rem">📤 Prompt</div><div style="background:var(--bg);padding:0.5rem;border-radius:4px;white-space:pre-wrap;word-break:break-word">'+escapeHtml(content.prompt.substring(0,2000))+(content.prompt.length>2000?'...':'')+'</div></div>':'')+
+          (content.completion?'<div><div style="font-weight:600;margin-bottom:0.25rem;color:var(--success);font-size:0.7rem">📥 Completion</div><div style="background:var(--bg);padding:0.5rem;border-radius:4px;white-space:pre-wrap;word-break:break-word">'+escapeHtml(content.completion.substring(0,2000))+(content.completion.length>2000?'...':'')+'</div></div>':'');
+      }catch(e){
+        expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">Failed to load content.</p>';
+      }
+    }
+    async function loadUsageAnalytics(days,model,mode){
+      var canvas=document.getElementById('dailyChart');
+      if(!canvas)return;
+      var summaryTotal=document.getElementById('usageTotalVal');
+      var summaryCost=document.getElementById('usageCostVal');
+      var summaryLabel=document.getElementById('usageTotalLabel');
+      try{
+        var params='?days='+(days||7);
+        if(model)params+='&model='+encodeURIComponent(model);
+        var data=await api('GET','/api/usage-analytics'+params);
+        if((!data.labels||!data.labels.length)&&(!data.tokens||!data.tokens.length)){
+          if(window.dailyChartInst){window.dailyChartInst.destroy();window.dailyChartInst=null}
+          canvas.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No usage data for this period.</p>';
+          return;
+        }
+        if(window.dailyChartInst){window.dailyChartInst.destroy()}
+        var isCost=mode==='cost';
+        var values=isCost?(data.costs||data.tokens.map(function(){return 0})):data.tokens;
+        var label=isCost?'Cost ($)':'Tokens';
+        var color=isCost?'rgba(0,214,143,0.7)':'rgba(255,179,71,0.6)';
+        var border=isCost?'#00D68F':'#FFB347';
+        window.dailyChartInst=new Chart(canvas,{
+          type:'bar',
+          data:{
+            labels:(data.labels||[]).map(function(l){var p=l.split('-');return p[1]+'/'+p[2]}),
+            datasets:[{label:label,data:values,backgroundColor:color,borderColor:border,borderWidth:1,borderRadius:4}]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{display:false}},
+            scales:{
+              y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+              x:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+            }
+          }
+        });
+        if(summaryTotal)summaryTotal.textContent=(data.total_tokens||0).toLocaleString();
+        if(summaryCost)summaryCost.textContent='$'+(data.total_cost||0).toFixed(2);
+        if(summaryLabel)summaryLabel.innerHTML='Total: <strong>'+(data.total_tokens||0).toLocaleString()+'</strong> '+(isCost?'cost ($)':'tokens');
+      }catch(e){
+        if(summaryTotal)summaryTotal.textContent='0';
+        if(summaryCost)summaryCost.textContent='$0.00';
+      }
+    }
+    function setUsageRange(days){
+      usageDays=days;
+      document.querySelectorAll('#usageRangeBtns .usage-range').forEach(function(b){b.classList.toggle('active',parseInt(b.getAttribute('data-days'))===days)});
+      refreshUsageChart();
+    }
+    function setUsageMode(mode){
+      usageMode=mode;
+      document.querySelectorAll('#usageModeBtns .usage-mode').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-mode')===mode)});
+      refreshUsageChart();
+    }
+    function refreshUsageChart(){
+      loadUsageAnalytics(usageDays,usageModel,usageMode);
+    }
+    async function populateModelFilter(){
+      var sel=document.getElementById('usageModelFilter');
+      if(!sel)return;
+      try{
+        var result=await api('GET','/api/available-models');
+        var models=result.models||[];
+        var seen={};
+        models.forEach(function(m){
+          var name=m.name||m.model||m.model_id;
+          if(name&&!seen[name]){seen[name]=true;
+            var opt=document.createElement('option');
+            opt.value=name;opt.textContent=name;
+            sel.appendChild(opt);
+          }
+        });
+      }catch(e){}
     }
     async function loadAvailableModels(){
       var container=document.getElementById('dashModelList');

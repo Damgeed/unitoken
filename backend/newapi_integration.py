@@ -125,3 +125,11 @@ async def get_user_models(user_id: int) -> list:
     if isinstance(result, list):
         return result
     return result.get("models", []) if isinstance(result, dict) else []
+
+
+async def get_log_content(log_id: int) -> dict:
+    """Fetch full request content (prompt + completion) for a specific log entry from New API."""
+    result = await _get(f"/api/log/content?log_id={log_id}", admin=True)
+    if "error" in result:
+        return {"error": "Content not available"}
+    return result

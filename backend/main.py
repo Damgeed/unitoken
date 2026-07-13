@@ -772,11 +772,17 @@ def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
 
 # ── Dashboard Routes ──
 @app.get("/api/dashboard")
-async def get_dashboard(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Usage by model (last 7 days)
+async def get_dashboard(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    days: int = Query(7, ge=1, le=90, description="Number of days of data to return"),
+):
+    # Usage by model (last N days)
+    since_dashboard = datetime.now(timezone.utc) - timedelta(days=days)
     usage = db.query(Transaction.model_used, func.sum(Transaction.tokens)).filter(
         Transaction.user_id == user.id,
         Transaction.type == "consumption",
+        Transaction.created_at >= since_dashboard,
     ).group_by(Transaction.model_used).all()
     
     # Recent transactions
@@ -811,8 +817,7 @@ async def get_dashboard(user: User = Depends(get_current_user), db: Session = De
         Transaction.type == "consumption"
     ).scalar() or 0
 
-    # ── Daily usage for last 7 days ──
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    # ── Daily usage for last N days ──
     daily_usage = db.query(
         func.date(Transaction.created_at),
         func.sum(Transaction.tokens),
@@ -820,13 +825,13 @@ async def get_dashboard(user: User = Depends(get_current_user), db: Session = De
     ).filter(
         Transaction.user_id == user.id,
         Transaction.type == "consumption",
-        Transaction.created_at >= seven_days_ago
+        Transaction.created_at >= since_dashboard
     ).group_by(func.date(Transaction.created_at)).order_by(func.date(Transaction.created_at)).all()
 
     daily_labels = []
     daily_values = []
     daily_requests = []
-    for i in range(6, -1, -1):
+    for i in range(days - 1, -1, -1):
         d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
         daily_labels.append(d)
         found = None
@@ -1717,6 +1722,309 @@ async def get_logs(
         print(f"⚠️ Failed to fetch request logs: {e}")
         return {"total": 0, "items": [], "message": str(e)}
 
+
+# ── Log Content (Prompt + Completion) ──
+@app.get("/api/logs/content")
+async def get_log_content(
+    log_id: int = Query(..., description="Log entry ID to fetch full content for"),
+    user: User = Depends(get_current_user),
+):
+    """Fetch full request content (prompt + completion) from New API for a specific log entry."""
+    if not user.newapi_user_id:
+        return {"error": "Content not available"}
+    try:
+        from newapi_integration import get_log_content as _get_log_content
+        content = await _get_log_content(log_id)
+        if "error" in content:
+            return {"error": "Content not available"}
+        return {
+            "prompt": content.get("prompt", ""),
+            "completion": content.get("completion", ""),
+            "model": content.get("model", ""),
+            "tokens": content.get("tokens", 0),
+            "cost": content.get("cost", 0),
+            "created_at": content.get("created_at", ""),
+        }
+    except Exception as e:
+        print(f"⚠️ Failed to fetch log content: {e}")
+        return {"error": "Content not available"}
+
+
+# ── User Settings (Notification Prefs) ──
+class UserSettingsUpdate(BaseModel):
+    email_notifications: Optional[bool] = None
+    low_balance_alert: Optional[bool] = None
+    login_alerts: Optional[bool] = None
+    theme: Optional[str] = None
+
+
+@app.get("/api/user/settings")
+def get_user_settings(user: User = Depends(get_current_user)):
+    """Get notification and theme preferences for the current user."""
+    import json
+    try:
+        settings = json.loads(user.settings) if user.settings else {}
+    except (json.JSONDecodeError, TypeError):
+        settings = {}
+    return {
+        "email_notifications": settings.get("email_notifications", True),
+        "low_balance_alert": settings.get("low_balance_alert", True),
+        "login_alerts": settings.get("login_alerts", True),
+        "theme": settings.get("theme", "light"),
+    }
+
+
+@app.put("/api/user/settings")
+def update_user_settings(
+    req: UserSettingsUpdate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update notification and theme preferences for the current user."""
+    import json
+    try:
+        settings = json.loads(user.settings) if user.settings else {}
+    except (json.JSONDecodeError, TypeError):
+        settings = {}
+
+    if req.email_notifications is not None:
+        settings["email_notifications"] = req.email_notifications
+    if req.low_balance_alert is not None:
+        settings["low_balance_alert"] = req.low_balance_alert
+    if req.login_alerts is not None:
+        settings["login_alerts"] = req.login_alerts
+    if req.theme is not None:
+        settings["theme"] = req.theme
+
+    user.settings = json.dumps(settings)
+    db.commit()
+    return {
+        "status": "updated",
+        "settings": {
+            "email_notifications": settings.get("email_notifications", True),
+            "low_balance_alert": settings.get("low_balance_alert", True),
+            "login_alerts": settings.get("login_alerts", True),
+            "theme": settings.get("theme", "light"),
+        },
+    }
+
+
+# ── Unified Activity Feed ──
+@app.get("/api/activity")
+async def get_activity(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Unified chronological feed of ALL account events."""
+    items = []
+
+    # 1. Recent transactions (last 20)
+    transactions = (
+        db.query(Transaction)
+        .filter(Transaction.user_id == user.id)
+        .order_by(desc(Transaction.created_at))
+        .limit(20)
+        .all()
+    )
+    for t in transactions:
+        event_type = "topup" if t.type == "deposit" else "consumption"
+        items.append({
+            "type": event_type,
+            "model": t.model_used,
+            "tokens": t.tokens,
+            "amount": t.amount,
+            "description": f"{'Top-up' if t.type == 'deposit' else 'Consumption'} — {t.payment_method or 'N/A'}",
+            "created_at": t.created_at.isoformat() if t.created_at else None,
+        })
+
+    # 2. Recent API key creation events
+    api_keys = (
+        db.query(ApiKey)
+        .filter(ApiKey.user_id == user.id)
+        .order_by(desc(ApiKey.created_at))
+        .limit(20)
+        .all()
+    )
+    for k in api_keys:
+        items.append({
+            "type": "key_created",
+            "model": None,
+            "tokens": None,
+            "amount": None,
+            "description": f"API key created: {k.name}",
+            "created_at": k.created_at.isoformat() if k.created_at else None,
+        })
+
+    # 3. New API request logs (recent API calls)
+    try:
+        if user.newapi_user_id:
+            logs = await get_user_logs(user.newapi_user_id, page=1, page_size=20)
+            if logs and "items" in logs:
+                for log_entry in logs["items"]:
+                    items.append({
+                        "type": "api_call",
+                        "model": log_entry.get("model", ""),
+                        "tokens": log_entry.get("tokens", 0),
+                        "amount": log_entry.get("cost", 0),
+                        "description": f"API call to {log_entry.get('model', 'unknown')}",
+                        "created_at": log_entry.get("created_at", ""),
+                    })
+    except Exception as e:
+        print(f"⚠️ Failed to fetch New API logs for activity: {e}")
+
+    # Sort all items by created_at descending, limit 50
+    def _sort_key(item):
+        ts = item.get("created_at")
+        if not ts:
+            return ""
+        return ts
+
+    items.sort(key=_sort_key, reverse=True)
+    items = items[:50]
+
+    return {"items": items}
+
+
+# ── Usage Analytics ──
+@app.get("/api/usage-analytics")
+async def get_usage_analytics(
+    days: int = Query(7, ge=1, le=90, description="Number of days of data to return"),
+    model: Optional[str] = Query(None, description="Optional model name filter"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Usage data with date range and optional model filter."""
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+
+    # Base query for consumption transactions in the date range
+    q = db.query(
+        func.date(Transaction.created_at).label("day"),
+        func.sum(Transaction.tokens).label("tokens"),
+        func.count(Transaction.id).label("requests"),
+    ).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "consumption",
+        Transaction.created_at >= since,
+    )
+    if model:
+        q = q.filter(Transaction.model_used == model)
+    q = q.group_by(func.date(Transaction.created_at)).order_by(func.date(Transaction.created_at))
+
+    daily_data = q.all()
+
+    # Build daily arrays for the full date range
+    labels = []
+    tokens_list = []
+    requests_list = []
+    costs_list = []
+
+    daily_map = {}
+    for row in daily_data:
+        day_str = str(row.day) if hasattr(row.day, 'strftime') else str(row.day)
+        daily_map[day_str] = {
+            "tokens": float(row.tokens or 0),
+            "requests": int(row.requests or 0),
+        }
+
+    # Estimate cost per token using average ~$0.001/1K tokens (modelsave heuristic)
+    # More accurate: lookup from AIModel table
+    model_prices = {}
+    if not model:
+        all_models = db.query(AIModel.model_id, AIModel.prompt_price, AIModel.completion_price).all()
+        for m in all_models:
+            avg_price = (float(m.prompt_price or 0) + float(m.completion_price or 0)) / 2
+            model_prices[m.model_id] = avg_price if avg_price > 0 else 0.000001  # ~$0.001/1K tokens default
+
+    # Get per-model costs for the period
+    model_cost_query = db.query(
+        Transaction.model_used,
+        func.sum(Transaction.tokens).label("tokens"),
+    ).filter(
+        Transaction.user_id == user.id,
+        Transaction.type == "consumption",
+        Transaction.created_at >= since,
+    )
+    if model:
+        model_cost_query = model_cost_query.filter(Transaction.model_used == model)
+    model_cost_data = model_cost_query.group_by(Transaction.model_used).all()
+
+    # Build daily arrays
+    for i in range(days - 1, -1, -1):
+        d = (datetime.now(timezone.utc) - timedelta(days=i)).strftime("%Y-%m-%d")
+        labels.append(d)
+        if d in daily_map:
+            tokens_list.append(daily_map[d]["tokens"])
+            requests_list.append(daily_map[d]["requests"])
+            # Estimate cost for this day's tokens
+            costs_list.append(round(daily_map[d]["tokens"] * 0.000001, 6))
+        else:
+            tokens_list.append(0)
+            requests_list.append(0)
+            costs_list.append(0)
+
+    # Compute total
+    total_tokens = sum(tokens_list)
+    total_cost = round(sum(costs_list), 6)
+
+    # Top models
+    top_models = []
+    for mc in model_cost_data:
+        model_name = mc.model_used or "unknown"
+        model_tokens = float(mc.tokens or 0)
+        price_per_token = model_prices.get(model_name, 0.000001)
+        model_cost = round(model_tokens * price_per_token, 6)
+        top_models.append({
+            "model": model_name,
+            "tokens": model_tokens,
+            "cost": model_cost,
+        })
+    top_models.sort(key=lambda x: x["tokens"], reverse=True)
+
+    return {
+        "labels": labels,
+        "tokens": tokens_list,
+        "requests": requests_list,
+        "costs": costs_list,
+        "total_tokens": total_tokens,
+        "total_cost": total_cost,
+        "top_models": top_models,
+    }
+
+
+# ── Billing / Invoices ──
+@app.get("/api/billing/invoices")
+def get_invoices(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Invoice/payment history — all deposit transactions."""
+    invoices = (
+        db.query(Transaction)
+        .filter(
+            Transaction.user_id == user.id,
+            Transaction.type == "deposit",
+        )
+        .order_by(desc(Transaction.created_at))
+        .all()
+    )
+    return {
+        "invoices": [
+            {
+                "id": t.id,
+                "amount": t.amount,
+                "currency": t.currency or "USD",
+                "payment_method": t.payment_method,
+                "tokens_added": t.tokens,
+                "status": t.status,
+                "created_at": t.created_at.isoformat() if t.created_at else None,
+                "receipt_url": None,  # Receipt URLs not stored currently
+            }
+            for t in invoices
+        ],
+        "total": len(invoices),
+    }
+
+
 # ── Available Models from New API ──
 @app.get("/api/available-models")
 async def get_available_models(user: User = Depends(get_current_user)):
@@ -1729,6 +2037,7 @@ async def get_available_models(user: User = Depends(get_current_user)):
     except Exception as e:
         print(f"⚠️ Failed to fetch available models: {e}")
         return {"models": [], "message": str(e)}
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=186" />
+  <link rel="stylesheet" href="style.css?v=187" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   </head>
 <body>
@@ -138,13 +138,31 @@
           <div style="font-size:0.8rem;color:var(--text-muted)">📊 <span id="dashTotalSpentLifetime">$0.00</span> lifetime spend</div>
         </div>
       </div>
-      <div class="dash-card" style="margin-top:1.25rem;margin-bottom:1.25rem">
-        <div class="dash-section-title">Usage (7 Days) <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Daily token consumption</span></div>
+      <div class="dash-card" style="margin-top:1.25rem">
+        <div class="dash-section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem">
+          <span>Usage</span>
+          <div style="display:flex;gap:0.25rem;font-size:0.75rem" id="usageRangeBtns">
+            <button class="sort-btn usage-range active" data-days="7" onclick="setUsageRange(7)">7d</button>
+            <button class="sort-btn usage-range" data-days="30" onclick="setUsageRange(30)">30d</button>
+            <button class="sort-btn usage-range" data-days="90" onclick="setUsageRange(90)">90d</button>
+          </div>
+          <select id="usageModelFilter" style="font-size:0.75rem;padding:0.2rem 0.4rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text)" onchange="refreshUsageChart()">
+            <option value="">All Models</option>
+          </select>
+          <div style="display:flex;gap:0.25rem;font-size:0.75rem;margin-left:auto" id="usageModeBtns">
+            <button class="sort-btn usage-mode active" data-mode="tokens" onclick="setUsageMode('tokens')">Tokens</button>
+            <button class="sort-btn usage-mode" data-mode="cost" onclick="setUsageMode('cost')">Cost</button>
+          </div>
+        </div>
         <div class="chart-container" style="height:180px"><canvas id="dailyChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border)" id="usageSummary">
+          <span id="usageTotalLabel">Total: <strong id="usageTotalVal">0</strong> tokens</span>
+          <span id="usageCostLabel">Cost: <strong id="usageCostVal">$0.00</strong></span>
+        </div>
       </div>
       <div class="dash-grid">
         <div class="dash-card"><div class="dash-section-title">Usage by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">All time</span></div><div class="chart-container"><canvas id="usageChart"></canvas></div><div id="modelRanking" style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.5rem"></div></div>
-        <div class="dash-card"><div class="dash-section-title">Request Logs <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="logCount">0 requests</span></div><div id="dashLogs" class="dash-activity"><p style="color:var(--text-muted);font-size:0.85rem;padding:1rem;text-align:center">Connect New API to see request logs.</p></div></div>
+        <div class="dash-card"><div class="dash-section-title">Activity Timeline <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="activityCount">0 events</span></div><div id="dashActivity" class="dash-activity"><p style="color:var(--text-muted);font-size:0.85rem;padding:1rem;text-align:center">Loading activity...</p></div></div>
       </div>
       <div class="dash-card" style="margin-top:1.25rem" id="dashAvailableModels">
         <div class="dash-section-title">🧠 Your Models <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="modelCountLabel">via New API</span></div>
@@ -188,8 +206,8 @@
     </div>
   </div>
 
-<script src="translations.js?v=186"></script>
-<script data-cfasync="false" src="script.js?v=186"></script>
+<script src="translations.js?v=187"></script>
+<script data-cfasync="false" src="script.js?v=187"></script>
 
 <script>
 (function(){

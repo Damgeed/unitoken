@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=186" />
+  <link rel="stylesheet" href="style.css?v=187" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   </head>
 <body>
@@ -128,6 +128,24 @@
             <button class="btn-secondary" onclick="updatePassword()" style="width:100%;margin-top:0.5rem">Update Password</button>
           </div>
         </div>
+        <div class="dash-card">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">🔔 Notifications</h3>
+          <div style="display:flex;flex-direction:column;gap:0.25rem">
+            <div class="toggle-row">
+              <div><div class="toggle-label">Email Notifications</div><div class="toggle-desc">Receive account &amp; marketing emails</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="notifEmail" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Low Balance Alerts</div><div class="toggle-desc">Get notified when your balance runs low</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="notifLowBalance" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div><div class="toggle-label">Login Alerts</div><div class="toggle-desc">Email when a new device signs in</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="notifLogin" /><span class="toggle-slider"></span></label>
+            </div>
+            <button class="btn-primary" onclick="saveNotificationSettings()" style="width:100%;margin-top:0.75rem">Save Notification Preferences</button>
+          </div>
+        </div>
       </div>
     </div></div><footer><div class="container">
     <div class="footer-grid">
@@ -150,9 +168,9 @@
     </div>
   </div>
 
-<script src="translations.js?v=186"></script>
-<script data-cfasync="false" src="script.js?v=186"></script>
-<script>if(localStorage.getItem('gt_token')){setTimeout(loadProfile,100)}</script>
+<script src="translations.js?v=187"></script>
+<script data-cfasync="false" src="script.js?v=187"></script>
+<script>if(localStorage.getItem('gt_token')){setTimeout(function(){loadProfile();loadSettings()},100)}</script>
 
 <script>
 (function(){

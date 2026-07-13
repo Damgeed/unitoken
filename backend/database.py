@@ -69,6 +69,7 @@ class User(Base):
     reset_token_expiry = Column(DateTime, nullable=True)
     newapi_user_id = Column(Integer, nullable=True)    # New API user ID
     newapi_token = Column(String, nullable=True)       # New API access token
+    settings = Column(Text, default="{}")              # JSON settings (notifications, theme, etc.)
     
     api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
     transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
