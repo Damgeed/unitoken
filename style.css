@@ -789,7 +789,7 @@
 .calculator-card .calc-result{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem;margin-top:0.75rem}
 .calculator-card .calc-currency{background:var(--bg-alt);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:0.75rem;text-align:center}
 .calculator-card .calc-currency .curr-label{font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem}
-.calculator-card .calc-currency .curr-value{font-size:1.1rem;font-weight:700;color:var(--primary)}
+  .calculator-card .calc-currency .curr-value{font-size:1.1rem;font-weight:700;color:var(--primary)}
 
 @media(max-width:600px){
   .back-to-top{bottom:1rem;right:1rem;left:auto;width:36px;height:36px;font-size:1rem}
@@ -797,4 +797,94 @@
   .calculator-card .calc-row{flex-direction:column;gap:0.5rem}
   .calculator-card input{min-width:100%}
 }
+
+/* ── Heatmap Grid ── */
+.heatmap-grid{display:grid;grid-template-columns:repeat(25,12px);gap:2px;padding:4px;overflow-x:auto}
+.heatmap-cell{width:12px;height:12px;border-radius:2px;transition:background 0.2s ease;cursor:pointer}
+.heatmap-cell:hover{outline:2px solid var(--primary);outline-offset:1px;transform:scale(1.15);z-index:1}
+.heatmap-label{font-size:0.6rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-weight:500;height:14px;user-select:none}
+
+/* ── Speed Indicators ── */
+.speed-fast{color:#22c55e;font-weight:600}
+.speed-medium{color:#eab308;font-weight:600}
+.speed-slow{color:#ef4444;font-weight:600}
+
+/* ── Cost Projection Card ── */
+.cost-projection-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;display:flex;flex-direction:column;gap:0.5rem}
+.cost-projection-card .proj-row{display:flex;justify-content:space-between;align-items:center;font-size:0.85rem}
+.cost-projection-card .proj-label{color:var(--text-muted)}
+.cost-projection-card .proj-value{font-weight:700;color:var(--primary);font-size:1.05rem}
+.cost-projection-card .proj-value.green{color:var(--success)}
+
+/* ── Export Button Group ── */
+.export-btn-group{display:flex;gap:0.5rem;flex-wrap:wrap}
+.export-btn{padding:0.5rem 1rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text-secondary);font-size:0.8rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;font-weight:500}
+.export-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-subtle)}
+.export-btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* ── Saved Filter Chips ── */
+.saved-filter-chip{display:inline-flex;align-items:center;gap:4px;padding:0.3rem 0.7rem;border-radius:999px;background:var(--card);border:1px solid var(--border);color:var(--text-secondary);font-size:0.78rem;cursor:pointer;transition:all 0.15s;font-weight:500;white-space:nowrap;user-select:none}
+.saved-filter-chip:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-subtle)}
+.filter-chip-remove{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:0.75rem;line-height:1;transition:all 0.15s}
+.filter-chip-remove:hover{background:var(--destructive-subtle);color:var(--destructive)}
+
+/* ── Ticker Bar ── */
+.ticker-bar{display:flex;align-items:center;gap:1.5rem;padding:0.5rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;white-space:nowrap;font-size:0.8rem;color:var(--text-secondary);animation:tickerScroll 20s linear infinite}
+.ticker-bar:hover{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:6px}
+.ticker-item strong{color:var(--primary)}
+@keyframes tickerScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+/* ── Alert Row ── */
+.alert-row{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid var(--border-light);flex-wrap:wrap}
+.alert-row:last-child{border-bottom:none;padding-bottom:0}
+.alert-row .alert-label{font-size:0.85rem;color:var(--text);font-weight:500;min-width:100px}
+.alert-row .alert-input{flex:1;min-width:120px;padding:0.6rem 0.75rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.85rem;transition:border 0.2s}
+.alert-row .alert-input:focus{outline:none;border-color:var(--primary)}
+.alert-row .alert-input:disabled{opacity:0.4;cursor:not-allowed}
+
+/* ── Toggle Switch (CSS-only) ── */
+.toggle-switch{position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0}
+.toggle-switch input{position:absolute;opacity:0;width:0;height:0;margin:0}
+.toggle-slider{position:relative;width:44px;height:24px;background:var(--border);border-radius:12px;transition:all 0.25s ease;box-shadow:inset 0 1px 3px rgba(0,0,0,0.2)}
+.toggle-slider::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--card);transition:all 0.25s ease;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.toggle-switch input:checked + .toggle-slider{background:var(--primary);box-shadow:var(--primary-glow)}
+.toggle-switch input:checked + .toggle-slider::after{transform:translateX(20px);background:#fff}
+.toggle-switch input:focus-visible + .toggle-slider{outline:2px solid var(--primary);outline-offset:2px}
+
+/* ── Monthly Compare Cards ── */
+.monthly-compare{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.monthly-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center}
+.monthly-card.current{border-color:hsla(44 96% 52% / 0.3);background:var(--primary-subtle)}
+.monthly-card .mc-label{font-size:0.75rem;color:var(--text-muted);font-weight:500;margin-bottom:0.25rem}
+.monthly-card .mc-val{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.monthly-card .mc-sub{font-size:0.7rem;color:var(--text-secondary);margin-top:0.25rem}
+
+/* ── Loading Indicator ── */
+.loading-indicator{display:flex;align-items:center;justify-content:center;padding:0.5rem;color:var(--text-muted);font-size:0.8rem;gap:6px}
+.loading-indicator .spin{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:btnSpin 0.6s linear infinite}
+
+/* ── Analytics Section Headers ── */
+.analytics-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem}
+.analytics-section-header h3{font-size:0.95rem;font-weight:600;color:var(--text)}
+.analytics-section-header .badge-count{font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:999px;background:var(--primary-subtle);color:var(--primary);font-weight:600}
+
+/* ── Responsive Analytics Grid ── */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.75rem}
+@media(max-width:768px){.analytics-grid{grid-template-columns:1fr}}
+
+/* ── Summary Stat Row ── */
+.summary-stats{display:flex;gap:1rem;flex-wrap:wrap;padding:0.5rem 0}
+.summary-stat{font-size:0.8rem;color:var(--text-muted)}
+.summary-stat strong{color:var(--text);font-weight:600}
+
+/* ── Section Filter Bar ── */
+.section-filter-bar{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
+.section-filter-bar select{padding:0.4rem 0.7rem;border-radius:var(--radius-sm);background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem}
+.section-filter-bar .range-btn{padding:0.35rem 0.7rem;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font-size:0.75rem;cursor:pointer;transition:all 0.15s}
+.section-filter-bar .range-btn.active{border-color:var(--primary);background:var(--primary-subtle);color:var(--primary);font-weight:600}
+
+/* ── Chart Card Container ── */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem}
+.chart-card .chart-title{font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.5rem}
 

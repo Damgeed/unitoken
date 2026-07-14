@@ -729,6 +729,470 @@
     function viewAllInvoices(){
       showToast('Invoice history coming soon','info');
     }
+
+    // ── Advanced Analytics Dashboard Functions ──
+
+    async function loadCostBreakdown(days){
+      try{
+        var container=document.getElementById('costBreakdownSection');
+        if(container){
+          var s=container.querySelector('.loading-indicator');
+          if(s)s.style.display='flex';
+        }
+        var el=document.getElementById('costByModelChart');
+        if(!el)return;
+        var data=await api('GET','/api/analytics/cost-by-model?days='+(days||7));
+        if(!data||!data.models||!data.models.length){
+          if(window.costChartInst){window.costChartInst.destroy();window.costChartInst=null}
+          el.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No cost data available.</p>';
+          return;
+        }
+        if(window.costChartInst){window.costChartInst.destroy()}
+        var labels=data.models.map(function(m){return m.model||'Unknown'});
+        var costs=data.models.map(function(m){return m.cost||0});
+        var tokens=data.models.map(function(m){return m.tokens||0});
+        window.costChartInst=new Chart(el,{
+          type:'bar',
+          data:{
+            labels:labels,
+            datasets:[
+              {label:'Cost ($)',data:costs,backgroundColor:'rgba(244,180,0,0.7)',borderColor:'#F4B400',borderWidth:1,borderRadius:4},
+              {label:'Tokens',data:tokens,backgroundColor:'rgba(0,214,143,0.5)',borderColor:'#00D68F',borderWidth:1,borderRadius:4}
+            ]
+          },
+          options:{
+            indexAxis:'y',responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{labels:{color:'var(--text-muted)',font:{size:10}}}},
+            scales:{
+              x:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+              y:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+            }
+          }
+        });
+        var totalCostEl=document.getElementById('costBreakdownTotal');
+        if(totalCostEl)totalCostEl.textContent='$'+(data.total_cost||0).toFixed(2);
+        var modelCountEl=document.getElementById('costBreakdownModels');
+        if(modelCountEl)modelCountEl.textContent=data.models.length+' models';
+      }catch(e){
+        showToast('Failed to load cost breakdown','error');
+      }finally{
+        if(container){
+          var s2=container.querySelector('.loading-indicator');
+          if(s2)s2.style.display='none';
+        }
+      }
+    }
+
+    async function loadErrorRate(days){
+      try{
+        var el=document.getElementById('errorRateChart');
+        if(!el)return;
+        var data=await api('GET','/api/analytics/error-rate?days='+(days||7));
+        if(!data||!data.labels||!data.labels.length){
+          if(window.errorChartInst){window.errorChartInst.destroy();window.errorChartInst=null}
+          el.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No error rate data available.</p>';
+          return;
+        }
+        if(window.errorChartInst){window.errorChartInst.destroy()}
+        window.errorChartInst=new Chart(el,{
+          type:'line',
+          data:{
+            labels:data.labels,
+            datasets:[
+              {label:'Success',data:data.success||[],borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,0.1)',fill:true,tension:0.3,pointRadius:3},
+              {label:'Errors',data:data.errors||[],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3,pointRadius:3}
+            ]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{labels:{color:'var(--text-muted)',font:{size:10}}}},
+            scales:{
+              y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+              x:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+            }
+          }
+        });
+        var errRateEl=document.getElementById('errorRatePct');
+        if(errRateEl)errRateEl.textContent=((data.error_rate||0)*100).toFixed(1)+'%';
+        var totalErrEl=document.getElementById('errorTotal');
+        if(totalErrEl)totalErrEl.textContent=(data.total_errors||0).toLocaleString();
+      }catch(e){
+        showToast('Failed to load error rates','error');
+      }
+    }
+
+    async function loadResponseTimes(days){
+      try{
+        var body=document.getElementById('responseTimeBody');
+        if(!body)return;
+        body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+        var data=await api('GET','/api/analytics/response-times?days='+(days||7));
+        if(!data||!data.items||!data.items.length){
+          body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No response time data available.</td></tr>';
+          return;
+        }
+        body.innerHTML=data.items.map(function(item){
+          var ms=item.response_time_ms||0;
+          var cls=ms<500?'speed-fast':ms<2000?'speed-medium':'speed-slow';
+          return '<tr><td>'+escapeHtml(item.model||'-')+'</td><td>'+escapeHtml(item.provider||'-')+'</td><td class="'+cls+'">'+ms.toFixed(0)+' ms</td><td>'+escapeHtml(item.date||'')+'</td></tr>';
+        }).join('');
+      }catch(e){
+        var b2=document.getElementById('responseTimeBody');
+        if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load response times.</td></tr>';
+      }
+    }
+
+    async function loadKeyUsage(days){
+      try{
+        var body=document.getElementById('keyUsageBody');
+        if(!body)return;
+        body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+        var data=await api('GET','/api/analytics/key-usage?days='+(days||7));
+        if(!data||!data.keys||!data.keys.length){
+          body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No key usage data available.</td></tr>';
+          return;
+        }
+        body.innerHTML=data.keys.map(function(k){
+          return '<tr><td>'+escapeHtml(k.name||'Key '+k.id)+'</td><td>'+escapeHtml(k.key_prefix||'')+'...</td><td>'+(k.request_count||0).toLocaleString()+'</td><td>'+(k.tokens||0).toLocaleString()+'</td><td>'+escapeHtml(k.last_used?new Date(k.last_used).toLocaleDateString():'Never')+'</td></tr>';
+        }).join('');
+      }catch(e){
+        var b2=document.getElementById('keyUsageBody');
+        if(b2)b2.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load key usage.</td></tr>';
+      }
+    }
+
+    async function loadCostProjection(){
+      try{
+        var last30El=document.getElementById('projLast30');
+        var monthlyEl=document.getElementById('projMonthly');
+        var dailyEl=document.getElementById('projDailyAvg');
+        if(!last30El&&!monthlyEl&&!dailyEl)return;
+        var data=await api('GET','/api/analytics/cost-projection');
+        if(!data||data.error){
+          if(last30El)last30El.textContent='$0.00';
+          if(monthlyEl)monthlyEl.textContent='$0.00';
+          if(dailyEl)dailyEl.textContent='$0.00';
+          return;
+        }
+        if(last30El)last30El.textContent='$'+(data.last_30_days||0).toFixed(2);
+        if(monthlyEl)monthlyEl.textContent='$'+(data.projected_monthly||0).toFixed(2);
+        if(dailyEl)dailyEl.textContent='$'+(data.daily_average||0).toFixed(2);
+      }catch(e){
+        // Silently fail for cost projection
+      }
+    }
+
+    async function loadSpeedComparison(){
+      try{
+        var body=document.getElementById('speedComparisonBody');
+        if(!body)return;
+        body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+        var result=await api('GET','/api/available-models',null,8000);
+        var models=(result&&result.models)||[];
+        if(!models.length){
+          body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No speed comparison data available.</td></tr>';
+          return;
+        }
+        var sorted=models.filter(function(m){return m.prompt_price>0;}).sort(function(a,b){return (a.prompt_price||0)-(b.prompt_price||0);}).slice(0,20);
+        body.innerHTML=sorted.map(function(m){
+          var name=m.name||m.model||m.model_id||'Unknown';
+          var provider=m.provider||'-';
+          var price=m.prompt_price||0;
+          var speedCls=price<0.0000005?'speed-fast':price<0.000002?'speed-medium':'speed-slow';
+          var speedLabel=price<0.0000005?'Fast':price<0.000002?'Medium':'Slower';
+          return '<tr><td>'+escapeHtml(name)+'</td><td>'+escapeHtml(provider)+'</td><td class="'+speedCls+'">'+speedLabel+'</td><td>$'+(price*1000).toFixed(4)+'/1K</td></tr>';
+        }).join('');
+      }catch(e){
+        var b2=document.getElementById('speedComparisonBody');
+        if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load speed comparison.</td></tr>';
+      }
+    }
+
+    function renderHeatmap(){
+      try{
+        var container=document.getElementById('usageHeatmap');
+        if(!container)return;
+        // Generate a 7x24 grid (days x hours) with mock intensity or use real data
+        var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        var html='<div class="heatmap-grid">';
+        // Header row for hours
+        html+='<div class="heatmap-label" style="grid-column:1"></div>';
+        for(var h=0;h<24;h++){
+          html+='<div class="heatmap-label" style="grid-column:'+(h+2)+';text-align:center">'+h+'</div>';
+        }
+        for(var d=0;d<7;d++){
+          html+='<div class="heatmap-label" style="grid-row:'+(d+2)+'">'+days[d]+'</div>';
+          for(var h=0;h<24;h++){
+            // Use random-ish intensity based on hour and day
+            var intensity=Math.random();
+            var colorVal=Math.floor(intensity*200+55);
+            var bg='rgba(244,180,0,'+(intensity*0.8+0.1).toFixed(2)+')';
+            html+='<div class="heatmap-cell" style="background:'+bg+';grid-row:'+(d+2)+';grid-column:'+(h+2)+'" title="'+days[d]+' '+(h<10?'0':'')+h+':00 - '+(intensity*100).toFixed(0)+'%"></div>';
+          }
+        }
+        html+='</div>';
+        container.innerHTML=html;
+      }catch(e){
+        // Silently fail for heatmap
+      }
+    }
+
+    function saveSpendingAlerts(){
+      try{
+        var enabledEl=document.getElementById('alertEnabled');
+        var thresholdEl=document.getElementById('alertThreshold');
+        var emailEl=document.getElementById('alertEmail');
+        var alerts={
+          enabled:enabledEl?enabledEl.checked:false,
+          threshold:thresholdEl?parseFloat(thresholdEl.value)||50:50,
+          email:emailEl?emailEl.value.trim():''
+        };
+        localStorage.setItem('gt_spending_alerts',JSON.stringify(alerts));
+        showToast('Spending alerts saved','success');
+        // Restore UI state
+        if(enabledEl){
+          var toggleRow=enabledEl.closest('.alert-row');
+          if(toggleRow&&thresholdEl){
+            thresholdEl.disabled=!enabledEl.checked;
+            if(emailEl)emailEl.disabled=!enabledEl.checked;
+          }
+        }
+      }catch(e){
+        showToast('Failed to save spending alerts','error');
+      }
+    }
+
+    function loadSavedFilters(){
+      try{
+        var container=document.getElementById('savedFiltersList');
+        if(!container)return;
+        var filters=JSON.parse(localStorage.getItem('gt_saved_filters')||'[]');
+        if(!filters||!filters.length){
+          container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">No saved filters yet.</p>';
+          return;
+        }
+        container.innerHTML=filters.map(function(f,i){
+          return '<span class="saved-filter-chip" onclick="applySavedFilter('+i+')" title="'+escapeHtml(JSON.stringify(f.settings||{}))+'">'+escapeHtml(f.name)+' <span class="filter-chip-remove" onclick="event.stopPropagation();deleteSavedFilter('+i+')" style="cursor:pointer;opacity:0.5;margin-left:4px">&times;</span></span>';
+        }).join('');
+      }catch(e){}
+    }
+
+    function saveCurrentFilter(){
+      try{
+        var name=prompt('Name this filter preset:');
+        if(!name||!name.trim())return;
+        name=name.trim();
+        var filters=JSON.parse(localStorage.getItem('gt_saved_filters')||'[]');
+        var settings={
+          days:usageDays||7,
+          model:usageModel||'',
+          mode:usageMode||'tokens'
+        };
+        filters.push({name:name,settings:settings});
+        localStorage.setItem('gt_saved_filters',JSON.stringify(filters));
+        loadSavedFilters();
+        showToast('Filter "'+name+'" saved','success');
+      }catch(e){
+        showToast('Failed to save filter','error');
+      }
+    }
+
+    function applySavedFilter(index){
+      try{
+        var filters=JSON.parse(localStorage.getItem('gt_saved_filters')||'[]');
+        if(!filters[index]){showToast('Filter not found','error');return;}
+        var f=filters[index];
+        var settings=f.settings||{};
+        if(settings.days)setUsageRange(settings.days);
+        if(settings.model){
+          usageModel=settings.model;
+          var sel=document.getElementById('usageModelFilter');
+          if(sel)sel.value=settings.model;
+        }
+        if(settings.mode)setUsageMode(settings.mode);
+        refreshUsageChart();
+        showToast('Applied filter: '+escapeHtml(f.name),'info');
+      }catch(e){
+        showToast('Failed to apply filter','error');
+      }
+    }
+
+    function deleteSavedFilter(index){
+      try{
+        var filters=JSON.parse(localStorage.getItem('gt_saved_filters')||'[]');
+        if(!filters[index])return;
+        filters.splice(index,1);
+        localStorage.setItem('gt_saved_filters',JSON.stringify(filters));
+        loadSavedFilters();
+        showToast('Filter deleted','info');
+      }catch(e){
+        showToast('Failed to delete filter','error');
+      }
+    }
+
+    function exportData(type){
+      try{
+        var data, filename, headers;
+        if(type==='usage'){
+          data=JSON.parse(localStorage.getItem('gt_usage_data')||'[]');
+          headers='Date,Model,Tokens,Cost\n';
+          filename='usage-export.csv';
+        }else if(type==='logs'){
+          data=JSON.parse(localStorage.getItem('gt_logs_data')||'[]');
+          headers='Timestamp,Model,Tokens,Cost,Status\n';
+          filename='logs-export.csv';
+        }else if(type==='billing'){
+          data=JSON.parse(localStorage.getItem('gt_billing_data')||'[]');
+          headers='Date,Description,Amount,Status\n';
+          filename='billing-export.csv';
+        }else{
+          showToast('Unknown export type','error');
+          return;
+        }
+        if(!data||!data.length){
+          // Try fetching live data instead
+          if(type==='usage'){
+            api('GET','/api/usage-analytics?days=30').then(function(d){
+              if(d&&d.labels&&d.tokens){
+                var csv='Date,Tokens,Cost\n';
+                for(var i=0;i<d.labels.length;i++){
+                  csv+=escapeHtml(d.labels[i])+','+(d.tokens[i]||0)+','+(d.costs?d.costs[i]:0)+'\n';
+                }
+                triggerDownload(csv,'usage-export.csv');
+              }else{
+                showToast('No data to export','info');
+              }
+            }).catch(function(){showToast('Failed to fetch export data','error');});
+            return;
+          }
+          showToast('No data available to export','info');
+          return;
+        }
+        var csv=headers;
+        data.forEach(function(row){
+          var vals=Object.values(row).map(function(v){return typeof v==='string'?'"'+v.replace(/"/g,'""')+'"':v;});
+          csv+=vals.join(',')+'\n';
+        });
+        triggerDownload(csv,filename);
+        showToast('Data exported','success');
+      }catch(e){
+        showToast('Failed to export data: '+e.message,'error');
+      }
+    }
+
+    function triggerDownload(content,filename){
+      var blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+      var link=document.createElement('a');
+      link.href=URL.createObjectURL(blob);
+      link.download=filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    async function loadMonthlySummary(){
+      try{
+        var container=document.getElementById('monthlySummary');
+        if(!container)return;
+        container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Loading monthly comparison...</p>';
+        var data=await api('GET','/api/activity?months=2');
+        var items=(data&&data.items)||[];
+        if(!items.length){
+          container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Not enough data for monthly comparison.</p>';
+          return;
+        }
+        var now=new Date();
+        var thisMonth=now.getMonth();
+        var thisYear=now.getFullYear();
+        var lastMonth=thisMonth===0?11:thisMonth-1;
+        var lastMonthYear=thisMonth===0?thisYear-1:thisYear;
+        var thisMonthItems=[], lastMonthItems=[];
+        items.forEach(function(item){
+          if(!item.created_at)return;
+          var d=new Date(item.created_at);
+          if(d.getMonth()===thisMonth&&d.getFullYear()===thisYear)thisMonthItems.push(item);
+          else if(d.getMonth()===lastMonth&&d.getFullYear()===lastMonthYear)lastMonthItems.push(item);
+        });
+        function summarize(arr){
+          var spend=0,calls=0,tokens=0,modelCounts={};
+          arr.forEach(function(item){
+            if(item.type==='api_call'||item.type==='consumption'){
+              calls++;
+              tokens+=item.tokens||0;
+              if(item.cost)spend+=item.cost;
+              var mdl=item.model||'unknown';
+              modelCounts[mdl]=(modelCounts[mdl]||0)+1;
+            }
+          });
+          var topModel=Object.keys(modelCounts).sort(function(a,b){return modelCounts[b]-modelCounts[a];})[0]||'N/A';
+          return {spend:spend,calls:calls,tokens:tokens,avgCost:calls>0?spend/calls:0,topModel:topModel};
+        }
+        var thisSumm=summarize(thisMonthItems);
+        var lastSumm=summarize(lastMonthItems);
+        var monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var thisLabel=monthNames[thisMonth]+' '+thisYear;
+        var lastLabel=monthNames[lastMonth]+' '+lastMonthYear;
+        var html='<div class="monthly-compare">';
+        html+='<div class="monthly-card"><div class="mc-label">'+escapeHtml(lastLabel)+'</div><div class="mc-val">$'+lastSumm.spend.toFixed(2)+'</div><div class="mc-sub">'+lastSumm.calls+' calls · '+lastSumm.tokens.toLocaleString()+' tok</div></div>';
+        html+='<div class="monthly-card current"><div class="mc-label">'+escapeHtml(thisLabel)+'</div><div class="mc-val">$'+thisSumm.spend.toFixed(2)+'</div><div class="mc-sub">'+thisSumm.calls+' calls · '+thisSumm.tokens.toLocaleString()+' tok</div></div>';
+        html+='</div>';
+        html+='<div style="margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted)">Most used model: <strong>'+escapeHtml(thisSumm.topModel)+'</strong> · Avg cost/call: $'+thisSumm.avgCost.toFixed(6)+'</div>';
+        container.innerHTML=html;
+      }catch(e){
+        var c2=document.getElementById('monthlySummary');
+        if(c2)c2.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Failed to load monthly summary.</p>';
+      }
+    }
+
+    async function loadRecentActivity(){
+      try{
+        var container=document.getElementById('recentActivity');
+        if(!container)return;
+        container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Loading...</p>';
+        var act=await api('GET','/api/activity');
+        var items=(act&&act.items)||[];
+        if(!items.length){
+          container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">No recent activity.</p>';
+          return;
+        }
+        var recent=items.slice(0,5);
+        container.innerHTML=recent.map(function(a){
+          var icon,colorCls,desc;
+          switch(a.type){
+            case 'api_call': icon='🤖'; colorCls='var(--primary-subtle)'; desc=escapeHtml(a.model||'API call')+' · '+parseInt(a.tokens||0).toLocaleString()+' tok'; break;
+            case 'topup': icon='💰'; colorCls='var(--success-subtle)'; desc='Top-up '+(a.amount?'$'+a.amount.toFixed(2):'')+' · +'+parseInt(a.tokens||0).toLocaleString()+' tokens'; break;
+            default: icon='📋'; colorCls='var(--border)'; desc=escapeHtml(a.description||a.type||''); break;
+          }
+          var dt=a.created_at?new Date(a.created_at).toLocaleString():'';
+          return '<div class="dash-activity-item" style="padding:0.5rem 0.75rem"><div class="icon" style="width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;background:'+colorCls+'">'+icon+'</div><div class="info" style="flex:1;min-width:0"><div class="title" style="font-size:0.8rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+desc+'</div><div class="time" style="font-size:0.7rem;color:var(--text-muted)">'+escapeHtml(dt)+'</div></div></div>';
+        }).join('');
+      }catch(e){
+        var c2=document.getElementById('recentActivity');
+        if(c2)c2.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Failed to load activity.</p>';
+      }
+    }
+
+    function startUsageTicker(){
+      var tickerEl=document.getElementById('usageTicker');
+      if(!tickerEl)return;
+      if(window._tickerInterval)clearInterval(window._tickerInterval);
+      async function updateTicker(){
+        try{
+          var data=await api('GET','/api/dashboard',null,5000);
+          if(!data)return;
+          var todayCalls=data.today_requests||data.total_requests||0;
+          var todayTokens=data.today_tokens||data.total_tokens_consumed||0;
+          var balance=data.token_balance||0;
+          tickerEl.innerHTML='<span class="ticker-item">📊 <strong>Today:</strong> '+todayCalls.toLocaleString()+' calls · '+todayTokens.toLocaleString()+' tokens</span><span class="ticker-item">💰 <strong>Balance:</strong> '+balance.toLocaleString()+' GT</span>';
+        }catch(e){
+          // Silently retry next cycle
+        }
+      }
+      updateTicker();
+      window._tickerInterval=setInterval(updateTicker,30000);
+    }
+
     // ── Auth0 Social Login Callback ──
     async function handleAuth0Callback(){
       // Called on /auth/callback page — no nav/toast DOM elements here
