@@ -23,6 +23,27 @@ def get_config() -> dict:
         "client_id": AUTH0_CLIENT_ID,
     }
 
+# ── PKCE Code Exchange (Social Login) ──
+
+def exchange_pkce_code(code: str, code_verifier: str, redirect_uri: str) -> dict:
+    """Exchange an Auth0 authorization code for tokens using PKCE (server-side)."""
+    if not is_configured():
+        raise ValueError("Auth0 not configured")
+    url = f"https://{AUTH0_DOMAIN}/oauth/token"
+    payload = {
+        "grant_type": "authorization_code",
+        "client_id": AUTH0_CLIENT_ID,
+        "client_secret": AUTH0_CLIENT_SECRET,
+        "code": code,
+        "code_verifier": code_verifier,
+        "redirect_uri": redirect_uri,
+    }
+    resp = requests.post(url, json=payload, timeout=10)
+    if resp.status_code != 200:
+        err = resp.json().get("error_description", resp.text)
+        raise ValueError(f"PKCE exchange failed: {err}")
+    return resp.json()
+
 # ── Password Grant (Email/Password Login) ──
 
 def password_login(email: str, password: str) -> dict:

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Redirecting — GlbTOKEN</title>
 <meta name="robots" content="noindex,nofollow" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://glbtoken-backend-production.up.railway.app https://glbtoken1.us.auth0.com; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
 <link rel="icon" type="image/x-icon" href="../favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
@@ -29,11 +29,6 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
   var API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:8000' : 'https://glbtoken-backend-production.up.railway.app';
 
-  // Hardcoded Auth0 config — no fetch to Railway needed
-  var AUTH0_DOMAIN = 'glbtoken1.us.auth0.com';
-  var AUTH0_CLIENT_ID = 'hJDPj23ouSgJrNzUY83EQbQzih8pamls';
-
-  // ====== DETECT AUTH FLOW TYPE ======
   var queryParams = new URLSearchParams(window.location.search);
   var hashParams = window.location.hash ? new URLSearchParams(window.location.hash.substring(1)) : null;
 
@@ -55,57 +50,19 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
     window.location.replace('/login.html?error=state_mismatch');
     return;
   }
-  sessionStorage.removeItem('gt_oauth_state');
 
   // ====== FLOW A: PKCE Code Flow (?code=xxx) ======
+  // Redirect to Railway server-side exchange — no cross-origin fetch
   if (code) {
     sessionStorage.removeItem('gt_code_verifier');
     if (!codeVerifier) {
       window.location.replace('/login.html?error=no_code_verifier');
       return;
     }
-
-    // Exchange code directly with Auth0 (no Railway fetch needed)
-    fetch('https://' + AUTH0_DOMAIN + '/oauth/token', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        grant_type: 'authorization_code',
-        client_id: AUTH0_CLIENT_ID,
-        code: code,
-        code_verifier: codeVerifier,
-        redirect_uri: window.location.origin + '/auth/callback.html'
-      })
-    })
-    .then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw new Error(e.error_description || 'Token exchange failed'); });
-      return r.json();
-    })
-    .then(function(tokens) {
-      if (!tokens || !tokens.id_token) throw new Error('No id_token in response');
-      // POST id_token to Railway for JWT exchange
-      return fetch(API_URL + '/api/auth/auth0/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: tokens.id_token})
-      });
-    })
-    .then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw new Error(e.detail || 'Auth0 login failed'); });
-      return r.json();
-    })
-    .then(function(data) {
-      if (data && data.token) {
-        localStorage.setItem('gt_token', data.token);
-        if (data.user) localStorage.setItem('gt_user', JSON.stringify(data.user));
-        window.location.replace(window.location.origin + '/dashboard.html');
-      } else {
-        window.location.replace('/login.html?error=Invalid+server+response');
-      }
-    })
-    .catch(function(e) {
-      window.location.replace('/login.html?error=' + encodeURIComponent(e.message || 'Login failed'));
-    });
+    sessionStorage.removeItem('gt_oauth_state');
+    // Browser redirects to Railway, which exchanges the code with Auth0 server-side
+    // Railway redirects back to dashboard.html?token=JWT&_ts=TIMESTAMP
+    window.location.replace(API_URL + '/api/auth/auth0/pkce-callback?code=' + encodeURIComponent(code) + '&code_verifier=' + encodeURIComponent(codeVerifier));
     return;
   }
 
@@ -116,29 +73,8 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
     sessionStorage.setItem('gt_temp_token', idToken);
     sessionStorage.setItem('gt_auth_pending', Date.now().toString());
 
-    fetch(API_URL + '/api/auth/auth0/login', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({token: idToken})
-    })
-    .then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw new Error(e.detail || 'Auth0 login failed'); });
-      return r.json();
-    })
-    .then(function(data) {
-      if (data && data.token) {
-        localStorage.setItem('gt_token', data.token);
-        if (data.user) localStorage.setItem('gt_user', JSON.stringify(data.user));
-        sessionStorage.removeItem('gt_temp_token');
-        sessionStorage.removeItem('gt_auth_pending');
-        window.location.replace(window.location.origin + '/dashboard.html');
-      } else {
-        window.location.replace('/login.html?error=Invalid+server+response');
-      }
-    })
-    .catch(function(e) {
-      window.location.replace('/login.html?error=' + encodeURIComponent(e.message || 'Login failed'));
-    });
+    // Redirect to Railway callback endpoint (server-side validation)
+    window.location.replace(API_URL + '/api/auth/auth0/callback?id_token=' + encodeURIComponent(idToken));
     return;
   }
 

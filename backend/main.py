@@ -789,6 +789,69 @@ async def auth0_callback_redirect(id_token: str = Query(...)):
     db.close()
     return RedirectResponse(url=f"https://glbtoken.com/dashboard.html?token={quote(jwt_token, safe='')}&user={user_json}")
 
+@app.get("/api/auth/auth0/pkce-callback")
+async def auth0_pkce_callback(code: str = Query(...), code_verifier: str = Query(...), state: str = Query(None)):
+    """Server-side PKCE callback: exchange Auth0 code for tokens, then redirect to dashboard with JWT."""
+    from starlette.responses import RedirectResponse
+    from urllib.parse import quote
+    if not is_auth0_configured():
+        return RedirectResponse(url="https://glbtoken.com/login.html?error=Auth0+not+configured")
+    try:
+        redirect_uri = "https://glbtoken.com/auth/callback.html"
+        tokens = exchange_pkce_code(code, code_verifier, redirect_uri)
+        id_token = tokens.get("id_token")
+        if not id_token:
+            return RedirectResponse(url="https://glbtoken.com/login.html?error=No+id_token+from+Auth0")
+        payload = verify_auth0_token(id_token)
+        info = get_user_info(payload)
+    except ValueError as e:
+        return RedirectResponse(url=f"https://glbtoken.com/login.html?error={quote(str(e))}")
+    from database import User, get_db
+    from sqlalchemy.orm import Session
+    db = next(get_db())
+    try:
+        user = db.query(User).filter(
+            (User.email == info["email"]) | (User.email == "" and 1 == 0)
+        ).first()
+        if not user and info.get("sub"):
+            user = db.query(User).filter(User.google_id == info["sub"]).first()
+        if not user and info["email"]:
+            user = db.query(User).filter(User.email == info["email"]).first()
+        if user:
+            if not user.google_id:
+                user.google_id = info["sub"]
+            user.email_verified = user.email_verified or info["email_verified"]
+            db.commit()
+        else:
+            user = User(
+                name=info["name"],
+                email=info["email"],
+                google_id=info["sub"],
+                token_balance=0,
+                email_verified=info["email_verified"],
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+    except Exception as e:
+        db.close()
+        return RedirectResponse(url=f"https://glbtoken.com/login.html?error=Database+error:+{quote(str(e))}")
+    try:
+        from newapi_integration import create_newapi_user
+        await create_newapi_user(email=info["email"], name=info["name"], quota=0)
+    except Exception as e:
+        print(f"⚠️ New API sync failed for Auth0 PKCE: {e}")
+    jwt_token = create_access_token({"sub": str(user.id)})
+    user_json = quote(json.dumps({
+        "id": user.id, "name": user.name, "email": user.email,
+        "token_balance": user.token_balance, "picture": info.get("picture", ""),
+    }))
+    db.close()
+    # Add timestamp to prevent bfcache from serving stale dashboard
+    import time
+    ts = int(time.time() * 1000)
+    return RedirectResponse(url=f"https://glbtoken.com/dashboard.html?token={quote(jwt_token, safe='')}&user={user_json}&_ts={ts}")
+
 @app.post("/api/auth/auth0/password-login")
 @limiter.limit("10/minute")
 async def auth0_password_login_endpoint(request: Request, body: Auth0PasswordLoginRequest, db: Session = Depends(get_db)):
