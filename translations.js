@@ -1326,7 +1326,24 @@ TRANS["Model  *"] = {en: "Model  *", "zh-CN": "模型  *", ru: "Модель  *"
 TRANS["Invoices  0"] = {en: "Invoices  0", "zh-CN": "发票  0", ru: "Счета  0", ja: "請求書  0", de: "Rechnungen  0"};
 TRANS["What's Next?"] = {en: "What's Next?", "zh-CN": "后续计划?", ru: "Что дальше?", ja: "今後の予定?", de: "Wie geht's weiter?"};
 TRANS["Amount:  $5.00"] = {en: "Amount:  $5.00", "zh-CN": "金额:  $5.00", ru: "Сумма:  $5.00", ja: "金額:  $5.00", de: "Betrag:  $5.00"};
-TRANS["Your Presets  0 saved"] = {en: "Your Presets  0 saved", "zh-CN": "您的预设  0 saved", ru: "Ваши пресеты  0 saved", ja: "あなたのプリセット  0 saved", de: "Ihre Voreinstellungen  0 saved"};(function() {
+TRANS["Your Presets  0 saved"] = {en: "Your Presets  0 saved", "zh-CN": "您的预设  0 saved", ru: "Ваши пресеты  0 saved", ja: "あなたのプリセット  0 saved", de: "Ihre Voreinstellungen  0 saved"};
+
+// ── Additional short UI labels ──
+TRANS["All"] = {en: "All", "zh-CN": "全部", ru: "Все", ja: "すべて", de: "Alle"};
+TRANS["Pro"] = {en: "Pro", "zh-CN": "专业版", ru: "Про", ja: "プロ", de: "Pro"};
+TRANS["Launch"] = {en: "Launch", "zh-CN": "发布", ru: "Запуск", ja: "リリース", de: "Einführung"};
+TRANS["Endpoint"] = {en: "Endpoint", "zh-CN": "端点", ru: "Точка доступа", ja: "エンドポイント", de: "Endpunkt"};
+TRANS["AI Models"] = {en: "AI Models", "zh-CN": "AI 模型", ru: "Модели ИИ", ja: "AIモデル", de: "KI-Modelle"};
+TRANS["Excellent"] = {en: "Excellent", "zh-CN": "优秀", ru: "Отлично", ja: "優秀", de: "Hervorragend"};
+TRANS["Very Good"] = {en: "Very Good", "zh-CN": "非常好", ru: "Очень хорошо", ja: "とても良い", de: "Sehr gut"};
+TRANS["Good"] = {en: "Good", "zh-CN": "良好", ru: "Хорошо", ja: "良い", de: "Gut"};
+TRANS["Capability"] = {en: "Capability", "zh-CN": "能力", ru: "Возможности", ja: "機能", de: "Fähigkeit"};
+TRANS["↓ Price"] = {en: "↓ Price", "zh-CN": "↓ 价格", ru: "↓ Цена", ja: "↓ 価格", de: "↓ Preis"};
+TRANS["🤖 Model"] = {en: "🤖 Model", "zh-CN": "🤖 模型", ru: "🤖 Модель", ja: "🤖 モデル", de: "🤖 Modell"};
+TRANS["✅ Success"] = {en: "✅ Success", "zh-CN": "✅ 成功", ru: "✅ Успешно", ja: "✅ 成功", de: "✅ Erfolg"};
+TRANS["❌ Failed"] = {en: "❌ Failed", "zh-CN": "❌ 失败", ru: "❌ Ошибка", ja: "❌ 失敗", de: "❌ Fehlgeschlagen"};
+TRANS["~0 tokens"] = {en: "~0 tokens", "zh-CN": "~0 代币", ru: "~0 токенов", ja: "~0 トークン", de: "~0 Tokens"};
+TRANS["Glb  TOKEN"] = {en: "Glb  TOKEN", "zh-CN": "Glb  TOKEN", ru: "Glb  TOKEN", ja: "Glb  TOKEN", de: "Glb  TOKEN"};(function() {
   var saved = localStorage.getItem('gt_lang');
   if (saved && saved !== 'en') {
     curLang = saved;
