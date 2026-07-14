@@ -281,9 +281,9 @@
     function showPage(page){
       // Auth-based redirects for multi-page setup
       if (token && (page === 'login' || page === 'register')) { window.location='dashboard.html'; return; }
-      if (!token && (page === 'dashboard' || page === 'history' || page === 'apikeys' || page === 'topup')) { window.location='register.html'; return; }
+      if (!token && (page === 'dashboard' || page === 'history' || page === 'apikeys' || page === 'topup' || page === 'referral' || page === 'team' || page === 'playground')) { window.location='register.html'; return; }
       if (page === 'home') { window.location='/'; return; }
-      const pageMap = {pricing:'pricing.html',how:'how.html',models:'models.html',apikeys:'apikeys.html',dashboard:'dashboard.html',history:'history.html',topup:'topup.html',faq:'faq.html',about:'about.html',blog:'blog.html',terms:'terms.html',privacy:'privacy.html',refund:'refund.html',login:'login.html',register:'register.html',settings:'settings.html',notifications:'notifications.html',billing:'billing.html'};
+      const pageMap = {pricing:'pricing.html',how:'how.html',models:'models.html',apikeys:'apikeys.html',dashboard:'dashboard.html',history:'history.html',topup:'topup.html',faq:'faq.html',about:'about.html',blog:'blog.html',terms:'terms.html',privacy:'privacy.html',refund:'refund.html',login:'login.html',register:'register.html',settings:'settings.html',notifications:'notifications.html',billing:'billing.html',referral:'referral.html',team:'team.html',playground:'playground.html'};
       if (pageMap[page]) { window.location=pageMap[page]; }
     }
 
@@ -1283,6 +1283,16 @@
       if(mal)mal.style.display=loggedIn?'none':'block';
       var mdl=document.getElementById('mNavDashLink');
       if(mdl)mdl.style.display=loggedIn?'block':'none';
+      // New feature nav links
+      var nrl=document.getElementById('navReferralLink');if(nrl)nrl.style.display=loggedIn?'inline-block':'none';
+      var ntl=document.getElementById('navTeamLink');if(ntl)ntl.style.display=loggedIn?'inline-block':'none';
+      var npl=document.getElementById('navPlaygroundLink');if(npl)npl.style.display=loggedIn?'inline-block':'none';
+      var nhl=document.getElementById('navHistoryLink');if(nhl)nhl.style.display='inline-block';
+      // Mobile
+      var mnrl=document.getElementById('mNavReferralLink');if(mnrl)mnrl.style.display=loggedIn?'block':'none';
+      var mntl=document.getElementById('mNavTeamLink');if(mntl)mntl.style.display=loggedIn?'block':'none';
+      var mnpl=document.getElementById('mNavPlaygroundLink');if(mnpl)mnpl.style.display=loggedIn?'block':'none';
+      var mnhl=document.getElementById('mNavHistoryLink');if(mnhl)mnhl.style.display='block';
       // API doc page: show Go to Dashboard button when logged in
       const goBtn=document.getElementById('apiGoToDashBtn');
       if(goBtn)goBtn.style.display=loggedIn?'inline-flex':'none';
@@ -1358,6 +1368,10 @@
       if(pageId==='apikeys'&&token)loadKeys();
       if(pageId==='history'&&token)loadTx();
       if(pageId==='models')loadModels();
+      if(pageId==='referral'&&token){if(typeof loadReferralStats==='function')loadReferralStats();}
+      if(pageId==='team'&&token){if(typeof loadOrgs==='function')loadOrgs();}
+      if(pageId==='playground'&&token){if(typeof loadConversations==='function')loadConversations();if(typeof loadPlaygroundModels==='function')loadPlaygroundModels();}
+      if(pageId==='history'&&token){if(typeof loadLoginHistory==='function')loadLoginHistory();}
     })();
 
     // ── Dashboard ──
@@ -2135,6 +2149,9 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       if(pageId==='apikeys'&&token)loadKeys();
       if(pageId==='history'&&token)loadTx();
       if(pageId==='models')loadModels();
+      if(pageId==='referral'&&token){if(typeof loadReferralStats==='function')loadReferralStats();}
+      if(pageId==='team'&&token){if(typeof loadOrgs==='function')loadOrgs();}
+      if(pageId==='playground'&&token){if(typeof loadConversations==='function')loadConversations();if(typeof loadPlaygroundModels==='function')loadPlaygroundModels();}
     });
     // Parse URL error param (from Auth0 callback failure redirect)
     (function(){
@@ -2755,4 +2772,404 @@ document.addEventListener('click', function(e) {
     if(typeof applyAuth === 'function') applyAuth();
   }
 })();
+
+// ── Referral System Functions ──
+
+async function loadReferralStats() {
+  if(!token)return;
+  try {
+    const d=await api('GET','/api/referral/stats');
+    const codeEl=document.getElementById('refCode');
+    const countEl=document.getElementById('refCount');
+    const earnEl=document.getElementById('refEarnings');
+    if(codeEl) codeEl.textContent=d.code||'—';
+    if(countEl) countEl.textContent=d.referral_count||0;
+    if(earnEl) earnEl.textContent=(d.total_earnings||0).toFixed(2);
+    const tableBody=document.getElementById('refTableBody');
+    if(tableBody&&d.referrals&&d.referrals.length){
+      tableBody.innerHTML=d.referrals.map(function(r){
+        return '<tr><td>'+escapeHtml(r.email||r.name||'—')+'</td><td>'+escapeHtml(r.status||'joined')+'</td><td>'+(r.joined_at?new Date(r.joined_at).toLocaleDateString():'—')+'</td><td class="gold">+'+(r.reward||0)+'</td></tr>';
+      }).join('');
+    }else if(tableBody){
+      tableBody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.5rem">No referrals yet</td></tr>';
+    }
+    // Chart
+    const chartEl=document.getElementById('refChart');
+    if(chartEl&&d.history&&d.history.length&&typeof Chart!=='undefined'){
+      if(window._refChartInst)window._refChartInst.destroy();
+      window._refChartInst=new Chart(chartEl,{
+        type:'line',
+        data:{labels:d.history.map(function(h){return h.date}),datasets:[{label:'Referrals',data:d.history.map(function(h){return h.count}),borderColor:'#F4B400',backgroundColor:'rgba(244,180,0,0.1)',fill:true,tension:0.3}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text-muted)',font:{size:10}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)'}},x:{grid:{display:false},ticks:{color:'var(--text-muted)'}}}}
+      });
+    }
+  }catch(e){showToast('Failed to load referral stats','error')}
+}
+
+async function generateReferralCode() {
+  if(!token){showToast('Please sign in','error');return}
+  try {
+    const d=await api('POST','/api/referral/code');
+    const codeEl=document.getElementById('refCode');
+    if(codeEl) codeEl.textContent=d.code;
+    showToast('New referral code generated!','success');
+  }catch(e){showToast(e.message||'Failed to generate code','error')}
+}
+
+function copyReferralCode() {
+  const codeEl=document.getElementById('refCode');
+  if(!codeEl||!codeEl.textContent||codeEl.textContent==='—'){showToast('No code to copy','error');return}
+  const code=codeEl.textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(code).then(function(){showToast('Referral code copied!','success')}).catch(function(){});
+  }else{
+    const ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Referral code copied!','success');
+  }
+}
+
+async function loadReferralRewards() {
+  if(!token)return;
+  try {
+    const d=await api('GET','/api/referral/rewards');
+    const body=document.getElementById('refRewardsBody');
+    if(!body)return;
+    if(!d||!d.length){body.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.5rem">No rewards yet</td></tr>';return}
+    body.innerHTML=d.map(function(r){
+      return '<tr><td>'+escapeHtml(r.from||'—')+'</td><td class="gold">+'+escapeHtml(String(r.amount||0))+'</td><td>'+escapeHtml(r.reason||'referral')+'</td><td>'+(r.created_at?new Date(r.created_at).toLocaleDateString():'—')+'</td></tr>';
+    }).join('');
+  }catch(e){showToast('Failed to load rewards','error')}
+}
+
+async function claimRewards() {
+  if(!token){showToast('Please sign in','error');return}
+  try {
+    const d=await api('POST','/api/referral/claim');
+    if(d.new_balance!==undefined){userData.token_balance=d.new_balance;localStorage.setItem('gt_user',JSON.stringify(userData));updateBalance()}
+    loadReferralRewards();
+    loadReferralStats();
+    showToast('Rewards claimed!','success');
+  }catch(e){showToast(e.message||'Failed to claim rewards','error')}
+}
+
+// ── Team / Org Functions ──
+
+async function loadOrgs() {
+  if(!token)return;
+  try {
+    const d=await api('GET','/api/orgs');
+    const selector=document.getElementById('orgSelector');
+    if(!selector)return;
+    const orgs=d.orgs||d||[];
+    if(!orgs.length){
+      selector.innerHTML='<option value="">No organizations</option>';
+      return;
+    }
+    selector.innerHTML='<option value="">Select organization</option>'+orgs.map(function(o){return '<option value="'+escapeHtml(String(o.id))+'">'+escapeHtml(o.name||'Org '+o.id)+'</option>';}).join('');
+    if(orgs.length===1){selector.value=orgs[0].id;switchOrg(orgs[0].id)}
+  }catch(e){showToast('Failed to load organizations','error')}
+}
+
+async function switchOrg(orgId) {
+  if(!orgId){document.getElementById('orgDetails').innerHTML='<div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">Select an organization</div></div>';return}
+  await loadOrgDetails(orgId);
+}
+
+async function loadOrgDetails(orgId) {
+  if(!token||!orgId)return;
+  try {
+    const d=await api('GET','/api/orgs/'+orgId);
+    const container=document.getElementById('orgDetails');
+    if(!container)return;
+    if(d.error){container.innerHTML='<p style="color:var(--destructive);text-align:center;padding:1rem">'+escapeHtml(d.error)+'</p>';return}
+    let html='<div class="org-header"><h3>'+escapeHtml(d.name||'Organization')+'</h3><span style="color:var(--text-muted);font-size:0.85rem">'+(d.member_count||0)+' members</span></div>';
+    html+='<div class="member-list">';
+    if(d.members&&d.members.length){
+      d.members.forEach(function(m){
+        const roleCls=m.role==='owner'?'badge-role-owner':m.role==='admin'?'badge-role-admin':'badge-role-member';
+        html+='<div class="member-row"><span class="member-avatar">'+(m.name?m.name[0].toUpperCase():'?')+'</span><span class="member-name">'+escapeHtml(m.name||m.email||'User')+'</span><span class="role-badge '+roleCls+'">'+escapeHtml(m.role||'member')+'</span></div>';
+      });
+    }else{
+      html+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No members found</p>';
+    }
+    html+='</div>';
+    container.innerHTML=html;
+  }catch(e){showToast('Failed to load organization details','error')}
+}
+
+async function createOrg() {
+  if(!token){showToast('Please sign in','error');return}
+  const nameEl=document.getElementById('orgNameInput');
+  if(!nameEl||!nameEl.value.trim()){showToast('Enter an organization name','error');return}
+  try {
+    const d=await api('POST','/api/orgs',{name:nameEl.value.trim()});
+    nameEl.value='';
+    document.getElementById('createOrgModal').classList.remove('open');
+    loadOrgs();
+    showToast('Organization created!','success');
+  }catch(e){showToast(e.message||'Failed to create organization','error')}
+}
+
+async function inviteMember(orgId) {
+  if(!token||!orgId){showToast('Select an organization first','error');return}
+  const emailEl=document.getElementById('inviteEmail');
+  const roleEl=document.getElementById('inviteRole');
+  if(!emailEl||!emailEl.value.trim()){showToast('Enter an email address','error');return}
+  try {
+    await api('POST','/api/orgs/'+orgId+'/invite',{email:emailEl.value.trim(),role:roleEl?roleEl.value:'member'});
+    emailEl.value='';
+    showToast('Invitation sent!','success');
+    loadOrgDetails(orgId);
+  }catch(e){showToast(e.message||'Failed to send invitation','error')}
+}
+
+async function updateMemberRole(orgId, userId, role) {
+  if(!token)return;
+  try {
+    await api('PUT','/api/orgs/'+orgId+'/members/'+userId+'/role',{role:role});
+    loadOrgDetails(orgId);
+    showToast('Member role updated','success');
+  }catch(e){showToast(e.message||'Failed to update role','error')}
+}
+
+async function removeMember(orgId, userId) {
+  if(!token)return;
+  showConfirm('Remove member?','This action cannot be undone.',async function(){
+    try {
+      await api('DELETE','/api/orgs/'+orgId+'/members/'+userId);
+      loadOrgDetails(orgId);
+      showToast('Member removed','info');
+    }catch(e){showToast(e.message||'Failed to remove member','error')}
+  });
+}
+
+async function leaveOrg(orgId) {
+  if(!token||!orgId)return;
+  showConfirm('Leave organization?','You will lose access to this organization.',async function(){
+    try {
+      await api('DELETE','/api/orgs/'+orgId+'/members/me');
+      loadOrgs();
+      document.getElementById('orgDetails').innerHTML='<div class="empty-state"><div class="empty-icon">👋</div><div class="empty-title">You left the organization</div></div>';
+      showToast('Left organization','info');
+    }catch(e){showToast(e.message||'Failed to leave organization','error')}
+  });
+}
+
+async function joinOrg(inviteToken) {
+  if(!token){showToast('Please sign in','error');return}
+  try {
+    const d=await api('POST','/api/orgs/join',{invite_token:inviteToken});
+    loadOrgs();
+    showToast('Joined organization!','success');
+  }catch(e){showToast(e.message||'Failed to join organization','error')}
+}
+
+// ── Login History Functions ──
+
+let loginHistoryOffset=0;
+const LOGIN_PAGE_SIZE=20;
+
+async function loadLoginHistory(offset) {
+  if(!token)return;
+  const off=offset!==undefined?offset:0;
+  try {
+    const d=await api('GET','/api/auth/login-history?offset='+off+'&limit='+LOGIN_PAGE_SIZE);
+    const body=document.getElementById('loginHistoryBody');
+    if(!body)return;
+    const events=d.events||d||[];
+    if(!events.length&&off===0){body.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem">No login history</td></tr>';return}
+    if(off===0) body.innerHTML='';
+    events.forEach(function(e){body.innerHTML+=renderLoginRow(e);});
+    loginHistoryOffset=off+events.length;
+    const loadMore=document.getElementById('loginLoadMore');
+    if(loadMore) loadMore.style.display=events.length<LOGIN_PAGE_SIZE?'none':'block';
+  }catch(e){showToast('Failed to load login history','error')}
+}
+
+function renderLoginRow(event) {
+  const deviceIcon=event.device_type==='mobile'?'📱':event.device_type==='tablet'?'📲':'💻';
+  const statusBadge=event.success?'<span class="badge-success">Success</span>':'<span class="badge-failed">Failed</span>';
+  const ip=escapeHtml(event.ip_address||'—');
+  const location=escapeHtml(event.location||'—');
+  const date=event.created_at?new Date(event.created_at).toLocaleString():'—';
+  const device=escapeHtml(event.device_name||event.device_type||'—');
+  return '<tr class="history-row"><td><span class="device-icon">'+deviceIcon+'</span><span>'+device+'</span></td><td><span class="location-tag">'+location+'</span></td><td>'+ip+'</td><td>'+statusBadge+'</td><td>'+date+'</td></tr>';
+}
+
+function filterLoginHistory() {
+  const dateFilter=document.getElementById('loginDateFilter');
+  const deviceFilter=document.getElementById('loginDeviceFilter');
+  const statusFilter=document.getElementById('loginStatusFilter');
+  const rows=document.querySelectorAll('#loginHistoryBody .history-row');
+  rows.forEach(function(row){
+    let show=true;
+    if(dateFilter&&dateFilter.value){
+      if(!row.textContent.toLowerCase().includes(dateFilter.value.toLowerCase())) show=false;
+    }
+    if(deviceFilter&&deviceFilter.value&&deviceFilter.value!=='all'){
+      const deviceIcon=row.querySelector('.device-icon');
+      if(deviceIcon){
+        const iconText=deviceIcon.textContent;
+        if(deviceFilter.value==='mobile'&&iconText!=='📱'&&iconText!=='📲') show=false;
+        if(deviceFilter.value==='desktop'&&iconText!=='💻') show=false;
+      }
+    }
+    if(statusFilter&&statusFilter.value&&statusFilter.value!=='all'){
+      const hasSuccess=row.querySelector('.badge-success');
+      const hasFailed=row.querySelector('.badge-failed');
+      if(statusFilter.value==='success'&&!hasSuccess) show=false;
+      if(statusFilter.value==='failed'&&!hasFailed) show=false;
+    }
+    row.style.display=show?'':'none';
+  });
+}
+
+// ── Playground Functions ──
+
+let playgroundMessages=[];
+let playgroundCurrentId=null;
+
+function createNewChat() {
+  playgroundMessages=[];
+  playgroundCurrentId=null;
+  const msgsEl=document.getElementById('playgroundMessages');
+  if(msgsEl) msgsEl.innerHTML='';
+  const inputEl=document.getElementById('playgroundInput');
+  if(inputEl) inputEl.value='';
+  const titleEl=document.getElementById('playgroundTitle');
+  if(titleEl) titleEl.textContent='New Chat';
+  const sidebar=document.querySelector('.playground-sidebar .conv-list');
+  if(sidebar) sidebar.querySelectorAll('.conv-item').forEach(function(e){e.classList.remove('active');});
+}
+
+async function loadConversations() {
+  if(!token)return;
+  try {
+    const d=await api('GET','/api/playground/conversations');
+    const list=document.querySelector('.playground-sidebar .conv-list');
+    if(!list)return;
+    const convs=d.conversations||d||[];
+    if(!convs.length){list.innerHTML='<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem">No conversations yet</p>';return}
+    list.innerHTML=convs.map(function(c){
+      return '<div class="conv-item" data-id="'+escapeHtml(String(c.id))+'" onclick="loadConversation('+escapeHtml(String(c.id))+')"><span class="conv-title">'+escapeHtml(c.title||'Untitled')+'</span><button class="conv-delete" onclick="event.stopPropagation();deleteConversation('+escapeHtml(String(c.id))+')">✕</button></div>';
+    }).join('');
+  }catch(e){showToast('Failed to load conversations','error')}
+}
+
+async function loadConversation(id) {
+  if(!token)return;
+  try {
+    const d=await api('GET','/api/playground/conversations/'+id);
+    playgroundCurrentId=id;
+    playgroundMessages=d.messages||[];
+    const msgsEl=document.getElementById('playgroundMessages');
+    if(!msgsEl)return;
+    msgsEl.innerHTML='';
+    playgroundMessages.forEach(function(m){
+      const cls=m.role==='user'?'message-bubble-user':'message-bubble-ai';
+      msgsEl.innerHTML+='<div class="playground-msg"><div class="'+cls+'">'+escapeHtml(m.content)+'</div></div>';
+    });
+    msgsEl.scrollTop=msgsEl.scrollHeight;
+    const titleEl=document.getElementById('playgroundTitle');
+    if(titleEl) titleEl.textContent=d.title||'Chat';
+    // Highlight in sidebar
+    document.querySelectorAll('.conv-item').forEach(function(e){e.classList.toggle('active',String(e.dataset.id)===String(id));});
+  }catch(e){showToast('Failed to load conversation','error')}
+}
+
+async function deleteConversation(id) {
+  if(!token)return;
+  showConfirm('Delete conversation?','This cannot be undone.',async function(){
+    try {
+      await api('DELETE','/api/playground/conversations/'+id);
+      if(playgroundCurrentId===id) createNewChat();
+      loadConversations();
+      showToast('Conversation deleted','info');
+    }catch(e){showToast(e.message||'Failed to delete conversation','error')}
+  });
+}
+
+async function sendChatMessage() {
+  const inputEl=document.getElementById('playgroundInput');
+  const msg=(inputEl?inputEl.value:'').trim();
+  if(!msg)return;
+  if(inputEl) inputEl.value='';
+  const msgsEl=document.getElementById('playgroundMessages');
+  if(!msgsEl)return;
+  // Add user message
+  msgsEl.innerHTML+='<div class="playground-msg"><div class="message-bubble-user">'+escapeHtml(msg)+'</div></div>';
+  playgroundMessages.push({role:'user',content:msg});
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+  // Show typing
+  const typingId='playgroundTyping';
+  msgsEl.innerHTML+='<div class="playground-msg" id="'+typingId+'"><div class="message-bubble-ai"><div class="ai-typing"><span></span><span></span><span></span></div></div></div>';
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+  // Get selected model + params
+  const modelSel=document.getElementById('playgroundModelSelect');
+  const model=modelSel?modelSel.value:'gpt-4o-mini';
+  const tempEl=document.getElementById('paramTemp');
+  const maxTokEl=document.getElementById('paramMaxTokens');
+  try {
+    const d=await api('POST','/api/playground/chat',{model:model,messages:playgroundMessages,temperature:tempEl?parseFloat(tempEl.value)||0.7:0.7,max_tokens:maxTokEl?parseInt(maxTokEl.value)||2048:2048},120000);
+    const typingEl=document.getElementById(typingId);
+    if(typingEl) typingEl.remove();
+    const resp=d.response||d.choices?.[0]?.message?.content||'No response';
+    msgsEl.innerHTML+='<div class="playground-msg"><div class="message-bubble-ai">'+escapeHtml(resp)+'</div></div>';
+    playgroundMessages.push({role:'assistant',content:resp});
+    msgsEl.scrollTop=msgsEl.scrollHeight;
+  }catch(e){
+    const typingEl2=document.getElementById(typingId);
+    if(typingEl2) typingEl2.remove();
+    msgsEl.innerHTML+='<div class="playground-msg"><div class="message-bubble-ai" style="color:var(--destructive)">Error: '+escapeHtml(e.message||'Connection failed')+'</div></div>';
+    msgsEl.scrollTop=msgsEl.scrollHeight;
+  }
+}
+
+async function saveConversation() {
+  if(!token){showToast('Please sign in','error');return}
+  if(!playgroundMessages.length){showToast('No messages to save','error');return}
+  const titleEl=document.getElementById('playgroundTitle');
+  const title=titleEl?titleEl.textContent:'Chat '+(new Date().toLocaleString());
+  try {
+    const d=await api('POST','/api/playground/conversations',{title:title,messages:playgroundMessages});
+    playgroundCurrentId=d.id;
+    loadConversations();
+    showToast('Conversation saved','success');
+  }catch(e){showToast(e.message||'Failed to save conversation','error')}
+}
+
+async function updateConversationTitle(id) {
+  if(!token||!id)return;
+  const titleEl=document.getElementById('playgroundTitle');
+  if(!titleEl)return;
+  const newTitle=titleEl.textContent.trim()||'Untitled';
+  try {
+    await api('PUT','/api/playground/conversations/'+id,{title:newTitle});
+    loadConversations();
+  }catch(e){showToast(e.message||'Failed to update title','error')}
+}
+
+async function loadPlaygroundModels() {
+  try {
+    const d=await api('GET','/api/playground/models');
+    const sel=document.getElementById('playgroundModelSelect');
+    if(!sel)return;
+    const models=d.models||d||[];
+    if(!models.length){sel.innerHTML='<option value="">No models available</option>';return}
+    sel.innerHTML=models.map(function(m){
+      return '<option value="'+escapeHtml(m.id||m.model||m)+'">'+escapeHtml(m.name||m.id||m.model||m)+'</option>';
+    }).join('');
+  }catch(e){showToast('Failed to load models','error')}
+}
+
+function toggleParams() {
+  const panel=document.getElementById('paramsPanel');
+  if(panel) panel.classList.toggle('open');
+}
+
+function insertPromptSuggestion(text) {
+  const inputEl=document.getElementById('playgroundInput');
+  if(!inputEl)return;
+  inputEl.value=text;
+  inputEl.focus();
+}
 

@@ -70,6 +70,10 @@ class User(Base):
     newapi_user_id = Column(Integer, nullable=True)    # New API user ID
     newapi_token = Column(String, nullable=True)       # New API access token
     settings = Column(Text, default="{}")              # JSON settings (notifications, theme, etc.)
+    # Referral fields
+    referral_code = Column(String, unique=True, nullable=True)
+    referral_earnings = Column(Float, default=0.0)
+    referred_by = Column(String, nullable=True)
     
     api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
     transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
@@ -132,6 +136,84 @@ class Preset(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", backref="presets")
+
+
+# ── Referral Models ──
+class Referral(Base):
+    __tablename__ = "referrals"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    code = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    total_earned = Column(Float, default=0.0)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class ReferralRedemption(Base):
+    __tablename__ = "referral_redemptions"
+    id = Column(Integer, primary_key=True, index=True)
+    referred_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    referrer_code = Column(String, nullable=False)
+    amount = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    referred_user = relationship("User", foreign_keys=[referred_user_id])
+
+
+# ── Login History Model ──
+class LoginEvent(Base):
+    __tablename__ = "login_events"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    ip_address = Column(String, default="")
+    user_agent = Column(String, default="")
+    device_type = Column(String, default="")
+    location = Column(String, nullable=True)
+    success = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="login_events")
+
+
+# ── Organization / Team Models ──
+class Organization(Base):
+    __tablename__ = "organizations"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    max_members = Column(Integer, default=10)
+
+    owner = relationship("User", foreign_keys=[owner_id])
+    members = relationship("OrgMember", back_populates="organization", cascade="all, delete-orphan")
+
+
+class OrgMember(Base):
+    __tablename__ = "org_members"
+    id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    role = Column(String, default="member")  # 'owner', 'admin', 'member'
+    joined_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    organization = relationship("Organization", back_populates="members")
+    user = relationship("User", foreign_keys=[user_id])
+
+
+# ── Playground Conversation Model ──
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, default="New Conversation")
+    messages = Column(Text, default="[]")  # JSON-serialized messages array
+    model = Column(String, default="")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="conversations")
+
 
 # Create all tables
 def init_db():

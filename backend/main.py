@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 from email.mime.text import MIMEText
 import smtplib, secrets, os, json, random
 
-from database import init_db, get_db, User, ApiKey, Transaction, AIModel, Preset
+from database import init_db, get_db, User, ApiKey, Transaction, AIModel, Preset, Referral, ReferralRedemption, LoginEvent, Organization, OrgMember, Conversation
 from auth import (
     hash_password, verify_password, create_access_token, decode_token,
     get_current_user, get_optional_user, generate_api_key,
@@ -215,6 +215,57 @@ class CostProjectionResponse(BaseModel):
     daily_avg: float
     days_of_data: int
 
+# ── Referral Schemas ──
+class ReferralCodeResponse(BaseModel):
+    referral_code: str
+
+class ReferralStatsResponse(BaseModel):
+    referral_code: Optional[str] = None
+    total_referrals: int = 0
+    total_earned: float = 0.0
+    recent_referrals: list = []
+
+class ReferralRewardItem(BaseModel):
+    amount: float
+    created_at: str
+    referred_user_name: str = ""
+
+class ReferralRewardsResponse(BaseModel):
+    rewards: list[ReferralRewardItem] = []
+    total: float = 0.0
+
+class ClaimReferralRequest(BaseModel):
+    pass
+
+# ── Organization Schemas ──
+class CreateOrgRequest(BaseModel):
+    name: str
+
+class InviteMemberRequest(BaseModel):
+    email: str
+
+class JoinOrgRequest(BaseModel):
+    token: str
+
+class ChangeRoleRequest(BaseModel):
+    role: str
+
+# ── Playground Schemas ──
+class PlaygroundChatRequest(BaseModel):
+    model: str
+    messages: list
+    temperature: float = 0.7
+    max_tokens: int = 4096
+    top_p: float = 1.0
+    frequency_penalty: float = 0.0
+    presence_penalty: float = 0.0
+    stream: bool = False
+
+class SaveConversationRequest(BaseModel):
+    title: str = "New Conversation"
+    messages: list = []
+    model: str = ""
+
 # ── Email Config ──
 def send_email(to: str, subject: str, body: str) -> bool:
     smtp_host = os.getenv("SMTP_HOST", "")
@@ -243,6 +294,26 @@ def send_email(to: str, subject: str, body: str) -> bool:
 # ── Startup check ──
 if not os.getenv("SMTP_HOST"):
     print("⚠️  SMTP not configured — password reset and email verification will silently fail.")
+
+# ── Login History Helper ──
+def record_login_event(user_id: int, request: Request, success: bool, db: Session):
+    """Record a login event for audit/history purposes."""
+    try:
+        ip_address = request.client.host if request.client else ""
+        user_agent = request.headers.get("user-agent", "")
+        device_type = "mobile" if any(k in user_agent.lower() for k in ["mobile", "android", "iphone", "ipad"]) else "desktop"
+        event = LoginEvent(
+            user_id=user_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            device_type=device_type,
+            success=success,
+        )
+        db.add(event)
+        db.commit()
+    except Exception as e:
+        print(f"⚠️ Failed to record login event: {e}")
+        db.rollback()
 
 # ── Auth Routes ──
 @app.post("/api/auth/register")
@@ -305,6 +376,13 @@ async def register(req: RegisterRequest, request: Request, db: Session = Depends
     if newapi_token:
         result["newapi_token"] = newapi_token
         result["newapi_endpoint"] = os.getenv("NEW_API_BASE_URL", "")
+    
+    # Record login event
+    try:
+        record_login_event(user.id, request, True, db)
+    except Exception:
+        pass
+    
     return result
 
 @app.post("/api/auth/login")
@@ -312,9 +390,12 @@ async def register(req: RegisterRequest, request: Request, db: Session = Depends
 def login(req: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email).first()
     if not user or not user.password_hash:
+        record_login_event(0, request, False, db)
         raise HTTPException(status_code=401, detail="Invalid credentials")
     if not verify_password(req.password, user.password_hash):
+        record_login_event(0, request, False, db)
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    record_login_event(user.id, request, True, db)
     token = create_access_token({"sub": str(user.id)})
     return {"user": {"id": user.id, "name": user.name, "email": user.email, "token_balance": user.token_balance, "country": user.country}, "token": token}
 
@@ -333,7 +414,8 @@ def google_auth_url():
     return {"url": f"https://accounts.google.com/o/oauth2/auth?{params}"}
 
 @app.post("/api/auth/google/callback")
-async def google_callback(req: GoogleAuthRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def google_callback(req: GoogleAuthRequest, request: Request, db: Session = Depends(get_db)):
     # Exchange authorization code for id_token
     if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
         raise HTTPException(status_code=400, detail="Google OAuth not configured")
@@ -374,6 +456,7 @@ async def google_callback(req: GoogleAuthRequest, db: Session = Depends(get_db))
         user.google_id = google_user["id"]
         db.commit()
     token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {"user": {"id": user.id, "name": user.name, "email": user.email, "token_balance": user.token_balance}, "token": token}
 
 @app.get("/api/auth/github")
@@ -389,7 +472,8 @@ def github_auth_url():
     return {"url": f"https://github.com/login/oauth/authorize?{params}"}
 
 @app.post("/api/auth/github/callback")
-async def github_callback(req: GithubAuthRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def github_callback(req: GithubAuthRequest, request: Request, db: Session = Depends(get_db)):
     try:
         github_user = await verify_github_code(req.code)
     except Exception as e:
@@ -413,6 +497,7 @@ async def github_callback(req: GithubAuthRequest, db: Session = Depends(get_db))
         user.github_id = github_user["id"]
         db.commit()
     token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {"user": {"id": user.id, "name": user.name, "email": user.email, "token_balance": user.token_balance}, "token": token}
 
 # ── Auth0 Routes (production-grade auth) ──
@@ -509,6 +594,7 @@ async def verify_code(request: Request, body: VerifyCodeRequest, db: Session = D
         db.commit()
     
     jwt_token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {
         "token": jwt_token,
         "user": {
@@ -580,6 +666,7 @@ async def verify_sms_code_endpoint(request: Request, body: VerifySmsCodeRequest,
         db.commit()
     
     jwt_token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {
         "token": jwt_token,
         "user": {
@@ -637,6 +724,7 @@ async def auth0_login(request: Request, req: Auth0LoginRequest, db: Session = De
             print(f"⚠️ New API sync failed for Auth0 user: {e}")
 
     token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {
         "user": {
             "id": user.id, "name": user.name, "email": user.email,
@@ -737,6 +825,7 @@ async def auth0_password_login_endpoint(request: Request, body: Auth0PasswordLog
             print(f"⚠️ New API sync failed for Auth0 password user: {e}")
 
     jwt_token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {
         "user": {"id": user.id, "name": user.name, "email": user.email,
                  "token_balance": user.token_balance, "picture": info.get("picture", "")},
@@ -781,6 +870,7 @@ async def auth0_signup_endpoint(request: Request, body: Auth0SignupRequest, db: 
         print(f"⚠️ New API sync failed for Auth0 signup user: {e}")
 
     jwt_token = create_access_token({"sub": str(user.id)})
+    record_login_event(user.id, request, True, db)
     return {
         "user": {"id": user.id, "name": user.name, "email": user.email,
                  "token_balance": user.token_balance, "picture": info.get("picture", "")},
@@ -881,6 +971,35 @@ def reset_password(request: Request, req: ResetPasswordRequest, db: Session = De
     user.reset_token_expiry = None
     db.commit()
     return {"status": "password_reset"}
+
+# ── Login History ──
+@app.get("/api/auth/login-history")
+@limiter.limit("30/minute")
+def get_login_history(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db),
+                      offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=100)):
+    """Returns paginated login history for the current user."""
+    total = db.query(LoginEvent).filter(LoginEvent.user_id == user.id).count()
+    events = db.query(LoginEvent).filter(
+        LoginEvent.user_id == user.id
+    ).order_by(desc(LoginEvent.created_at)).offset(offset).limit(limit).all()
+    
+    return {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "events": [
+            {
+                "id": e.id,
+                "ip_address": e.ip_address,
+                "user_agent": e.user_agent,
+                "device_type": e.device_type,
+                "location": e.location,
+                "success": e.success,
+                "created_at": e.created_at.isoformat() if e.created_at else None,
+            }
+            for e in events
+        ],
+    }
 
 # ── Dashboard Routes ──
 @app.get("/api/dashboard")
@@ -1378,6 +1497,195 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
     result["balance_remaining"] = user.token_balance
     return result
 
+# ── Model Playground ──
+PLAYGROUND_MODELS = [
+    "gpt-4o-mini", "gpt-4o", "claude-3-haiku-20240307", "claude-3-sonnet-20240229",
+    "gemini-1.5-flash", "gemini-1.5-pro", "mistral-small-latest", "mistral-medium-latest",
+    "llama-3.1-8b-instant", "llama-3.1-70b-versatile",
+]
+
+@app.get("/api/playground/models")
+@limiter.limit("60/minute")
+def get_playground_models(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns models available for playground (faster, cheaper ones filtered)."""
+    models = db.query(AIModel).filter(
+        AIModel.is_active == True,
+        AIModel.model_id.in_(PLAYGROUND_MODELS),
+    ).all()
+    
+    if not models:
+        # Fallback: return all active models sorted by prompt_price
+        models = db.query(AIModel).filter(
+            AIModel.is_active == True
+        ).order_by(AIModel.prompt_price).limit(20).all()
+    
+    return [
+        {
+            "model_id": m.model_id,
+            "name": m.name,
+            "provider": m.provider,
+            "context_length": m.context_length,
+            "prompt_price": m.prompt_price,
+            "completion_price": m.completion_price,
+            "category": m.category,
+        }
+        for m in models
+    ]
+
+
+@app.post("/api/playground/chat")
+@limiter.limit("30/minute")
+async def playground_chat(req: PlaygroundChatRequest, request: Request,
+                          user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Similar to proxy/chat but with additional parameters."""
+    # Estimate cost
+    input_chars = sum(len(m.get("content", "")) for m in req.messages)
+    input_tokens = max(1, input_chars // 4)
+    output_tokens = min(req.max_tokens, 4096)
+    cost_tokens = int((input_tokens + output_tokens) * 0.002)
+    
+    if user.token_balance < cost_tokens:
+        raise HTTPException(status_code=402, detail=f"Insufficient balance. Need {cost_tokens} tokens, have {user.token_balance}")
+    
+    newapi_key = user.newapi_token
+    newapi_url = os.getenv("NEW_API_BASE_URL", "")
+    
+    import httpx
+    headers = {"Content-Type": "application/json"}
+    
+    if newapi_key and newapi_url:
+        headers["Authorization"] = f"Bearer {newapi_key}"
+        api_endpoint = f"{newapi_url}/v1/chat/completions"
+    else:
+        fallback_key = os.getenv("FALLBACK_API_KEY", "")
+        if not fallback_key:
+            raise HTTPException(status_code=400, detail="No AI routing configured")
+        headers = {
+            "Authorization": f"Bearer {fallback_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://glbtoken.com",
+            "X-Title": "GlbTOKEN",
+        }
+        fallback_url = os.getenv("FALLBACK_API_URL", "")
+        if not fallback_url:
+            raise HTTPException(status_code=400, detail="No AI routing configured")
+        api_endpoint = f"{fallback_url.rstrip('/')}/v1/chat/completions"
+    
+    payload = {
+        "model": req.model,
+        "messages": req.messages,
+        "max_tokens": req.max_tokens,
+        "temperature": req.temperature,
+        "top_p": req.top_p,
+        "frequency_penalty": req.frequency_penalty,
+        "presence_penalty": req.presence_penalty,
+        "stream": req.stream,
+    }
+    
+    async with httpx.AsyncClient(timeout=120) as client:
+        resp = await client.post(api_endpoint, headers=headers, json=payload)
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail="AI API error. Please try again later.")
+        result = resp.json()
+    
+    # Deduct tokens
+    actual_tokens_cost = max(1, cost_tokens)
+    user.token_balance -= actual_tokens_cost
+    tx = Transaction(
+        user_id=user.id, type="consumption", amount=0,
+        payment_method="playground", model_used=req.model,
+        tokens=actual_tokens_cost, status="completed",
+    )
+    db.add(tx)
+    db.commit()
+    result["tokens_used"] = actual_tokens_cost
+    result["balance_remaining"] = user.token_balance
+    return result
+
+
+@app.get("/api/playground/conversations")
+@limiter.limit("30/minute")
+def list_conversations(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """List saved conversation titles for the current user."""
+    conversations = db.query(Conversation).filter(
+        Conversation.user_id == user.id
+    ).order_by(desc(Conversation.updated_at)).all()
+    
+    return [
+        {
+            "id": c.id,
+            "title": c.title,
+            "model": c.model,
+            "message_count": len(json.loads(c.messages)) if c.messages else 0,
+            "created_at": c.created_at.isoformat() if c.created_at else None,
+            "updated_at": c.updated_at.isoformat() if c.updated_at else None,
+        }
+        for c in conversations
+    ]
+
+
+@app.post("/api/playground/conversations")
+@limiter.limit("20/minute")
+def save_conversation(req: SaveConversationRequest, request: Request,
+                      user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Save current conversation."""
+    conversation = Conversation(
+        user_id=user.id,
+        title=req.title or "New Conversation",
+        messages=json.dumps(req.messages),
+        model=req.model,
+    )
+    db.add(conversation)
+    db.commit()
+    db.refresh(conversation)
+    
+    return {
+        "id": conversation.id,
+        "title": conversation.title,
+        "model": conversation.model,
+        "message_count": len(req.messages),
+        "created_at": conversation.created_at.isoformat() if conversation.created_at else None,
+        "updated_at": conversation.updated_at.isoformat() if conversation.updated_at else None,
+    }
+
+
+@app.get("/api/playground/conversations/{conv_id}")
+@limiter.limit("30/minute")
+def get_conversation(conv_id: int, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get full conversation by ID."""
+    conversation = db.query(Conversation).filter(
+        Conversation.id == conv_id, Conversation.user_id == user.id
+    ).first()
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    messages = json.loads(conversation.messages) if conversation.messages else []
+    
+    return {
+        "id": conversation.id,
+        "title": conversation.title,
+        "model": conversation.model,
+        "messages": messages,
+        "created_at": conversation.created_at.isoformat() if conversation.created_at else None,
+        "updated_at": conversation.updated_at.isoformat() if conversation.updated_at else None,
+    }
+
+
+@app.delete("/api/playground/conversations/{conv_id}")
+@limiter.limit("20/minute")
+def delete_conversation(conv_id: int, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Delete a saved conversation."""
+    conversation = db.query(Conversation).filter(
+        Conversation.id == conv_id, Conversation.user_id == user.id
+    ).first()
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    db.delete(conversation)
+    db.commit()
+    return {"status": "deleted"}
+
+
 # ── Models Route ──
 @app.get("/api/models")
 def list_models(provider: Optional[str] = None, db: Session = Depends(get_db)):
@@ -1440,8 +1748,431 @@ def update_profile(req: ProfileUpdateRequest, user: User = Depends(get_current_u
     db.commit()
     return {"status": "updated", "name": user.name, "country": user.country}
 
+# ── Referral System ──
+@app.post("/api/referral/code")
+@limiter.limit("10/minute")
+def generate_referral_code(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Generate a unique referral code for the current user (if none exists)."""
+    if user.referral_code:
+        return {"referral_code": user.referral_code}
+    
+    # Check if user already has a Referral record
+    existing = db.query(Referral).filter(Referral.user_id == user.id).first()
+    if existing:
+        user.referral_code = existing.code
+        db.commit()
+        return {"referral_code": existing.code}
+    
+    # Generate a unique code
+    import string
+    for _ in range(10):
+        code = "GLB" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        if not db.query(Referral).filter(Referral.code == code).first():
+            break
+    else:
+        raise HTTPException(status_code=500, detail="Failed to generate unique code")
+    
+    referral = Referral(user_id=user.id, code=code)
+    db.add(referral)
+    user.referral_code = code
+    db.commit()
+    return {"referral_code": code}
+
+
+@app.get("/api/referral/stats")
+@limiter.limit("30/minute")
+def get_referral_stats(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns referral stats for the current user."""
+    code = user.referral_code
+    total_earned = user.referral_earnings or 0.0
+    
+    # Count referrals (users who used this user's code)
+    total_referrals = db.query(User).filter(User.referred_by == code).count() if code else 0
+    
+    # Recent referrals
+    recent = []
+    if code:
+        recent_users = db.query(User).filter(
+            User.referred_by == code
+        ).order_by(desc(User.created_at)).limit(10).all()
+        recent = [{"id": u.id, "name": u.name, "joined_at": u.created_at.isoformat() if u.created_at else None} for u in recent_users]
+    
+    return {
+        "referral_code": code,
+        "total_referrals": total_referrals,
+        "total_earned": total_earned,
+        "recent_referrals": recent,
+    }
+
+
+@app.get("/api/referral/rewards")
+@limiter.limit("30/minute")
+def get_referral_rewards(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Returns list of referral rewards for the current user."""
+    if not user.referral_code:
+        return {"rewards": [], "total": 0.0}
+    
+    redemptions = db.query(ReferralRedemption).filter(
+        ReferralRedemption.referrer_code == user.referral_code
+    ).order_by(desc(ReferralRedemption.created_at)).all()
+    
+    rewards = []
+    for r in redemptions:
+        referred_user = db.query(User).filter(User.id == r.referred_user_id).first()
+        rewards.append({
+            "amount": r.amount,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "referred_user_name": referred_user.name if referred_user else "Unknown",
+        })
+    
+    total = sum(r.amount for r in redemptions)
+    return {"rewards": rewards, "total": total}
+
+
+@app.post("/api/referral/claim")
+@limiter.limit("5/minute")
+def claim_referral_reward(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Claim referral earnings (transfer to token balance)."""
+    if not user.referral_code:
+        raise HTTPException(status_code=400, detail="No referral code created yet")
+    
+    pending_earnings = user.referral_earnings or 0.0
+    if pending_earnings < 1.0:
+        raise HTTPException(status_code=400, detail=f"Minimum claim is 1.0 token. You have {pending_earnings:.2f}")
+    
+    # Transfer to balance
+    user.token_balance += pending_earnings
+    user.referral_earnings = 0.0
+    
+    # Create transaction record
+    tx = Transaction(
+        user_id=user.id, type="deposit", amount=0,
+        payment_method="referral_reward", tokens=pending_earnings,
+        status="completed",
+    )
+    db.add(tx)
+    db.commit()
+    
+    return {
+        "status": "claimed",
+        "amount": pending_earnings,
+        "new_balance": user.token_balance,
+    }
+
+
+# ── Organization / Team ──
+@app.post("/api/orgs")
+@limiter.limit("10/minute")
+def create_org(req: CreateOrgRequest, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Create a new organization."""
+    if not req.name or not req.name.strip():
+        raise HTTPException(status_code=400, detail="Organization name is required")
+    
+    org = Organization(name=req.name.strip(), owner_id=user.id)
+    db.add(org)
+    db.commit()
+    db.refresh(org)
+    
+    # Add creator as owner member
+    member = OrgMember(org_id=org.id, user_id=user.id, role="owner")
+    db.add(member)
+    db.commit()
+    
+    return {
+        "id": org.id,
+        "name": org.name,
+        "owner_id": org.owner_id,
+        "max_members": org.max_members,
+        "created_at": org.created_at.isoformat() if org.created_at else None,
+        "member_count": 1,
+    }
+
+
+@app.get("/api/orgs")
+@limiter.limit("30/minute")
+def list_orgs(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """List user's organizations."""
+    memberships = db.query(OrgMember).filter(OrgMember.user_id == user.id).all()
+    org_ids = [m.org_id for m in memberships]
+    orgs = db.query(Organization).filter(Organization.id.in_(org_ids)).all() if org_ids else []
+    
+    result = []
+    for org in orgs:
+        member_count = db.query(OrgMember).filter(OrgMember.org_id == org.id).count()
+        membership = db.query(OrgMember).filter(
+            OrgMember.org_id == org.id, OrgMember.user_id == user.id
+        ).first()
+        result.append({
+            "id": org.id,
+            "name": org.name,
+            "owner_id": org.owner_id,
+            "max_members": org.max_members,
+            "member_count": member_count,
+            "role": membership.role if membership else "member",
+            "created_at": org.created_at.isoformat() if org.created_at else None,
+        })
+    
+    return {"organizations": result}
+
+
+@app.get("/api/orgs/{org_id}")
+@limiter.limit("30/minute")
+def get_org(org_id: int, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get org details including members."""
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Verify user is a member
+    membership = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="You are not a member of this organization")
+    
+    members = db.query(OrgMember).filter(OrgMember.org_id == org_id).all()
+    member_list = []
+    for m in members:
+        u = db.query(User).filter(User.id == m.user_id).first()
+        member_list.append({
+            "user_id": m.user_id,
+            "name": u.name if u else "Unknown",
+            "email": u.email if u else "",
+            "role": m.role,
+            "joined_at": m.joined_at.isoformat() if m.joined_at else None,
+        })
+    
+    return {
+        "id": org.id,
+        "name": org.name,
+        "owner_id": org.owner_id,
+        "max_members": org.max_members,
+        "created_at": org.created_at.isoformat() if org.created_at else None,
+        "members": member_list,
+        "my_role": membership.role,
+    }
+
+
+@app.post("/api/orgs/{org_id}/invite")
+@limiter.limit("10/minute")
+def invite_to_org(org_id: int, req: InviteMemberRequest, request: Request,
+                  user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Invite a user by email to join the organization. Generates an invite token."""
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Check permission (owner or admin)
+    membership = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if not membership or membership.role not in ("owner", "admin"):
+        raise HTTPException(status_code=403, detail="Only owner or admin can invite members")
+    
+    # Check max members
+    current_count = db.query(OrgMember).filter(OrgMember.org_id == org_id).count()
+    if current_count >= org.max_members:
+        raise HTTPException(status_code=400, detail="Organization has reached maximum member capacity")
+    
+    # Find invited user
+    invited_user = db.query(User).filter(User.email == req.email).first()
+    if not invited_user:
+        raise HTTPException(status_code=404, detail="User with this email not found")
+    
+    # Check if already a member
+    existing = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == invited_user.id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User is already a member of this organization")
+    
+    # Generate invite token (simple random string; stored in a real system would be a separate table)
+    invite_token = secrets.token_urlsafe(32)
+    
+    # For simplicity, store the invite token on the membership record once joined;
+    # Here we return the token directly. In production, email the link.
+    # Store pending invite in user settings or a separate table — for now we return it directly.
+    
+    return {
+        "invite_token": invite_token,
+        "org_name": org.name,
+        "invited_email": req.email,
+        "message": f"Invite sent to {req.email}. Share the token with them to join.",
+    }
+
+
+@app.post("/api/orgs/{org_id}/join")
+@limiter.limit("10/minute")
+def join_org(org_id: int, req: JoinOrgRequest, request: Request,
+             user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Accept an invite and join the organization."""
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Verify token (in production, validate against stored tokens)
+    if not req.token or len(req.token) < 10:
+        raise HTTPException(status_code=400, detail="Invalid invite token")
+    
+    # Check if already a member
+    existing = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="You are already a member of this organization")
+    
+    # Check max members
+    current_count = db.query(OrgMember).filter(OrgMember.org_id == org_id).count()
+    if current_count >= org.max_members:
+        raise HTTPException(status_code=400, detail="Organization has reached maximum member capacity")
+    
+    member = OrgMember(org_id=org_id, user_id=user.id, role="member")
+    db.add(member)
+    db.commit()
+    
+    return {"status": "joined", "org_id": org_id, "org_name": org.name}
+
+
+@app.put("/api/orgs/{org_id}/members/{member_id}/role")
+@limiter.limit("10/minute")
+def change_member_role(org_id: int, member_id: int, req: ChangeRoleRequest, request: Request,
+                       user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Change a member's role (owner only)."""
+    if req.role not in ("admin", "member"):
+        raise HTTPException(status_code=400, detail="Role must be 'admin' or 'member'")
+    
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Only owner can change roles
+    membership = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if not membership or membership.role != "owner":
+        raise HTTPException(status_code=403, detail="Only the owner can change member roles")
+    
+    target = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == member_id
+    ).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="Member not found in this organization")
+    
+    if target.role == "owner":
+        raise HTTPException(status_code=400, detail="Cannot change the owner's role")
+    
+    target.role = req.role
+    db.commit()
+    
+    return {"status": "updated", "user_id": member_id, "new_role": req.role}
+
+
+@app.delete("/api/orgs/{org_id}/members/{member_id}")
+@limiter.limit("10/minute")
+def remove_member(org_id: int, member_id: int, request: Request,
+                  user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Remove a member from the organization (owner or admin only)."""
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Check permission
+    membership = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if not membership or membership.role not in ("owner", "admin"):
+        raise HTTPException(status_code=403, detail="Only owner or admin can remove members")
+    
+    # Admins cannot remove other admins or the owner
+    target = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == member_id
+    ).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    if target.role == "owner":
+        raise HTTPException(status_code=400, detail="Cannot remove the owner")
+    if membership.role == "admin" and target.role == "admin":
+        raise HTTPException(status_code=403, detail="Admins cannot remove other admins")
+    
+    db.delete(target)
+    db.commit()
+    
+    return {"status": "removed", "user_id": member_id}
+
+
+@app.get("/api/orgs/{org_id}/usage")
+@limiter.limit("30/minute")
+def get_org_usage(org_id: int, request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get aggregated org usage stats."""
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Verify user is a member
+    membership = db.query(OrgMember).filter(
+        OrgMember.org_id == org_id, OrgMember.user_id == user.id
+    ).first()
+    if not membership:
+        raise HTTPException(status_code=403, detail="You are not a member of this organization")
+    
+    # Get all member IDs
+    member_ids = [m.user_id for m in db.query(OrgMember).filter(OrgMember.org_id == org_id).all()]
+    
+    if not member_ids:
+        return {
+            "total_members": 0,
+            "total_tokens_used": 0,
+            "total_transactions": 0,
+            "total_spent": 0.0,
+            "member_breakdown": [],
+        }
+    
+    # Aggregate stats
+    total_tokens_used = db.query(func.sum(Transaction.tokens)).filter(
+        Transaction.user_id.in_(member_ids),
+        Transaction.type == "consumption",
+    ).scalar() or 0
+    
+    total_transactions = db.query(Transaction).filter(
+        Transaction.user_id.in_(member_ids)
+    ).count()
+    
+    total_spent = db.query(func.sum(Transaction.amount)).filter(
+        Transaction.user_id.in_(member_ids),
+        Transaction.type == "deposit",
+    ).scalar() or 0.0
+    
+    # Per-member breakdown
+    member_breakdown = []
+    for m_id in member_ids:
+        u = db.query(User).filter(User.id == m_id).first()
+        m = db.query(OrgMember).filter(
+            OrgMember.org_id == org_id, OrgMember.user_id == m_id
+        ).first()
+        tokens = db.query(func.sum(Transaction.tokens)).filter(
+            Transaction.user_id == m_id, Transaction.type == "consumption"
+        ).scalar() or 0
+        member_breakdown.append({
+            "user_id": m_id,
+            "name": u.name if u else "Unknown",
+            "role": m.role if m else "member",
+            "tokens_used": float(tokens),
+            "token_balance": u.token_balance if u else 0,
+        })
+    
+    return {
+        "org_id": org_id,
+        "org_name": org.name,
+        "total_members": len(member_ids),
+        "total_tokens_used": float(total_tokens_used),
+        "total_transactions": total_transactions,
+        "total_spent": float(total_spent),
+        "member_breakdown": member_breakdown,
+    }
+
+
 # ── Admin Endpoints ──
-@app.get("/api/admin/users")
 def admin_list_users(page: int = 1, per_page: int = 20, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
