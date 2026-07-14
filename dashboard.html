@@ -14,10 +14,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=201" />
+  <link rel="stylesheet" href="style.css?v=202" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   </head>
 <body>
+<script>
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  var tok = p.get('token');
+  if (tok) {
+    localStorage.setItem('gt_token', tok);
+    var u = p.get('user');
+    if (u) { try { localStorage.setItem('gt_user', decodeURIComponent(u)); } catch(e) {} }
+    var clean = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, clean);
+  }
+})();
+</script>
 <script>if(!localStorage.getItem('gt_token')){window.location.replace('login.html')}window.addEventListener('pageshow',function(e){if(e.persisted&&!localStorage.getItem('gt_token')){window.location.replace('login.html')}})</script>
 <div class="stars-bg"><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star white"></div><div class="star white"></div><div class="star white"></div><div class="star trail gold"></div><div class="star trail teal"></div><div class="star trail teal"></div><div class="star trail blue"></div><div class="star trail gold"></div></div>
 <nav class="navbar"><div class="container navbar-inner">
@@ -466,8 +479,8 @@
     </div>
   </div>
 
-<script src="translations.js?v=201"></script>
-<script data-cfasync="false" src="script.js?v=201"></script>
+<script src="translations.js?v=202"></script>
+<script data-cfasync="false" src="script.js?v=202"></script>
 
 <script>
 (function(){

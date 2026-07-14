@@ -272,6 +272,9 @@
           throw new Error(((errData&&errData.detail)||'API error').replace(/^\[?\d{3}\]?\s*/,''));
         }
         return await resp.json();
+      } catch(e) {
+        if (e.name === 'AbortError') throw new Error('Request timed out');
+        throw new Error('Network error. Check your connection.');
       } finally {
         if(timer) clearTimeout(timer);
       }

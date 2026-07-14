@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Redirecting — GlbTOKEN</title>
 <meta name="robots" content="noindex,nofollow" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://glbtoken-backend-production.up.railway.app; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://glbtoken-backend-production.up.railway.app; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
 <link rel="icon" type="image/x-icon" href="../favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
@@ -18,12 +18,48 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
 .card{background:#161822;border:1px solid #2a2b3d;border-radius:12px;padding:2rem;text-align:center;max-width:360px}
 .card p{margin-top:1rem;color:#7f8490;font-size:0.9rem}
 </style>
-<script src="../script.js?v=201"></script>
 </head>
 <body>
 <div class="card">
 <div class="spinner"></div>
 <p>Completing sign in...</p>
 </div>
+<script>
+(function() {
+  var API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000' : 'https://glbtoken-backend-production.up.railway.app';
+
+  var hash = window.location.hash;
+  if (!hash || hash.indexOf('id_token=') === -1) {
+    window.location.replace('login.html?error=no_auth_response');
+    return;
+  }
+
+  var params = new URLSearchParams(hash.substring(1));
+  var idToken = params.get('id_token');
+  var state = params.get('state');
+
+  if (!idToken) {
+    window.location.replace('login.html?error=no_id_token');
+    return;
+  }
+
+  // CSRF check: verify state against sessionStorage
+  if (state) {
+    var expectedState = sessionStorage.getItem('gt_auth0_state');
+    if (expectedState && state !== expectedState) {
+      window.location.replace('login.html?error=state_mismatch');
+      return;
+    }
+    sessionStorage.removeItem('gt_auth0_state');
+  }
+
+  // Clear hash from URL
+  history.replaceState(null, document.title, window.location.pathname + window.location.search);
+
+  // Redirect to Railway callback endpoint
+  window.location.replace(API_URL + '/api/auth/auth0/callback?id_token=' + encodeURIComponent(idToken));
+})();
+</script>
 </body>
 </html>

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=201" />
+  <link rel="stylesheet" href="style.css?v=202" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <style>
 /* Playground-specific styles */
@@ -190,7 +190,7 @@
       <div class="playground-history-item active" onclick="switchConversation(this)" data-id="1">
         <span class="conv-title">GPT-4o API integration</span>
         <span class="conv-date">Jun 14</span>
-        <button class="delete-conv" onclick="event.stopPropagation();deleteConversation(this)" title="Delete">
+        <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
           </svg>
@@ -199,7 +199,7 @@
       <div class="playground-history-item" onclick="switchConversation(this)" data-id="2">
         <span class="conv-title">Claude 3.5 Sonnet testing</span>
         <span class="conv-date">Jun 13</span>
-        <button class="delete-conv" onclick="event.stopPropagation();deleteConversation(this)" title="Delete">
+        <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
           </svg>
@@ -208,7 +208,7 @@
       <div class="playground-history-item" onclick="switchConversation(this)" data-id="3">
         <span class="conv-title">Code generation test</span>
         <span class="conv-date">Jun 12</span>
-        <button class="delete-conv" onclick="event.stopPropagation();deleteConversation(this)" title="Delete">
+        <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
           </svg>
@@ -217,7 +217,7 @@
       <div class="playground-history-item" onclick="switchConversation(this)" data-id="4">
         <span class="conv-title">Translation comparison</span>
         <span class="conv-date">Jun 10</span>
-        <button class="delete-conv" onclick="event.stopPropagation();deleteConversation(this)" title="Delete">
+        <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
           </svg>
@@ -337,8 +337,8 @@
     </div>
   </div>
 
-<script src="translations.js?v=201"></script>
-<script data-cfasync="false" src="script.js?v=201"></script>
+<script src="translations.js?v=202"></script>
+<script data-cfasync="false" src="script.js?v=202"></script>
 
 <script>
 // Playground chat functionality
@@ -358,7 +358,7 @@ function newConversation(){
   item.setAttribute('data-id', id);
   item.onclick = function(){ switchConversation(this); };
   item.innerHTML = '<span class="conv-title">New conversation</span><span class="conv-date">Today</span>'
-    + '<button class="delete-conv" onclick="event.stopPropagation();deleteConversation(this)" title="Delete">'
+    + '<button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">'
     + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
     + '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
   history.prepend(item);
@@ -374,7 +374,7 @@ function switchConversation(el){
   clearChat();
 }
 
-function deleteConversation(btn){
+function deleteConvItem(btn){
   if(confirm('Delete this conversation?')){
     var item = btn.closest('.playground-history-item');
     if(item){
