@@ -29,6 +29,7 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
   var API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:8000' : 'https://glbtoken-backend-production.up.railway.app';
 
+  // Parse Auth0 response from URL hash fragment
   var hash = window.location.hash;
   if (!hash || hash.indexOf('id_token=') === -1) {
     window.location.replace('login.html?error=no_auth_response');
@@ -37,6 +38,8 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
 
   var params = new URLSearchParams(hash.substring(1));
   var idToken = params.get('id_token');
+  // Also grab access_token if present (some providers send it)
+  var accessToken = params.get('access_token');
   var state = params.get('state');
 
   if (!idToken) {
@@ -57,7 +60,14 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
   // Clear hash from URL
   history.replaceState(null, document.title, window.location.pathname + window.location.search);
 
-  // Redirect to Railway callback endpoint
+  // ====== DUAL PATH REDUNDANCY ======
+  // Path A: Store id_token in sessionStorage as fallback (survives Railway redirect round-trip)
+  sessionStorage.setItem('gt_temp_token', idToken);
+  if (accessToken) sessionStorage.setItem('gt_temp_access_token', accessToken);
+  sessionStorage.setItem('gt_auth_pending', Date.now().toString());
+
+  // Path B: Redirect to Railway callback endpoint as PRIMARY path
+  // Railway validates token and redirects to dashboard.html?token=JWT
   window.location.replace(API_URL + '/api/auth/auth0/callback?id_token=' + encodeURIComponent(idToken));
 })();
 </script>
