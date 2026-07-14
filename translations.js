@@ -978,6 +978,25 @@ I18N_MIXED["read-more"] = {en: "Read more →", "zh-CN": "阅读更多 →", ru:
 I18N_MIXED["back-to-blog"] = {en: "← Back to Blog", "zh-CN": "← 返回博客", ru: "← Назад в блог", ja: "← ブログに戻る", de: "← Zurück zum Blog"};
 I18N_MIXED["share-label"] = {en: "Share:", "zh-CN": "分享：", ru: "Поделиться:", ja: "シェア：", de: "Teilen:"};
 
+// ── Auto-generated translations ──
+TRANS["Buy Tokens — GlbTOKEN"] = {en: "Buy Tokens — GlbTOKEN", "zh-CN": "购买代币", ru: "Купить токены", ja: "トークンを購入", de: "Tokens kaufen"};
+TRANS["Loading speed data..."] = {en: "Loading speed data...", "zh-CN": "正在加载速度数据...", ru: "Загрузка данных о скорости...", ja: "速度データを読み込み中...", de: "Geschwindigkeitsdaten werden geladen..."};
+TRANS["Showing 8 of 8 entries"] = {en: "Showing 8 of 8 entries", "zh-CN": "显示第 8 条，共 8 条", ru: "Показано 8 из 8 записей", ja: "8件中8件を表示", de: "Zeige 8 von 8 Einträgen"};
+TRANS["Usage by Model  All time"] = {en: "Usage by Model  All time", "zh-CN": "按模型查看用量", ru: "Использование по моделям", ja: "モデル別使用量", de: "Nutzung nach Modell"};
+TRANS["Your Models  via New API"] = {en: "Your Models  via New API", "zh-CN": "您的模型", ru: "Ваши модели", ja: "あなたのモデル", de: "Ihre Modelle"};
+TRANS["Loading response times..."] = {en: "Loading response times...", "zh-CN": "正在加载响应时间...", ru: "Загрузка времени ответа...", ja: "応答時間を読み込み中...", de: "Antwortzeiten werden geladen..."};
+TRANS["Hello,  User   Token usage overview"] = {en: "Hello,  User   Token usage overview", "zh-CN": "你好，", ru: "Здравствуйте, ", ja: "こんにちは、", de: "Hallo, "};
+TRANS["Available Balance   —   GT   $0.00 USD"] = {en: "Available Balance   —   GT   $0.00 USD", "zh-CN": "可用余额", ru: "Доступный баланс", ja: "利用可能残高", de: "Verfügbares Guthaben"};
+TRANS["Error Rate Monitoring  Track API errors"] = {en: "Error Rate Monitoring  Track API errors", "zh-CN": "错误率监控", ru: "Мониторинг ошибок", ja: "エラー率監視", de: "Fehlerraten-Überwachung"};
+TRANS["Connect New API to see available models."] = {en: "Connect New API to see available models.", "zh-CN": "连接 New API 以查看可用模型。", ru: "Подключите New API, чтобы увидеть доступные модели.", ja: "New APIに接続すると利用可能なモデルが表示されます。", de: "Verbinden Sie New API, um verfügbare Modelle anzuzeigen."};
+TRANS["Cost Breakdown by Model  Per-model spend"] = {en: "Cost Breakdown by Model  Per-model spend", "zh-CN": "按模型费用明细", ru: "Разбивка затрат по моделям", ja: "モデル別コスト明細", de: "Kostenaufschlüsselung nach Modell"};
+TRANS["Recent Transactions  Last 5   View all →"] = {en: "Recent Transactions  Last 5   View all →", "zh-CN": "最近交易", ru: "Последние транзакции", ja: "最近の取引", de: "Letzte Transaktionen"};
+TRANS["Response Time by Model  Speed indicators"] = {en: "Response Time by Model  Speed indicators", "zh-CN": "按模型响应时间", ru: "Время ответа по моделям", ja: "モデル別応答時間", de: "Antwortzeit nach Modell"};
+TRANS["Model Speed Comparison  Performance tiers"] = {en: "Model Speed Comparison  Performance tiers", "zh-CN": "模型速度对比", ru: "Сравнение скорости моделей", ja: "モデル速度比較", de: "Modellgeschwindigkeitsvergleich"};
+TRANS["Activity Timeline  0 events    Loading activity..."] = {en: "Activity Timeline  0 events    Loading activity...", "zh-CN": "活动时间线", ru: "Хронология активности", ja: "アクティビティタイムライン", de: "Aktivitätszeitstrahl"};
+TRANS["Buy Tokens  Top Up Wallet  Select a package or custom amount. $2 minimum."] = {en: "Buy Tokens  Top Up Wallet  Select a package or custom amount. $2 minimum.", "zh-CN": "购买代币", ru: "Купить токены", ja: "トークンを購入", de: "Tokens kaufen"};
+TRANS["Offline mode  — cached dashboard data so you can view your balance and recent transactions even without an internet connection"] = {en: "Offline mode  — cached dashboard data so you can view your balance and recent transactions even without an internet connection", "zh-CN": "离线", ru: "Офлайн", ja: "オフライン", de: "Offline"};
+
 (function() {
   var saved = localStorage.getItem('gt_lang');
   if (saved && saved !== 'en') {
