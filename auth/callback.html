@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Redirecting — GlbTOKEN</title>
 <meta name="robots" content="noindex,nofollow" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://glbtoken-backend-production.up.railway.app https://*.auth0.com; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://glbtoken-backend-production.up.railway.app https://glbtoken1.us.auth0.com; img-src 'self'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
 <link rel="icon" type="image/x-icon" href="../favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
@@ -29,13 +29,14 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
   var API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:8000' : 'https://glbtoken-backend-production.up.railway.app';
 
-  // ====== DETECT AUTH FLOW TYPE ======
-  // Auth0 can use either PKCE code flow (?code=xxx) or implicit flow (#id_token=xxx)
-  // We auto-detect and handle both.
+  // Hardcoded Auth0 config — no fetch to Railway needed
+  var AUTH0_DOMAIN = 'glbtoken1.us.auth0.com';
+  var AUTH0_CLIENT_ID = 'hJDPj23ouSgJrNzUY83EQbQzih8pamls';
 
+  // ====== DETECT AUTH FLOW TYPE ======
   var queryParams = new URLSearchParams(window.location.search);
   var hashParams = window.location.hash ? new URLSearchParams(window.location.hash.substring(1)) : null;
-  
+
   var code = queryParams.get('code');
   var idToken = hashParams ? hashParams.get('id_token') : null;
   var error = queryParams.get('error') || (hashParams ? hashParams.get('error') : null);
@@ -64,61 +65,33 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
       return;
     }
 
-    // Get Auth0 config from Railway with retry
-    var configAttempts = 0;
-    function fetchConfig() {
-      configAttempts++;
-      return fetch(API_URL + '/api/auth/auth0/config', {method:'GET', headers:{'Content-Type':'application/json'}})
-        .then(function(r) {
-          if (!r.ok) throw new Error('Config fetch failed (HTTP ' + r.status + ')');
-          return r.json();
-        })
-        .catch(function(e) {
-          if (configAttempts < 2) {
-            // Wait 2s and retry once
-            return new Promise(function(resolve) { setTimeout(resolve, 2000); }).then(fetchConfig);
-          }
-          throw e;
-        });
-    }
-    fetchConfig()
-    .then(function(cfg) {
-      if (!cfg.configured || !cfg.domain || !cfg.client_id) {
-        window.location.replace('/login.html?error=Auth0+not+configured');
-        return null;
-      }
-      return fetch('https://' + cfg.domain + '/oauth/token', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          client_id: cfg.client_id,
-          code: code,
-          code_verifier: codeVerifier,
-          redirect_uri: window.location.origin + '/auth/callback.html'
-        })
-      });
+    // Exchange code directly with Auth0 (no Railway fetch needed)
+    fetch('https://' + AUTH0_DOMAIN + '/oauth/token', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        grant_type: 'authorization_code',
+        client_id: AUTH0_CLIENT_ID,
+        code: code,
+        code_verifier: codeVerifier,
+        redirect_uri: window.location.origin + '/auth/callback.html'
+      })
     })
     .then(function(r) {
-      if (!r) return null;
       if (!r.ok) return r.json().then(function(e) { throw new Error(e.error_description || 'Token exchange failed'); });
       return r.json();
     })
     .then(function(tokens) {
-      if (!tokens || !tokens.id_token) return null;
-      return tokens.id_token;
-    })
-    .then(function(idToken) {
-      if (!idToken) return null;
+      if (!tokens || !tokens.id_token) throw new Error('No id_token in response');
+      // POST id_token to Railway for JWT exchange
       return fetch(API_URL + '/api/auth/auth0/login', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: idToken})
+        body: JSON.stringify({token: tokens.id_token})
       });
     })
     .then(function(r) {
-      if (!r) return;
-      if (!r.ok) return r.json().then(function(e) { throw new Error(e.detail || 'Login failed'); });
+      if (!r.ok) return r.json().then(function(e) { throw new Error(e.detail || 'Auth0 login failed'); });
       return r.json();
     })
     .then(function(data) {
@@ -126,7 +99,7 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
         localStorage.setItem('gt_token', data.token);
         if (data.user) localStorage.setItem('gt_user', JSON.stringify(data.user));
         window.location.replace(window.location.origin + '/dashboard.html');
-      } else if (data) {
+      } else {
         window.location.replace('/login.html?error=Invalid+server+response');
       }
     })
@@ -138,14 +111,11 @@ body{background:#0A0B14;color:#cdd6f4;font-family:Inter,-apple-system,sans-serif
 
   // ====== FLOW B: Implicit Flow (#id_token=xxx) ======
   if (idToken) {
-    // Clear hash from URL
     history.replaceState(null, document.title, window.location.pathname + window.location.search);
 
-    // Store id_token in sessionStorage for redundancy, POST to Railway directly
     sessionStorage.setItem('gt_temp_token', idToken);
     sessionStorage.setItem('gt_auth_pending', Date.now().toString());
 
-    // POST id_token to Railway to exchange for JWT
     fetch(API_URL + '/api/auth/auth0/login', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
