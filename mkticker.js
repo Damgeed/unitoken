@@ -1,30 +1,53 @@
-/* ── Ticker Data Updater (animation is pure CSS) ── */
+/* ── Ticker: KAIEX pattern — JS builds items, CSS animates ── */
 (function(){
+  var defaults = {
+    balance: {label:'Balance', val:'0 GT'},
+    spent:   {label:'Spent',   val:'$0.00'},
+    models:  {label:'Models',  val:'0'},
+    requests:{label:'API Calls', val:'0'},
+    keys:    {label:'Active Keys', val:'0'},
+    days:    {label:'Days Active', val:'0'},
+    consumed:{label:'Tokens Used', val:'0'},
+    status:  {label:'New API',  val:'● Standby'},
+  };
+  var keys = ['balance','spent','models','requests','keys','days','consumed','status'];
+
+  function buildItems(){
+    var inner = document.getElementById('tickerInner');
+    if (!inner) return;
+    var html = '';
+    // Double for seamless scroll loop
+    for (var r = 0; r < 2; r++) {
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var d = defaults[k];
+        html += '<span class="ticker-item" data-ticker="' + k + '">' +
+          '<span class="ticker-label">' + d.label + '</span>' +
+          '<span class="ticker-dot"></span>' +
+          '<span class="ticker-value">' + d.val + '</span>' +
+          '</span>';
+      }
+    }
+    inner.innerHTML = html;
+  }
+
+  buildItems();
+
+  /* ── Data updater ── */
   var tickerVals = {};
 
-  var defaults = {
-    balance: '0 GT',
-    spent: '$0.00',
-    models: '0',
-    requests: '0',
-    keys: '0',
-    days: '0',
-    consumed: '0',
-    status: 'Offline'
-  };
-
   function updateTicker(){
-    var bar = document.getElementById('tickerBar');
-    if (!bar) return;
-    var inner = bar.querySelector('.ticker-inner');
+    var inner = document.getElementById('tickerInner');
     if (!inner) return;
-    Array.from(inner.children).forEach(function(el){
+    var items = inner.querySelectorAll('.ticker-item');
+    for (var i = 0; i < items.length; i++) {
+      var el = items[i];
       var key = el.getAttribute('data-ticker');
-      if (!key) return;
-      var val = tickerVals[key] || defaults[key] || '—';
+      if (!key) continue;
+      var val = tickerVals[key] || defaults[key].val || '—';
       var vEl = el.querySelector('.ticker-value');
       if (vEl) vEl.textContent = val;
-    });
+    }
   }
 
   function refreshTickerData(){
