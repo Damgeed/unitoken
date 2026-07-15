@@ -227,6 +227,8 @@ body{background:var(--bg)}
   .billing-summary-grid{grid-template-columns:repeat(3,1fr);gap:0.4rem}
   .dash-section .dash-card[style*="margin-top"]{margin-top:0.75rem!important}
   .dash-section .dash-card[style*="margin-bottom"]{margin-bottom:0.75rem!important}
+  #section-apikeys .section-title{font-size:1.3rem!important}
+  #section-apikeys .section-label{font-size:0.65rem!important}
 }
 </style>
   </head>
@@ -764,10 +766,10 @@ function toggleDashSidebar() {
     <!-- ===== API KEYS SECTION ===== -->
     <div class="dash-section" id="section-apikeys">
 
-      <div style="text-align:center;margin-bottom:2.5rem">
+      <div style="text-align:center;margin-bottom:2rem">
         <span class="section-label">Developer</span>
-        <h2 class="section-title" style="font-size:2rem">API Documentation</h2>
-        <p style="color:var(--text-secondary);margin:0.5rem auto 0">OpenAI-compatible endpoint. One API key for 100+ models. Integrate in minutes.</p>
+        <h2 class="section-title" style="font-size:1.75rem">API Keys</h2>
+        <p style="color:var(--text-secondary);margin:0.5rem auto 0;font-size:0.9rem">Generate and manage your API keys for programmatic access.</p>
       </div>
 
       <!-- Key Management Card -->
@@ -1284,7 +1286,7 @@ function applyFilters(){
     <div class="dash-section" id="section-referral">
 
       <!-- Referral Hero -->
-      <div class="dash-header" style="margin-top:2rem">
+      <div class="dash-header">
         <div class="dash-welcome">
           <h1>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
