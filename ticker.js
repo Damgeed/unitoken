@@ -1,8 +1,36 @@
+/* ── Ticker: scrollLeft (no wrapper) ── */
+(function(){
+  var bar = document.getElementById('tickerBar');
+  if (!bar) return;
+
+  // Duplicate items for seamless loop
+  var items = Array.from(bar.children);
+  items.forEach(function(item) {
+    bar.appendChild(item.cloneNode(true));
+  });
+
+  var speed = 0.4; // px per frame (~24px/s at 60fps)
+
+  function tick() {
+    bar.scrollLeft += speed;
+
+    // Recycle: when first item is fully off-screen left, move it to end
+    var first = bar.children[0];
+    if (first && bar.scrollLeft >= first.offsetWidth) {
+      bar.scrollLeft -= first.offsetWidth;
+      bar.appendChild(first);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  tick();
+})();
+
 /* ── Ticker Data Updater ── */
 (function(){
   var tickerVals = {};
-  
-  // Default values before API loads
+
   var defaults = {
     balance: '0 GT',
     spent: '$0.00',
@@ -13,36 +41,34 @@
     consumed: '0',
     status: 'Offline'
   };
-  
-  // Update ticker items with current data
+
   function updateTicker(){
-    document.querySelectorAll('.ticker-item').forEach(function(el){
+    bar = document.getElementById('tickerBar');
+    if (!bar) return;
+    Array.from(bar.children).forEach(function(el){
       var key = el.getAttribute('data-ticker');
-      if(!key) return;
+      if (!key) return;
       var val = tickerVals[key] || defaults[key] || '—';
       var vEl = el.querySelector('.ticker-value');
-      if(vEl) vEl.textContent = val;
+      if (vEl) vEl.textContent = val;
     });
   }
-  
-  // Pull data from dashboard API or user data
+
   function refreshTickerData(){
     var token = localStorage.getItem('gt_token');
-    if(!token) return;
-    
-    // Update from userData if available
-    if(typeof userData !== 'undefined' && userData){
+    if (!token) return;
+
+    if (typeof userData !== 'undefined' && userData){
       tickerVals['balance'] = (userData.token_balance || 0) + ' GT';
       tickerVals['spent'] = '$' + (userData.total_spent || 0).toFixed(2);
       updateTicker();
     }
-    
-    // Also fetch dashboard data for richer info
+
     try {
       fetch('https://glbtoken-backend-production.up.railway.app/api/dashboard?days=1', {
         headers: {'Authorization': 'Bearer ' + token}
       }).then(function(r){ return r.json(); }).then(function(d){
-        if(d && !d.error){
+        if (d && !d.error){
           tickerVals['balance'] = (d.token_balance || 0) + ' GT';
           tickerVals['spent'] = '$' + (d.total_spent || 0).toFixed(2);
           tickerVals['models'] = d.models_used || 0;
@@ -55,13 +81,11 @@
         }
       }).catch(function(){});
     } catch(e){}
-    
-    // Refresh periodically
-    setTimeout(refreshTickerData, 30000); // every 30s
+
+    setTimeout(refreshTickerData, 30000);
   }
-  
-  // Init
-  if(document.readyState === 'loading'){
+
+  if (document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', refreshTickerData);
   } else {
     refreshTickerData();
