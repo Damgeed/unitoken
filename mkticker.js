@@ -3,7 +3,7 @@
   var bar = document.getElementById('tickerBar');
   if (!bar) return;
 
-  var speed = 0.2; // px per frame
+  var speed = 0.1; // px per frame (slower on desktop)
 
   function tick() {
     bar.scrollLeft += speed;
