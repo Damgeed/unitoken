@@ -293,6 +293,9 @@ function showDashSection(section) {
   // Scroll section content to top
   var content = document.querySelector('.dash-content');
   if(content) content.scrollTop = 0;
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 }
 // Auto-open section from URL hash on page load
 (function() {
