@@ -25,7 +25,7 @@
   transition: background 0.3s, border-color 0.3s;
 }
 
-/* Edge fade overlays — theme-aware, stay fixed, don't move with content */
+/* Edge fade overlays — theme-aware, stay fixed */
 .ticker-bar::before,
 .ticker-bar::after {
   content: '';
@@ -52,7 +52,6 @@
   display: flex;
   gap: 0;
   white-space: nowrap;
-  animation: tickerScroll 50s linear infinite;
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -119,11 +118,6 @@
 @keyframes tickerPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.15); }
-}
-
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 
 /* Mobile */
