@@ -23,7 +23,6 @@
 .ticker-item .ticker-down{color:var(--destructive,#FF6B6B)}
 .ticker-item .ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--primary);display:inline-block;margin:0 2px;opacity:0.5}
 @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.ticker-sep{color:color-mix(in srgb, var(--primary) 30%, transparent);font-size:0.7rem;padding:0 4px}
 @media(max-width:768px){
   .ticker-bar{height:26px}
   .ticker-item{font-size:0.65rem;padding:0 10px;gap:4px}
