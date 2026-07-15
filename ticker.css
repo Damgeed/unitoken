@@ -1,4 +1,4 @@
-/* ── Market Ticker ── */
+/* ── Wall Street Ticker ── */
 
 /* Site header: sticky container for nav + ticker */
 .site-header {
@@ -13,15 +13,15 @@
   top: auto !important;
 }
 
-.ticker-bar{width:100%;background:#131722;border-bottom:1px solid #2a2e39;overflow:hidden;height:32px;display:flex;align-items:center;z-index:49}
+.ticker-bar{width:100%;background:var(--card);border-bottom:1px solid var(--border);overflow:hidden;height:32px;display:flex;align-items:center;z-index:49}
 .ticker-track{display:flex;gap:0;white-space:nowrap;animation:tickerScroll 40s linear infinite;will-change:transform}
 .ticker-track:hover{animation-play-state:paused}
-.ticker-item{display:inline-flex;align-items:center;gap:6px;padding:0 24px;font-size:0.78rem;font-weight:500;color:#e0e3eb;border-right:1px solid #2a2e39;height:32px;flex-shrink:0}
-.ticker-item .ticker-label{color:#787b86;font-weight:400;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.5px}
-.ticker-item .ticker-value{color:#ffffff;font-weight:600;font-variant-numeric:tabular-nums}
-.ticker-item .ticker-up{color:#26a69a}
-.ticker-item .ticker-down{color:#ef5350}
-.ticker-item .ticker-dot{width:4px;height:4px;border-radius:50%;background:#26a69a;display:inline-block;margin:0 2px;opacity:0.8}
+.ticker-item{display:inline-flex;align-items:center;gap:6px;padding:0 24px;font-size:0.78rem;font-weight:500;color:var(--text);border-right:1px solid var(--border);height:32px;flex-shrink:0}
+.ticker-item .ticker-label{color:var(--text-muted);font-weight:400}
+.ticker-item .ticker-value{color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums}
+.ticker-item .ticker-up{color:var(--success,#00D68F)}
+.ticker-item .ticker-down{color:var(--destructive,#FF6B6B)}
+.ticker-item .ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--primary);display:inline-block;margin:0 2px;opacity:0.5}
 @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @media(max-width:768px){
   .ticker-bar{height:26px}
