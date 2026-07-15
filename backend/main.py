@@ -1180,7 +1180,11 @@ async def get_dashboard(
         # Calculate active days from registration
         days_active = 0
         if user.created_at:
-            days_active = (datetime.now(timezone.utc) - user.created_at).days or 1
+            created = user.created_at
+            if hasattr(created, 'tzinfo') and created.tzinfo is None:
+                from datetime import timezone as tz2
+                created = created.replace(tzinfo=tz2.utc)
+            days_active = (datetime.now(timezone.utc) - created).days or 1
         
         # Total consumption from local DB (fallback when New API not connected)
         total_consumption = db.query(func.sum(Transaction.tokens)).filter(
