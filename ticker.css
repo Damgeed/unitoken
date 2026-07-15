@@ -2,40 +2,37 @@
 .ticker-bar {
   width: 100%;
   height: 38px;
-  background: linear-gradient(90deg, 
+  position: sticky;
+  top: 64px;
+  z-index: 49;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg,
     color-mix(in srgb, var(--card) 97%, var(--primary)) 0%,
-    var(--card) 3%, 
+    var(--card) 3%,
     var(--card) 97%,
     color-mix(in srgb, var(--card) 97%, var(--primary)) 100%
   );
   border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   border-top: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 64px;
-  z-index: 49;
   transition: background 0.4s, border-color 0.4s;
-  /* Edge fade mask — Bloomberg style gradient fade on both sides */
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 2%, #000 98%, transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 2%, #000 98%, transparent 100%);
+  /* Edge fade — stable, doesn't move with content */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 2.5%, #000 97.5%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 2.5%, #000 97.5%, transparent 100%);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
+  -webkit-mask-composite: add;
+  mask-composite: add;
 }
 
 .ticker-track {
   display: flex;
   gap: 0;
   white-space: nowrap;
-  animation: tickerScroll 60s linear infinite;
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
 }
 
 .ticker-item {
@@ -109,17 +106,12 @@
 
 .ticker-status-dot.standby {
   background: var(--text-muted);
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 @keyframes tickerPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.15); }
-}
-
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 
 /* Mobile responsive */
@@ -135,17 +127,15 @@
     height: 32px;
     font-size: 0.7rem;
   }
-  .ticker-label {
-    font-size: 0.6rem;
-  }
-  .ticker-value {
-    font-size: 0.72rem;
-  }
+  .ticker-label { font-size: 0.6rem; }
+  .ticker-value { font-size: 0.72rem; }
 }
 
 @media (max-width: 480px) {
   .ticker-bar {
     height: 28px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 2%, #000 4%, #000 96%, transparent 98%);
+    mask-image: linear-gradient(90deg, transparent 2%, #000 4%, #000 96%, transparent 98%);
   }
   .ticker-item {
     padding: 0 10px;
@@ -157,11 +147,6 @@
     font-size: 0.55rem;
     letter-spacing: 0.04em;
   }
-  .ticker-value {
-    font-size: 0.68rem;
-  }
-  .ticker-status-dot {
-    width: 5px;
-    height: 5px;
-  }
+  .ticker-value { font-size: 0.68rem; }
+  .ticker-status-dot { width: 5px; height: 5px; }
 }
