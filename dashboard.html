@@ -309,6 +309,7 @@ function showDashSection(section) {
   if (hash && document.getElementById('section-' + hash)) {
     showDashSection(hash);
   }
+  initBackToTop();
 })();
 function toggleDashSidebar() {
   var sb = document.getElementById('dashSidebar');
