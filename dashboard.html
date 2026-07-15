@@ -282,9 +282,18 @@ function showDashSection(section) {
 })();
 function toggleDashSidebar() {
   var sb = document.getElementById('dashSidebar');
-  sb.classList.toggle('open');
   var toggle = document.getElementById('dashSidebarToggle');
-  if(toggle) toggle.classList.toggle('hidden', sb.classList.contains('open'));
+  if(window.innerWidth < 768){
+    // Mobile: use open class
+    sb.classList.toggle('open');
+    if(toggle) toggle.classList.toggle('hidden', sb.classList.contains('open'));
+  } else {
+    // Desktop: use collapsed class
+    sb.classList.toggle('collapsed');
+    var content = document.querySelector('.dash-content');
+    if(content) content.style.marginLeft = sb.classList.contains('collapsed') ? '0' : '240px';
+    if(toggle) toggle.classList.toggle('hidden', !sb.classList.contains('collapsed'));
+  }
 }
 // Drag gesture: swipe from left edge to open, tap outside to close
 (function(){
