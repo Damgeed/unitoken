@@ -1,20 +1,31 @@
+/* ── Site Header: sticky container for nav + ticker ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Nav inside header — header handles sticky positioning */
+.site-header > .navbar {
+  position: relative;
+  top: 0;
+  z-index: auto;
+}
+
 /* ── Premium Seamless Ticker ── */
 .ticker-bar {
   width: 100%;
   height: 34px;
-  position: sticky;
-  top: 64px;
-  z-index: 49;
+  position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   background: var(--card);
   border-bottom: 1px solid var(--border);
-  border-top: 1px solid var(--border);
   transition: background 0.3s, border-color 0.3s;
 }
 
-/* Edge fade overlays — theme-aware, don't move with content */
+/* Edge fade overlays — theme-aware, stay fixed, don't move with content */
 .ticker-bar::before,
 .ticker-bar::after {
   content: '';
@@ -44,10 +55,6 @@
   animation: tickerScroll 50s linear infinite;
   will-change: transform;
   backface-visibility: hidden;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
 }
 
 .ticker-item {
