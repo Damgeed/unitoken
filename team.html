@@ -2,9 +2,9 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, " />
   <title>Team — GlbTOKEN</title>
-  <meta name="description" content="Manage your organization and team members on GlbTOKEN." />
+  <meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
   <meta name="theme-color" content="#0A0B14" id="metaTheme" />
 <link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -14,21 +14,343 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=261" />
+  <link rel="stylesheet" href="style.css?v=277" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<style>
+/* ── Billing page extras ── */
+.billing-grid{display:grid;gap:1.25rem;margin-top:1.25rem}
+@media(min-width:768px){.billing-grid{grid-template-columns:1fr 1fr}}
+.billing-summary-grid{display:grid;gap:0.75rem;grid-template-columns:1fr}
+@media(min-width:480px){.billing-summary-grid{grid-template-columns:repeat(3,1fr)}}
+.billing-stat-card{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;text-align:center}
+.billing-stat-card .num{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.billing-stat-card .lbl{font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem}
+.billing-stat-card .icon{display:flex;align-items:center;justify-content:center;height:2rem;margin-bottom:0.35rem}
+.billing-empty-state{text-align:center;padding:2rem 1rem;color:var(--text-muted)}
+.billing-empty-state .empty-icon{font-size:2.5rem;margin-bottom:0.5rem;opacity:0.5}
+.billing-empty-state p{font-size:0.85rem;margin:0.25rem 0}
+.payment-card{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--bg-alt);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.payment-card .card-icon{font-size:1.5rem;flex-shrink:0}
+.payment-card .card-info{flex:1}
+.payment-card .card-info .name{font-weight:600;font-size:0.85rem}
+.payment-card .card-info .meta{font-size:0.75rem;color:var(--text-muted)}
+.payment-card .badge{font-size:0.7rem;padding:0.15rem 0.5rem;background:var(--primary-subtle);border-radius:4px;color:var(--primary);font-weight:500;margin-left:auto;flex-shrink:0}
+.status-badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:4px;font-weight:500}
+.status-paid{background:var(--success-subtle,rgba(0,214,143,0.12));color:var(--success,#00D68F)}
+.status-pending{background:rgba(255,183,0,0.12);color:#FFB700}
+.status-failed{background:rgba(255,77,79,0.12);color:#FF4D4F}
+.status-refunded{background:rgba(114,46,209,0.12);color:#722ED1}
+.receipt-link{color:var(--primary);text-decoration:none;font-size:0.8rem;font-weight:500}
+.receipt-link:hover{text-decoration:underline}
+@media(max-width:767px){
+  .billing-page-header h2{font-size:1.4rem}
+  .payment-card{-ms-flex-wrap:wrap;flex-wrap:wrap}
+  .tx-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tx-table-wrap table{min-width:600px}
+  .billing-grid .dash-card{width:100%;max-width:100%;box-sizing:border-box;overflow:hidden}
+  .billing-stat-card{padding:0.75rem 0.5rem}
+  .billing-stat-card .num{font-size:1rem}
+  #billingSummaryCard .dash-section-title{font-size:0.9rem}
+  .billing-empty-state{padding:1.5rem 0.75rem}
+  .billing-grid{gap:0.75rem;margin-top:0.75rem}
+  .dash-section-title{font-size:0.85rem}
+  .tx-table{font-size:0.75rem}
+  .tx-table th,.tx-table td{padding:0.4rem 0.3rem}
+}
+/* Playground-specific styles */
+.playground-page{display:flex;height:calc(100vh - 112px);position:relative;background:var(--bg);overflow:hidden}
+.playground-sidebar{width:280px;min-width:280px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.playground-main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.playground-new-btn{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;margin:0.75rem;border-radius:8px;background:var(--primary);color:#0A0B14;font-weight:600;font-size:0.85rem;cursor:pointer;border:none;transition:opacity 0.2s}
+.playground-new-btn:hover{opacity:0.9}
+.playground-history{flex:1;overflow-y:auto;padding:0.5rem 0.75rem}
+.playground-history-item{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 0.75rem;border-radius:8px;cursor:pointer;transition:background 0.2s;font-size:0.82rem;color:var(--text);position:relative}
+.playground-history-item:hover{background:var(--bg-alt)}
+.playground-history-item.active{background:var(--bg-alt);border-left:3px solid var(--primary)}
+.playground-history-item .delete-conv{position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);opacity:0;background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0.25rem;border-radius:4px;transition:all 0.2s}
+.playground-history-item:hover .delete-conv{opacity:1}
+.playground-history-item .delete-conv:hover{background:rgba(255,107,107,0.15);color:#FF6B6B}
+.playground-history-item .conv-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.playground-history-item .conv-date{font-size:0.7rem;color:var(--text-muted);white-space:nowrap}
+.playground-chat{flex:1;overflow-y:auto;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem}
+.playground-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:2rem}
+.playground-empty svg{margin-bottom:1.5rem;opacity:0.3}
+.playground-empty h2{margin:0 0 0.5rem;font-size:1.25rem;color:var(--text)}
+.playground-empty p{margin:0 0 1.5rem;font-size:0.9rem;color:var(--text-muted);max-width:400px}
+.playground-suggestions{display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;max-width:500px}
+.playground-suggestion{background:var(--bg-alt);border:1px solid var(--border);border-radius:20px;padding:0.5rem 1rem;font-size:0.82rem;color:var(--text-muted);cursor:pointer;transition:all 0.2s}
+.playground-suggestion:hover{background:var(--card);border-color:var(--primary);color:var(--text)}
+.playground-msg{display:flex;gap:0.75rem;max-width:85%;animation:fadeIn 0.3s ease}
+.playground-msg.user{flex-direction:row-reverse;align-self:flex-end}
+.playground-msg.ai{flex-direction:row;align-self:flex-start}
+.playground-msg .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.playground-msg.user .avatar{background:linear-gradient(135deg,#F4B400,#FF6B6B);color:#fff}
+.playground-msg.ai .avatar{background:linear-gradient(135deg,#4FC3F7,#00D68F);color:#fff}
+.playground-msg .bubble-group{display:flex;flex-direction:column;gap:0.25rem}
+.playground-msg.user .bubble-group{align-items:flex-end}
+.playground-msg.ai .bubble-group{align-items:flex-start}
+.playground-msg .bubble{padding:0.75rem 1rem;border-radius:12px;font-size:0.88rem;line-height:1.5;word-wrap:break-word;white-space:pre-wrap}
+.playground-msg.user .bubble{background:var(--primary);color:#0A0B14;border-bottom-right-radius:4px}
+.playground-msg.ai .bubble{background:var(--bg-alt);border:1px solid var(--border);border-bottom-left-radius:4px}
+.playground-msg .msg-meta{display:flex;gap:0.5rem;font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem}
+.playground-msg.user .msg-meta{justify-content:flex-end}
+.playground-msg.ai .msg-meta{justify-content:flex-start}
+.playground-msg .model-badge{background:rgba(79,195,247,0.15);color:#4FC3F7;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.7rem}
+.playground-input-area{border-top:1px solid var(--border);padding:1rem 2rem;background:var(--card)}
+.playground-input-row{display:flex;gap:0.5rem;align-items:flex-end;max-width:900px;margin:0 auto}
+.playground-input-row textarea{flex:1;padding:0.75rem 1rem;border-radius:12px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.88rem;resize:none;min-height:48px;max-height:150px;font-family:inherit;line-height:1.4}
+.playground-input-row textarea:focus{outline:none;border-color:var(--primary)}
+.playground-send-btn{width:48px;height:48px;border-radius:12px;background:var(--primary);color:#0A0B14;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.2s;flex-shrink:0}
+.playground-send-btn:hover{opacity:0.9}
+.playground-send-btn:disabled{opacity:0.4;cursor:not-allowed}
+.playground-toolbar{display:flex;gap:0.5rem;align-items:center;max-width:900px;margin:0.75rem auto 0;padding-top:0.5rem;border-top:1px solid var(--border)}
+.playground-model-select{padding:0.35rem 0.6rem;border-radius:6px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem;max-width:220px}
+.playground-params-toggle{background:none;border:1px solid var(--border);border-radius:6px;padding:0.35rem 0.6rem;font-size:0.78rem;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;gap:0.3rem;white-space:nowrap}
+.playground-params-toggle:hover{background:var(--bg-alt);color:var(--text)}
+.playground-params-panel{max-width:900px;margin:0.75rem auto 0;background:var(--bg-alt);border:1px solid var(--border);border-radius:12px;padding:1rem;display:none;flex-wrap:wrap;gap:1rem}
+.playground-params-panel.open{display:flex}
+.playground-param{display:flex;flex-direction:column;gap:0.25rem;min-width:160px;flex:1}
+.playground-param label{font-size:0.75rem;color:var(--text-muted)}
+.playground-param input[type="range"]{width:100%;accent-color:var(--primary);height:4px;cursor:pointer}
+.playground-param .param-value{font-size:0.85rem;color:var(--text);font-weight:500}
+.playground-param input[type="number"]{padding:0.3rem 0.5rem;border-radius:4px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:0.8rem;width:80px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.playground-typing .bubble::after{content:'...';animation:typing 1.5s infinite}
+@keyframes typing{0%,100%{opacity:0.3}50%{opacity:1}}
+.playground-sidebar-toggle{display:none;background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0.25rem}
+@media(max-width:768px){
+  .playground-sidebar{display:none;position:absolute;z-index:10;height:100%;width:260px;min-width:260px}
+  .playground-sidebar.open{display:flex}
+  .playground-chat{padding:1rem}
+  .playground-msg{max-width:95%}
+  .playground-input-area{padding:0.75rem 1rem}
+  .playground-params-panel{flex-direction:column}
+  .playground-main{height:100%}
+  .sidebar-mobile-toggle{display:flex!important}
+}
+.sidebar-mobile-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:0.5rem;margin-right:0.5rem;align-items:center;justify-content:center}
+
+/* ── Professional Dashboard Styling ── */
+body{background:var(--bg)}
+.dash-content{background:var(--bg)}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.75rem}
+.dash-welcome h1{font-size:1.5rem;font-weight:700;margin:0 0 0.2rem;letter-spacing:-0.02em}
+.dash-welcome p{font-size:0.85rem;color:var(--text-muted);margin:0}
+.dash-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:1.25rem;margin-bottom:0}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr}}
+#section-referral .dash-grid{grid-template-columns:repeat(4,1fr)}
+#section-team .dash-grid{grid-template-columns:repeat(4,1fr)}
+/* Standardised vertical spacing — all section children except header get 1.25rem gap */
+.dash-section > .dash-card,
+.dash-section > .dash-grid,
+.dash-section > .settings-grid,
+.dash-section > .billing-grid{margin-bottom:1.25rem}
+.dash-section > :last-child{margin-bottom:0}
+.dash-section > .dash-header{margin-bottom:0}
+.dash-balance{background:linear-gradient(135deg,hsla(44 96% 52% / 0.18) 0%,hsla(44 96% 52% / 0.04) 100%);border:1px solid hsla(44 96% 52% / 0.25);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden}
+.dash-balance::before{content:'';position:absolute;top:-50%;right:-50%;width:100%;height:100%;background:radial-gradient(circle,rgba(244,180,0,0.08),transparent 70%);pointer-events:none}
+.dash-balance .top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.dash-balance .label{font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:500}
+.dash-balance .amount{font-size:2rem;font-weight:800;margin:0.35rem 0 0.15rem;letter-spacing:-0.03em}
+.dash-balance .amount small{font-size:0.9rem;font-weight:600;color:var(--primary);margin-left:0.3rem}
+.dash-balance .usd-equiv{font-size:0.85rem;color:var(--text-muted)}
+.dash-balance .mini-chart{opacity:0.6}
+.dash-balance .actions{display:flex;gap:0.625rem;margin-top:3rem;position:relative;z-index:1}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+@media(min-width:600px){.dash-stats{grid-template-columns:repeat(3,1fr)}}
+.dash-stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;transition:all 0.2s;position:relative;overflow:hidden}
+.dash-stat-card:hover{border-color:color-mix(in srgb,var(--border) 60%,var(--primary));transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.dash-stat-card .num{font-size:1.35rem;font-weight:700;margin-bottom:0.2rem}
+.dash-stat-card .lbl{font-size:0.75rem;color:var(--text-muted);font-weight:500}
+.dash-stat-card .chg{font-size:0.7rem;font-weight:500;margin-top:0.4rem}
+.dash-stat-card .chg.up{color:var(--success)}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;transition:all 0.2s}
+.dash-card:hover{border-color:color-mix(in srgb,var(--border) 70%,var(--primary));box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+/* Logs grid: 2x2 for admin cards */
+.logs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:768px){.logs-grid{grid-template-columns:1fr;gap:0.75rem}}
+.dash-section-title{font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;color:var(--text);letter-spacing:-0.01em}
+.dash-section-title svg{flex-shrink:0}
+.section-title{font-size:1.75rem;font-weight:700;margin:0 0 0.25rem;letter-spacing:-0.02em}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;margin-top:0}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:0.85rem;font-weight:500;margin-bottom:0.1rem}
+.toggle-desc{font-size:0.75rem;color:var(--text-muted)}
+.toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--bg-alt);border:1px solid var(--border);border-radius:12px;transition:0.3s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:2px;bottom:2px;background:var(--text-muted);border-radius:50%;transition:0.3s}
+.toggle-switch input:checked+.toggle-slider{background:var(--primary);border-color:var(--primary)}
+.toggle-switch input:checked+.toggle-slider::before{background:#0A0B14;transform:translateX(20px)}
+.notif-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+@media(max-width:768px){.notif-grid{grid-template-columns:1fr;gap:0.5rem}}
+.notif-item{transition:all 0.2s}
+.notif-item:hover{background:var(--bg-alt)!important}
+.chart-container{height:220px;position:relative;margin-top:0.5rem}
+.sort-btn{padding:0.4rem 0.75rem;border-radius:6px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem;cursor:pointer;transition:all 0.2s;font-weight:500}
+.sort-btn:hover{background:var(--card);border-color:var(--primary);color:var(--primary)}
+.sort-btn.active{background:var(--primary);color:#0A0B14;border-color:var(--primary);font-weight:600}
+.tx-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.tx-table th{padding:0.6rem 0.5rem;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)}
+.tx-table td{padding:0.6rem 0.5rem;border-bottom:1px solid var(--border);color:var(--text)}
+.tx-table tr:last-child td{border-bottom:none}
+.tx-table tr:hover td{background:var(--bg-alt)}
+.dash-activity{display:flex;flex-direction:column;gap:0.5rem}
+.dash-activity .activity-item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:var(--radius-sm);transition:background 0.2s;font-size:0.82rem}
+.dash-activity .activity-item:hover{background:var(--bg-alt)}
+.dash-activity .activity-item .act-time{font-size:0.72rem;color:var(--text-muted);margin-left:auto;white-space:nowrap}
+
+/* Mobile responsive */
+@media(max-width:768px){
+  .dash-sidebar{width:280px;min-width:280px;position:fixed;left:-300px;top:0;z-index:100;transition:left 0.3s;height:100vh;margin-left:0;border-radius:0 12px 12px 0;box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+  .dash-sidebar.open{left:0}
+  .dash-sidebar.open+.dash-sidebar-backdrop{display:block}
+  .dash-sidebar-backdrop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99;backdrop-filter:blur(2px)}
+  .dash-sidebar-toggle{display:flex;position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:50;width:32px;height:40px;border-radius:0 20px 20px 0;border:2px solid var(--primary);border-left:none;background:var(--card);color:var(--primary);cursor:pointer;align-items:center;justify-content:center;box-shadow:3px 0 12px rgba(244,180,0,0.12);transition:all 0.25s;opacity:1;pointer-events:auto}
+  .dash-content{padding:0.5rem;margin-left:0}
+  .dash-header{flex-direction:row;text-align:left;gap:0.35rem;margin-bottom:0.75rem}
+  .dash-welcome h1{font-size:1.2rem}
+  .dash-welcome p{font-size:0.72rem}
+  .dash-balance{padding:0.75rem}
+  .dash-balance .amount{font-size:1.35rem}
+  .dash-balance .mini-chart{display:none}
+  .dash-balance .actions{gap:0.35rem;margin-top:0.75rem}
+  .dash-balance .actions button{font-size:0.72rem;padding:0.4rem 0.75rem!important}
+  .dash-stats{grid-template-columns:repeat(3,1fr);gap:0.4rem}
+  .dash-stat-card{padding:0.5rem 0.4rem}
+  .dash-stat-card .num{font-size:0.95rem}
+  .dash-stat-card .lbl{font-size:0.62rem}
+  .dash-stat-card .chg{font-size:0.6rem;margin-top:0.2rem}
+  .dash-card{padding:0.75rem}
+  .dash-section-title{font-size:0.82rem;margin-bottom:0.6rem}
+  .dash-grid{gap:0.5rem;margin:0}
+  .settings-grid{grid-template-columns:1fr;gap:0.5rem}
+  .billing-grid{gap:0.5rem;margin:0;grid-template-columns:1fr}
+  .tx-table{font-size:0.7rem}
+  .tx-table th,.tx-table td{padding:0.3rem 0.25rem}
+  .chart-container{height:120px}
+  .dash-header .btn-primary,.dash-header .btn-secondary{font-size:0.72rem;padding:0.35rem 0.6rem}
+  .billing-stat-card{padding:0.5rem 0.35rem}
+  .billing-stat-card .num{font-size:0.9rem}
+  .billing-summary-grid{grid-template-columns:repeat(3,1fr);gap:0.4rem}
+  /* Hide country codes on mobile (flags suffice) */
+  .loc-country{display:none}
+  .status-text{display:none}
+  .ip-col{display:none}
+  .loc-city{display:inline}
+  /* Mobile standardised vertical spacing */
+  .dash-section > .dash-card,
+  .dash-section > .dash-grid,
+  .dash-section > .settings-grid,
+  .dash-section > .billing-grid{margin-bottom:0.75rem}
+  #section-referral .dash-grid{grid-template-columns:1fr 1fr!important;gap:0.4rem;overflow-x:auto}
+  #referral-share-charts{grid-template-columns:1fr 1fr!important;gap:1rem}
+  #referral-share-charts>.dash-card:first-child{grid-column:1/-1}
+  #section-referral .dash-stat-card{padding:0.5rem 0.35rem;white-space:nowrap;overflow-x:auto}
+  #section-referral .dash-stat-card .num{font-size:0.9rem}
+  #section-referral .dash-stat-card .lbl{font-size:0.62rem}
+  #section-referral .dash-stat-card .chg{font-size:0.6rem}
+  #section-team .dash-grid{grid-template-columns:1fr 1fr!important;gap:0.4rem;overflow-x:auto}
+}
+/* ── Make section-team visible by default ── */
+#section-team { display: block; }
+</style>
   </head>
 <body>
-<script>if(!localStorage.getItem('gt_token')){window.location.replace('login.html')}window.addEventListener('pageshow',function(e){if(e.persisted&&!localStorage.getItem('gt_token')){window.location.replace('login.html')}})</script>
+<script>
+(function() {
+  // ====== ATOMIC TOKEN RECOVERY ======
+  // Path A: Read token from URL query params (Railway redirect)
+  var params = new URLSearchParams(window.location.search);
+  var urlToken = params.get('token');
+  var urlUser = params.get('user');
+
+  if (urlToken) {
+    localStorage.setItem('gt_token', urlToken);
+    if (urlUser) {
+      try { localStorage.setItem('gt_user', decodeURIComponent(urlUser)); } catch(e) {}
+    }
+    // Clean URL immediately — remove token from address bar
+    var clean = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, clean);
+  }
+
+  // Auth check
+  var token = localStorage.getItem('gt_token');
+  if (!token) {
+    window.location.replace('login.html');
+    return;
+  }
+})();
+
+function showDashSection(section) {
+  document.querySelectorAll('.dash-section').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById('section-' + section);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.dash-sidebar-item').forEach(function(i) { i.classList.remove('active'); });
+  var link = document.querySelector('.dash-sidebar-item[data-section="' + section + '"]');
+  if (link) link.classList.add('active');
+  // Update URL hash for direct navigation
+  if (window.history && window.history.replaceState) {
+    var hash = section === 'overview' ? '' : '#' + section;
+    if (window.location.hash !== hash) {
+      window.history.replaceState(null, '', window.location.pathname + hash);
+    }
+  }
+  // Close sidebar on mobile after selection
+  var sb = document.getElementById('dashSidebar');
+  if (sb && window.innerWidth < 768) {
+    sb.classList.remove('open');
+    var toggle = document.getElementById('dashSidebarToggle');
+    if(toggle) toggle.classList.remove('hidden');
+  }
+  // Auto-load section data
+  if (section === 'billing' && typeof loadBillingPage === 'function') {
+    setTimeout(loadBillingPage, 50);
+  }
+  // Scroll section content to top
+  var content = document.querySelector('.dash-content');
+  if(content) content.scrollTop = 0;
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+// Auto-open section from URL hash on page load
+(function() {
+  var hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('section-' + hash)) {
+    showDashSection(hash);
+  }
+})();
+function toggleDashSidebar() {
+  var sb = document.getElementById('dashSidebar');
+  var toggle = document.getElementById('dashSidebarToggle');
+  if(window.innerWidth < 768){
+    // Mobile: use open class
+    sb.classList.toggle('open');
+    if(toggle) toggle.classList.toggle('hidden', sb.classList.contains('open'));
+  } else {
+    // Desktop: use collapsed class
+    sb.classList.toggle('collapsed');
+    var content = document.querySelector('.dash-content');
+    if(content) content.style.marginLeft = sb.classList.contains('collapsed') ? '0' : '240px';
+    if(toggle) toggle.classList.toggle('hidden', !sb.classList.contains('collapsed'));
+  }
+}
+
+</script>
 <div class="stars-bg"><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star gold"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star teal"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star blue"></div><div class="star white"></div><div class="star white"></div><div class="star white"></div><div class="star trail gold"></div><div class="star trail teal"></div><div class="star trail teal"></div><div class="star trail blue"></div><div class="star trail gold"></div></div>
 <nav class="navbar"><div class="container navbar-inner">
     <a href="/" class="nav-logo notranslate"><span class="nav-logo-icon"><img src="logo-nav.png" alt="GlbTOKEN" width="30" height="32" class="nav-logo-img" /></span><span class="logo-full notranslate"><span class="logo-glb notranslate">Glb</span><span class="logo-token notranslate">TOKEN</span></span></a>
     <div class="nav-center" id="navCenter">
-      <a href="index.html">Home</a>
+      <a href="index.html" class="active">Home</a>
       <a href="pricing.html">Pricing</a>
       <a href="how.html">How It Works</a>
       <a href="models.html">Models</a>
       <a href="apikeys.html" id="navApiLink">Docs</a>
       <a href="dashboard.html" class="active" id="navDashLink" style="display:none">Dashboard</a>
+
     </div>
     <div class="nav-right">
         <a class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</a>
@@ -49,7 +371,7 @@
         </div>
         <div id="navUser" style="display:none">
           <div class="nav-avatar" onclick="toggleDropdown()">U<div class="dropdown" id="userDropdown">
-            <div class="dropdown-header" onclick="window.location='dashboard.html#settings'" style="cursor:pointer">
+            <a class="dropdown-header" href="settings.html" style="display:block;text-decoration:none;color:inherit;cursor:pointer">
               <div class="dd-av" id="ddAvatar">U</div>
               <div class="dd-info">
                 <div class="dd-name" id="dropName">User</div>
@@ -82,6 +404,7 @@
     <a href="models.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Models</a>
     <a href="apikeys.html" onclick="closeMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Docs</a>
     <a href="dashboard.html" onclick="closeMobile()" id="mobileDashLink" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard</a>
+
     <hr>
     <div class="m-section-label">Account</div>
     <div class="mobile-auth-grid" id="mobileGuestSection">
@@ -97,193 +420,263 @@
       </div>
     </div>
   </div>
-
-<div class="dash-page"><div class="container">
-
-  <!-- Header -->
-  <div class="dash-header">
-    <div class="dash-welcome">
-      <h1>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
-          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
-        </svg>
-        Team Management
-      </h1>
-      <p>Manage organizations, members, and roles</p>
+<div class="dash-layout">
+  <!-- ===== LEFT SIDEBAR ===== -->
+  <div class="dash-sidebar" id="dashSidebar">
+    <!-- CHAT -->
+    <div class="dash-sidebar-section">
+      <div class="dash-sidebar-label">Chat</div>
+      <a class="dash-sidebar-item" href="dashboard.html#playground">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Playground
+      </a>
     </div>
-    <div><button class="btn-primary" onclick="document.getElementById('inviteSection').scrollIntoView({behavior:'smooth'})">+ Invite Member</button></div>
+    <!-- GENERAL -->
+    <div class="dash-sidebar-section">
+      <div class="dash-sidebar-label">General</div>
+      <a class="dash-sidebar-item" href="dashboard.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a class="dash-sidebar-item" href="manage-keys.html">
+        <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Keys
+      </a>
+    </div>
+    <!-- PERSONAL -->
+    <div class="dash-sidebar-section">
+      <div class="dash-sidebar-label">Personal</div>
+      <a class="dash-sidebar-item" href="billing.html">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Billing
+      </a>
+      <a class="dash-sidebar-item" href="settings.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+      <a class="dash-sidebar-item" href="usage.html">
+        <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Usage &amp; History
+      </a>
+    </div>
+    <!-- ADMIN -->
+    <div class="dash-sidebar-section">
+      <div class="dash-sidebar-label">Admin</div>
+      <a class="dash-sidebar-item" href="dashboard.html"">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Logs
+      </a>
+    </div>
+    <!-- TEAM -->
+    <div class="dash-sidebar-section">
+      <div class="dash-sidebar-label">Team</div>
+      <a class="dash-sidebar-item active" href="team.html">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Team
+      </a>
+      <a class="dash-sidebar-item" href="referrals.html">
+        <svg viewBox="0 0 24 24"><path d="M17 20l5-5-5-5"/><path d="M7 4l-5 5 5 5"/><path d="M14 4l-4 16"/></svg>
+        Referrals
+      </a>
+    </div>
   </div>
+  <div class="dash-sidebar-backdrop" onclick="toggleDashSidebar()"></div>
+  <div class="dash-content">
 
-  <!-- Org Selector -->
-  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem" id="orgSelector">
-    <button class="sort-btn active" data-org="org1" onclick="switchOrg('org1')">Acme Corp</button>
-    <button class="sort-btn" data-org="org2" onclick="switchOrg('org2')">Startup Inc</button>
-    <button class="sort-btn" data-org="org3" onclick="switchOrg('org3')">Dev Team Alpha</button>
-    <button class="btn-primary" style="margin-left:auto;padding:0.4rem 0.85rem;font-size:0.8rem" onclick="showCreateOrgModal()">+ New Org</button>
-  </div>
+    <!-- ===== TEAM & REFERRALS SECTION ===== -->
+    <div class="dash-section active" id="section-team">
 
-  <!-- Current Org Header -->
-  <div class="dash-card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem">
-    <div style="display:flex;align-items:center;gap:1rem">
-      <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#F4B400,#FF6B6B);display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:700;color:#fff" id="orgAvatar">A</div>
-      <div>
-        <h2 style="margin:0;font-size:1.1rem" id="orgName">Acme Corp</h2>
-        <div style="display:flex;gap:0.75rem;margin-top:0.25rem;font-size:0.85rem;color:var(--text-muted)">
-          <span id="orgMemberCount">12 members</span>
-          <span id="orgPlanBadge" style="background:rgba(244,180,0,0.15);color:#F4B400;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.75rem">Pro Plan</span>
+      <!-- Header -->
+      <div class="dash-header">
+        <div class="dash-welcome">
+          <h1>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+            Team Management
+          </h1>
+          <p>Manage organizations, members, and roles</p>
         </div>
+        <div><button class="btn-primary" onclick="document.getElementById('inviteSection').scrollIntoView({behavior:'smooth'})">+ Invite Member</button></div>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:0.5rem">
-      <span id="orgRoleBadge" style="background:rgba(79,195,247,0.15);color:#4FC3F7;padding:0.25rem 0.75rem;border-radius:6px;font-size:0.8rem;font-weight:500">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        Owner
-      </span>
-    </div>
-  </div>
 
-  <!-- Usage Stats -->
-  <div class="dash-grid" style="margin-top:1.25rem">
-    <div class="dash-stat-card"><div class="num" id="orgTotalSpend">$1,245.80</div><div class="lbl">Total Spend</div><div class="chg up">↑ $320.50 this month</div></div>
-    <div class="dash-stat-card"><div class="num" id="orgTotalCalls">48,392</div><div class="lbl">Total API Calls</div><div class="chg up">↑ 12.4% vs last month</div></div>
-    <div class="dash-stat-card"><div class="num" id="orgActiveMembers">8</div><div class="lbl">Active Members</div><div class="chg" style="color:var(--text-muted)">This month</div></div>
-    <div class="dash-stat-card"><div class="num" id="orgAvgCost">$0.026</div><div class="lbl">Avg Cost / Call</div><div class="chg down">↓ 3.2% vs last month</div></div>
-  </div>
-
-  <!-- Members Table -->
-  <div class="dash-card" style="margin-top:1.25rem">
-    <div class="dash-section-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
-      </svg>
-      Team Members
-    </div>
-    <div style="overflow-x:auto">
-      <table class="tx-table">
-        <thead><tr><th>Member</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody id="teamMembersBody">
-          <tr>
-            <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F4B400,#FF6B6B);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">JD</div><span>John Doe</span></div></td>
-            <td>john@acmecorp.com</td>
-            <td>
-              <select class="role-select" onchange="updateRole(this,'john')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
-                <option value="owner">Owner</option>
-                <option value="admin" selected>Admin</option>
-                <option value="member">Member</option>
-                <option value="viewer">Viewer</option>
-              </select>
-            </td>
-            <td style="font-size:0.85rem;color:var(--text-muted)">Jan 15, 2026</td>
-            <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('john')">Remove</button></td>
-          </tr>
-          <tr>
-            <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00D68F,#4FC3F7);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">JS</div><span>Jane Smith</span></div></td>
-            <td>jane@acmecorp.com</td>
-            <td>
-              <select class="role-select" onchange="updateRole(this,'jane')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
-                <option value="owner">Owner</option>
-                <option value="admin">Admin</option>
-                <option value="member" selected>Member</option>
-                <option value="viewer">Viewer</option>
-              </select>
-            </td>
-            <td style="font-size:0.85rem;color:var(--text-muted)">Mar 3, 2026</td>
-            <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('jane')">Remove</button></td>
-          </tr>
-          <tr>
-            <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#FF6B6B,#F4B400);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">MB</div><span>Mike Brown</span></div></td>
-            <td>mike@acmecorp.com</td>
-            <td>
-              <select class="role-select" onchange="updateRole(this,'mike')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
-                <option value="owner">Owner</option>
-                <option value="admin">Admin</option>
-                <option value="member" selected>Member</option>
-                <option value="viewer">Viewer</option>
-              </select>
-            </td>
-            <td style="font-size:0.85rem;color:var(--text-muted)">Apr 12, 2026</td>
-            <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('mike')">Remove</button></td>
-          </tr>
-          <tr>
-            <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4FC3F7,#00D68F);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">SW</div><span>Sarah Wilson</span></div></td>
-            <td>sarah@acmecorp.com</td>
-            <td>
-              <select class="role-select" onchange="updateRole(this,'sarah')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
-                <option value="owner">Owner</option>
-                <option value="admin">Admin</option>
-                <option value="member">Member</option>
-                <option value="viewer" selected>Viewer</option>
-              </select>
-            </td>
-            <td style="font-size:0.85rem;color:var(--text-muted)">May 8, 2026</td>
-            <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('sarah')">Remove</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Invite Section -->
-  <div class="dash-card" style="margin-top:1.25rem" id="inviteSection">
-    <div class="dash-section-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Invite Members
-    </div>
-    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin:0.75rem 0">
-      <input type="email" id="inviteEmail" placeholder="Enter email address..." style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem" />
-      <select id="inviteRole" style="padding:0.6rem 1rem;border-radius:8px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.85rem">
-        <option value="admin">Admin</option>
-        <option value="member" selected>Member</option>
-        <option value="viewer">Viewer</option>
-      </select>
-      <button class="btn-primary" onclick="sendInvite()" style="padding:0.6rem 1.25rem;font-size:0.85rem;white-space:nowrap">Send Invite</button>
-    </div>
-
-    <!-- Pending Invites -->
-    <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem">
-      <div class="dash-section-title" style="font-size:0.85rem;margin-bottom:0.5rem">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        Pending Invites
+      <!-- Org Selector -->
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.25rem" id="orgSelector">
+        <button class="sort-btn active" data-org="org1" onclick="switchOrg('org1')">Acme Corp</button>
+        <button class="sort-btn" data-org="org2" onclick="switchOrg('org2')">Startup Inc</button>
+        <button class="sort-btn" data-org="org3" onclick="switchOrg('org3')">Dev Team Alpha</button>
+        <button class="btn-primary" style="margin-left:auto;padding:0.4rem 0.85rem;font-size:0.8rem" onclick="showCreateOrgModal()">+ New Org</button>
       </div>
-      <div id="pendingInvitesList">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)">
-          <div><span style="font-size:0.85rem">alex@example.com</span> <span style="font-size:0.75rem;color:var(--text-muted)">— Member</span></div>
-          <div style="display:flex;gap:0.5rem">
-            <span style="font-size:0.75rem;color:#FFB347">Sent Jun 14</span>
-            <button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button>
+
+      <!-- Current Org Header -->
+      <div class="dash-card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#F4B400,#FF6B6B);display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:700;color:#fff" id="orgAvatar">A</div>
+          <div>
+            <h2 style="margin:0;font-size:1.1rem" id="orgName">Acme Corp</h2>
+            <div style="display:flex;gap:0.75rem;margin-top:0.25rem;font-size:0.85rem;color:var(--text-muted)">
+              <span id="orgMemberCount">12 members</span>
+              <span id="orgPlanBadge" style="background:rgba(244,180,0,0.15);color:#F4B400;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.75rem">Pro Plan</span>
+            </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)">
-          <div><span style="font-size:0.85rem">lisa@example.com</span> <span style="font-size:0.75rem;color:var(--text-muted)">— Admin</span></div>
-          <div style="display:flex;gap:0.5rem">
-            <span style="font-size:0.75rem;color:#FFB347">Sent Jun 13</span>
-            <button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <span id="orgRoleBadge" style="background:rgba(79,195,247,0.15);color:#4FC3F7;padding:0.25rem 0.75rem;border-radius:6px;font-size:0.8rem;font-weight:500">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Owner
+          </span>
+        </div>
+      </div>
+
+      <!-- Usage Stats -->
+      <div class="dash-grid" style="margin-top:1.25rem">
+        <div class="dash-stat-card"><div class="num" id="orgTotalSpend">$1,245.80</div><div class="lbl">Total Spend</div><div class="chg up">↑ $320.50 this month</div></div>
+        <div class="dash-stat-card"><div class="num" id="orgTotalCalls">48,392</div><div class="lbl">Total API Calls</div><div class="chg up">↑ 12.4% vs last month</div></div>
+        <div class="dash-stat-card"><div class="num" id="orgActiveMembers">8</div><div class="lbl">Active Members</div><div class="chg" style="color:var(--text-muted)">This month</div></div>
+        <div class="dash-stat-card"><div class="num" id="orgAvgCost">$0.026</div><div class="lbl">Avg Cost / Call</div><div class="chg down">↓ 3.2% vs last month</div></div>
+      </div>
+
+      <!-- Members Table -->
+      <div class="dash-card">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+          Team Members
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tx-table">
+            <thead><tr><th>Member</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="teamMembersBody">
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F4B400,#FF6B6B);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">JD</div><span>John Doe</span></div></td>
+                <td>john@acmecorp.com</td>
+                <td>
+                  <select class="role-select" onchange="updateRole(this,'john')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
+                    <option value="owner">Owner</option>
+                    <option value="admin" selected>Admin</option>
+                    <option value="member">Member</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
+                </td>
+<td style="font-size:0.85rem;color:var(--text-muted)">🇩🇪 <span class="loc-city">Berlin</span><span class="loc-country">, DE</span></td>
+                <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('john')">Remove</button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00D68F,#4FC3F7);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">JS</div><span>Jane Smith</span></div></td>
+                <td>jane@acmecorp.com</td>
+                <td>
+                  <select class="role-select" onchange="updateRole(this,'jane')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
+                    <option value="owner">Owner</option>
+                    <option value="admin">Admin</option>
+                    <option value="member" selected>Member</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
+                </td>
+<td style="font-size:0.85rem;color:var(--text-muted)">🇩🇪 <span class="loc-city">Berlin</span><span class="loc-country">, DE</span></td>
+                <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('jane')">Remove</button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#FF6B6B,#F4B400);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">MB</div><span>Mike Brown</span></div></td>
+                <td>mike@acmecorp.com</td>
+                <td>
+                  <select class="role-select" onchange="updateRole(this,'mike')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
+                    <option value="owner">Owner</option>
+                    <option value="admin">Admin</option>
+                    <option value="member" selected>Member</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
+                </td>
+<td style="font-size:0.85rem;color:var(--text-muted)">🇩🇪 <span class="loc-city">Berlin</span><span class="loc-country">, DE</span></td>
+                <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('mike')">Remove</button></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:0.5rem"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4FC3F7,#00D68F);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff">SW</div><span>Sarah Wilson</span></div></td>
+                <td>sarah@acmecorp.com</td>
+                <td>
+                  <select class="role-select" onchange="updateRole(this,'sarah')" style="padding:0.3rem 0.5rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.8rem">
+                    <option value="owner">Owner</option>
+                    <option value="admin">Admin</option>
+                    <option value="member">Member</option>
+                    <option value="viewer" selected>Viewer</option>
+                  </select>
+                </td>
+<td style="font-size:0.85rem;color:var(--text-muted)">🇩🇪 <span class="loc-city">Berlin</span><span class="loc-country">, DE</span></td>
+                <td><button class="btn-secondary" style="padding:0.25rem 0.6rem;font-size:0.75rem;color:#FF6B6B" onclick="removeMember('sarah')">Remove</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Invite Section -->
+      <div class="dash-card" id="inviteSection">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Invite Members
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin:0.75rem 0">
+          <input type="email" id="inviteEmail" placeholder="Enter email address..." style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.9rem" />
+          <select id="inviteRole" style="padding:0.6rem 1rem;border-radius:8px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text);font-size:0.85rem">
+            <option value="admin">Admin</option>
+            <option value="member" selected>Member</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <button class="btn-primary" onclick="sendInvite()" style="padding:0.6rem 1.25rem;font-size:0.85rem;white-space:nowrap">Send Invite</button>
+        </div>
+        <!-- Pending Invites -->
+        <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem">
+          <div class="dash-section-title" style="font-size:0.85rem;margin-bottom:0.5rem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Pending Invites
+          </div>
+          <div id="pendingInvitesList">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+              <div><span style="font-size:0.85rem">alex@example.com</span> <span style="font-size:0.75rem;color:var(--text-muted)">— Member</span></div>
+              <div style="display:flex;gap:0.5rem">
+                <span style="font-size:0.75rem;color:#FFB347">Sent Jun 14</span>
+                <button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+              <div><span style="font-size:0.85rem">lisa@example.com</span> <span style="font-size:0.75rem;color:var(--text-muted)">— Admin</span></div>
+              <div style="display:flex;gap:0.5rem">
+                <span style="font-size:0.75rem;color:#FFB347">Sent Jun 13</span>
+                <button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Membership -->
+      <div class="dash-card" id="membershipSection">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Membership
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0.5rem 0">You are a member of this organization. You can leave at any time.</p>
+        <button class="btn-secondary" style="color:#FF6B6B;border-color:#FF6B6B;padding:0.6rem 1.25rem;font-size:0.85rem" onclick="leaveOrg()">Leave Organization</button>
+      </div>
+
     </div>
+
   </div>
+</div>
 
-  <!-- Membership / Leave Section -->
-  <div class="dash-card" style="margin-top:1.25rem" id="membershipSection">
-    <div class="dash-section-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      Membership
-    </div>
-    <p style="font-size:0.85rem;color:var(--text-muted);margin:0.5rem 0">You are a member of this organization. You can leave at any time.</p>
-    <button class="btn-secondary" style="color:#FF6B6B;border-color:#FF6B6B;padding:0.6rem 1.25rem;font-size:0.85rem" onclick="leaveOrg()">Leave Organization</button>
-  </div>
+<button class="dash-sidebar-toggle" id="dashSidebarToggle" onclick="toggleDashSidebar()" title="Open menu">
+  <span style="font-size:16px;line-height:1;font-weight:700">→</span>
+</button>
 
-</div></div>
-
+  <!-- TOP-UP -->
 <footer><div class="container">
     <div class="footer-grid">
       <div class="footer-brand notranslate"><a href="/" class="nav-logo notranslate"><span class="nav-logo-icon"><img src="logo-nav.png" alt="GlbTOKEN" width="30" height="32" class="nav-logo-img" /></span><span class="logo-full notranslate"><span class="logo-glb notranslate">Glb</span><span class="logo-token notranslate">TOKEN</span></span></a><p data-i18n="footer-tagline">Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges notranslate"><span class="trust-badge notranslate">💳 Stripe</span><span class="trust-badge notranslate">🔶 Paystack</span><span class="trust-badge notranslate">₿ USDT</span><span class="trust-badge notranslate">₿ BTC</span></div></div>
@@ -305,75 +698,8 @@
     </div>
   </div>
 
-<script src="translations.js?v=214"></script>
-<script data-cfasync="false" src="script.js?v=214"></script>
-
-<script>
-// Org switching
-var currentOrg = 'org1';
-function switchOrg(orgId){
-  document.querySelectorAll('#orgSelector .sort-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.querySelector('#orgSelector [data-org="'+orgId+'"]').classList.add('active');
-  currentOrg = orgId;
-  // Update org header
-  var names = { org1: 'Acme Corp', org2: 'Startup Inc', org3: 'Dev Team Alpha' };
-  var initials = { org1: 'A', org2: 'S', org3: 'D' };
-  var counts = { org1: '12 members', org2: '5 members', org3: '3 members' };
-  document.getElementById('orgName').textContent = names[orgId];
-  document.getElementById('orgAvatar').textContent = initials[orgId];
-  document.getElementById('orgMemberCount').textContent = counts[orgId];
-}
-
-function updateRole(select, memberId){
-  // Placeholder for role update API call
-  var role = select.value;
-  console.log('Updated role for '+memberId+' to '+role);
-}
-
-function removeMember(memberId){
-  if(confirm('Remove this member from the organization?')){
-    var row = event.target.closest('tr');
-    if(row) row.style.opacity = '0.3';
-    setTimeout(function(){
-      if(row) row.remove();
-    }, 300);
-  }
-}
-
-function sendInvite(){
-  var email = document.getElementById('inviteEmail').value.trim();
-  if(!email || !email.includes('@')){
-    alert('Please enter a valid email address.');
-    return;
-  }
-  var role = document.getElementById('inviteRole').value;
-  var list = document.getElementById('pendingInvitesList');
-  var sentDate = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'});
-  var div = document.createElement('div');
-  div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)';
-  div.innerHTML = '<div><span style="font-size:0.85rem">'+email+'</span> <span style="font-size:0.75rem;color:var(--text-muted)">— '+role.charAt(0).toUpperCase()+role.slice(1)+'</span></div><div style="display:flex;gap:0.5rem"><span style="font-size:0.75rem;color:#FFB347">Sent '+sentDate+'</span><button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button></div>';
-  list.prepend(div);
-  document.getElementById('inviteEmail').value = '';
-}
-
-function cancelInvite(btn){
-  var item = btn.closest('div[style]');
-  if(item) item.remove();
-}
-
-function leaveOrg(){
-  if(confirm('Are you sure you want to leave this organization?')){
-    alert('You have left the organization.');
-  }
-}
-
-function showCreateOrgModal(){
-  var name = prompt('Enter organization name:');
-  if(name && name.trim()){
-    alert('Organization "'+name.trim()+'" created!');
-  }
-}
-</script>
+<script src="translations.js?v=224"></script>
+<script data-cfasync="false" src="script.js?v=224"></script>
 
 <script>
 (function(){
@@ -407,6 +733,64 @@ function showCreateOrgModal(){
   document.addEventListener('mouseup', endDrag);
   document.addEventListener('touchend', endDrag);
 })();
+</script>
+
+<script>
+// ===== Team Management Functions =====
+var currentOrg = 'org1';
+function switchOrg(orgId){
+  document.querySelectorAll('#orgSelector .sort-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('#orgSelector [data-org="'+orgId+'"]').classList.add('active');
+  currentOrg = orgId;
+  var names = { org1: 'Acme Corp', org2: 'Startup Inc', org3: 'Dev Team Alpha' };
+  var initials = { org1: 'A', org2: 'S', org3: 'D' };
+  var counts = { org1: '12 members', org2: '5 members', org3: '3 members' };
+  document.getElementById('orgName').textContent = names[orgId];
+  document.getElementById('orgAvatar').textContent = initials[orgId];
+  document.getElementById('orgMemberCount').textContent = counts[orgId];
+}
+function updateRole(select, memberId){
+  var role = select.value;
+  console.log('Updated role for '+memberId+' to '+role);
+}
+function removeMember(memberId){
+  showConfirm('Remove Member', 'Remove this member from the organization?', function(){
+    var row = document.querySelector('#teamMembersBody tr[data-member="'+memberId+'"]');
+    if(row) row.style.opacity = '0.3';
+    setTimeout(function(){
+      if(row) row.remove();
+    }, 300);
+  }, 'Remove');
+}
+function sendInvite(){
+  var email = document.getElementById('inviteEmail').value.trim();
+  if(!email || !email.includes('@')){
+    showAlert('Invalid Email', 'Please enter a valid email address.');
+    return;
+  }
+  var role = document.getElementById('inviteRole').value;
+  var list = document.getElementById('pendingInvitesList');
+  var sentDate = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  var div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)';
+  div.innerHTML = '<div><span style="font-size:0.85rem">'+email+'</span> <span style="font-size:0.75rem;color:var(--text-muted)">— '+role.charAt(0).toUpperCase()+role.slice(1)+'</span></div><div style="display:flex;gap:0.5rem"><span style="font-size:0.75rem;color:#FFB347">Sent '+sentDate+'</span><button class="btn-secondary" style="padding:0.2rem 0.5rem;font-size:0.7rem;color:#FF6B6B" onclick="cancelInvite(this)">Cancel</button></div>';
+  list.prepend(div);
+  document.getElementById('inviteEmail').value = '';
+}
+function cancelInvite(btn){
+  var item = btn.closest('div[style]');
+  if(item) item.remove();
+}
+function leaveOrg(){
+  showConfirm('Leave Organization', 'Are you sure you want to leave this organization?', function(){
+    showAlert('Left Organization', 'You have left the organization.');
+  }, 'Leave');
+}
+function showCreateOrgModal(){
+  showPrompt('Create Organization', 'Enter organization name', function(name){
+    showAlert('Organization Created', 'Organization "'+name+'" created!');
+  });
+}
 </script>
 
 </body>

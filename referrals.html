@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, " />
-  <title>Dashboard — GlbTOKEN</title>
+  <title>Referrals — GlbTOKEN</title>
   <meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
   <meta name="theme-color" content="#0A0B14" id="metaTheme" />
 <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -254,6 +254,7 @@ body{background:var(--bg)}
   #section-team .dash-grid{grid-template-columns:1fr 1fr!important;gap:0.4rem;overflow-x:auto}
 }
 </style>
+<style>#section-referral{display:block!important}</style>
   </head>
 <body>
 <script>
@@ -302,6 +303,10 @@ function showDashSection(section) {
     sb.classList.remove('open');
     var toggle = document.getElementById('dashSidebarToggle');
     if(toggle) toggle.classList.remove('hidden');
+  }
+  // Auto-load section data
+  if (section === 'billing' && typeof loadBillingPage === 'function') {
+    setTimeout(loadBillingPage, 50);
   }
   // Scroll section content to top
   var content = document.querySelector('.dash-content');
@@ -428,7 +433,7 @@ function toggleDashSidebar() {
     <!-- GENERAL -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">General</div>
-      <a class="dash-sidebar-item active" href="dashboard.html">
+      <a class="dash-sidebar-item" href="dashboard.html">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Overview
       </a>
@@ -468,7 +473,7 @@ function toggleDashSidebar() {
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Team
       </a>
-      <a class="dash-sidebar-item" href="referrals.html">
+      <a class="dash-sidebar-item active" href="referrals.html">
         <svg viewBox="0 0 24 24"><path d="M17 20l5-5-5-5"/><path d="M7 4l-5 5 5 5"/><path d="M14 4l-4 16"/></svg>
         Referrals
       </a>
@@ -476,206 +481,183 @@ function toggleDashSidebar() {
   </div>
   <div class="dash-sidebar-backdrop" onclick="toggleDashSidebar()"></div>
   <div class="dash-content">
-    <div class="dash-section active" id="section-overview">
+
+      <!-- ===== REFERRAL SECTION ===== -->
+    <div class="dash-section" id="section-referral">
+
+      <!-- Referral Hero -->
       <div class="dash-header">
-        <div class="dash-welcome"><h1>Hello, <span id="dashUserName">User</span></h1><p>Token usage overview</p></div>
-      </div>
-      <div class="dash-grid">
-        <div class="dash-balance">
-          <div class="top">
-            <div><div class="label">Available Balance</div><div class="amount"><span id="dashBalance">—</span> <small>GT</small></div><div class="usd-equiv" id="dashUsd">$0.00 USD</div></div>
-            <div class="mini-chart"><canvas id="sparkline" width="120" height="40"></canvas></div>
-          </div>
-          <div class="actions"><button class="btn-primary" onclick="showPage('topup')" style="padding:0.625rem 1.25rem;font-size:0.85rem">Buy Tokens</button></div>
-        </div>
-        <div class="dash-stats">
-          <div class="dash-stat-card"><div class="num" id="dashTotalSpent">—</div><div class="lbl">Total Spent</div><div class="chg up">↑ Lifetime</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashModelsUsed">—</div><div class="lbl">Models Used</div><div class="chg up">↑ All time</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashTotalRequests">—</div><div class="lbl">API Requests</div><div class="chg up">↑ Total calls</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashKeyCount">—</div><div class="lbl">API Keys Active</div><div class="chg" style="color:var(--text-muted)" id="dashKeyStatus">-</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashDaysActive">—</div><div class="lbl">Days Active</div><div class="chg" style="color:var(--text-muted)" id="dashNewapiStatus">Offline</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashTotalConsumed">—</div><div class="lbl">Tokens Consumed</div><div class="chg" style="color:var(--text-muted)">Lifetime</div></div>
-        </div>
-      </div>
-      <div class="dash-card">
-        <div class="dash-section-title">Token Usage <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="usageSubtitle">Loading...</span></div>
-        <div style="margin:0.75rem 0 0.5rem">
-          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem">
-            <span style="color:var(--text-muted)"><span id="usedTokens">—</span> used</span>
-            <span style="color:var(--text-muted)" id="remainingTokens">0 remaining</span>
-          </div>
-          <div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden;position:relative">
-            <div id="quotaBar" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#00D68F);transition:width 0.6s ease"></div>
-          </div>
-        </div>
-        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.25rem">
-          <div style="font-size:0.8rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span id="dashTotalConsumed">—</span> tokens consumed</div>
-          <div style="font-size:0.8rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span id="dashTotalSpentLifetime">$0.00</span> lifetime spend</div>
-        </div>
-      </div>
-      <div class="dash-card">
-        <div class="dash-section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem">
-          <span>Usage</span>
-          <div style="display:flex;gap:0.25rem;font-size:0.75rem" id="usageRangeBtns">
-            <button class="sort-btn usage-range active" data-days="7" onclick="setUsageRange(7)">7d</button>
-            <button class="sort-btn usage-range" data-days="30" onclick="setUsageRange(30)">30d</button>
-            <button class="sort-btn usage-range" data-days="90" onclick="setUsageRange(90)">90d</button>
-          </div>
-          <select id="usageModelFilter" style="font-size:0.75rem;padding:0.2rem 0.4rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text)" onchange="refreshUsageChart()">
-            <option value="">All Models</option>
-          </select>
-          <div style="display:flex;gap:0.25rem;font-size:0.75rem;margin-left:auto" id="usageModeBtns">
-            <button class="sort-btn usage-mode active" data-mode="tokens" onclick="setUsageMode('tokens')">Tokens</button>
-            <button class="sort-btn usage-mode" data-mode="cost" onclick="setUsageMode('cost')">Cost</button>
-          </div>
-        </div>
-        <div class="chart-container" style="height:180px"><canvas id="dailyChart"></canvas></div>
-        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border)" id="usageSummary">
-          <span id="usageTotalLabel">Total: <strong id="usageTotalVal">0</strong> tokens</span>
-          <span id="usageCostLabel">Cost: <strong id="usageCostVal">$0.00</strong></span>
-        </div>
-      </div>
-      <div class="dash-grid">
-        <div class="dash-card"><div class="dash-section-title">Usage by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">All time</span></div><div class="chart-container"><canvas id="usageChart"></canvas></div><div id="modelRanking" style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.5rem"></div></div>
-        <div class="dash-card"><div class="dash-section-title">Activity Timeline <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="activityCount">0 events</span></div><div id="dashActivity" class="dash-activity"><p style="color:var(--text-muted);font-size:0.85rem;padding:1rem;text-align:center">Loading activity...</p></div></div>
-      </div>
-      <div class="dash-card" id="dashAvailableModels">
-        <div class="dash-section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Your Models <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="modelCountLabel">via New API</span></div>
-        <div id="dashModelList" style="max-height:200px;overflow-y:auto;margin-top:0.25rem"><p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">Connect New API to see available models.</p></div>
-      </div>
-      <div class="dash-card"><div class="dash-section-title">Recent Transactions <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Last 5</span> <a href="usage.html" style="font-size:0.8rem;color:var(--primary);cursor:pointer;margin-left:0.5rem;text-decoration:none">View all →</a></div>
-        <table class="tx-table"><thead><tr><th>Date</th><th>Type</th><th>Detail</th><th>Amount</th><th>Status</th></tr></thead>
-        <tbody id="dashTxBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:0.85rem">No transactions yet</td></tr></tbody></table>
-      </div>
-
-    </div>
-
-    </div>
-
-    <!-- ===== PLAYGROUND SECTION ===== -->
-    <div class="dash-section" id="section-playground">
-
-      <div class="playground-page">
-        <!-- Left Sidebar -->
-        <div class="playground-sidebar" id="playgroundSidebar">
-          <button class="playground-new-btn" onclick="newConversation()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        <div class="dash-welcome">
+          <h1>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+              <path d="M17 20l5-5-5-5"/><path d="M7 4l-5 5 5 5"/><path d="M14 4l-4 16"/>
             </svg>
-            New Chat
-          </button>
-          <div class="playground-history" id="conversationHistory">
-            <div class="playground-history-item active" onclick="switchConversation(this)" data-id="1">
-              <span class="conv-title">GPT-4o API integration</span>
-              <span class="conv-date">Jun 14</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            Referral Program
+          </h1>
+          <p>Invite friends and earn rewards for every signup</p>
+        </div>
+        <div><button class="btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('refCode').textContent)">📋 Copy Code</button></div>
+      </div>
+
+      <!-- Referral Stats -->
+      <div class="dash-grid" style="margin-bottom:1.25rem">
+        <div class="dash-stat-card">
+          <div class="num" id="refYourCode" style="font-size:1.1rem;font-family:monospace;letter-spacing:2px;color:#F4B400">GLB-ABCD</div>
+          <div class="lbl">Your Code</div>
+          <div class="chg" style="color:var(--text-muted)">Share this code</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="num" id="refTotalReferrals">27</div>
+          <div class="lbl">Total Referrals</div>
+          <div class="chg up">↑ +3 this month</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="num" id="refTotalEarned">1,250 GT</div>
+          <div class="lbl">Total Earned</div>
+          <div class="chg up">↑ Value: $12.50</div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="num" id="refPendingRewards">350 GT</div>
+          <div class="lbl">Pending Rewards</div>
+          <div class="chg" style="color:#FFB347">⏳ Awaiting confirmation</div>
+        </div>
+      </div>
+
+      <!-- Share & Charts Grid -->
+      <div class="dash-grid" id="referral-share-charts" style="margin-top:1.25rem;grid-template-columns:1fr 2.5fr 2.5fr">
+        <div class="dash-card">
+          <div class="dash-section-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share Your Referral Link
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin:0.75rem 0">
+            <div style="flex:1;min-width:200px;display:flex;background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+              <span id="refCode" style="padding:0.75rem 1rem;font-family:monospace;font-size:0.95rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">https://glbtoken.com/ref/GLB-ABCD</span>
+              <button class="btn-primary" onclick="copyRefLink()" style="border-radius:0;padding:0.75rem 1.25rem;font-size:0.85rem;white-space:nowrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Copy
               </button>
             </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="2">
-              <span class="conv-title">Claude 3.5 Sonnet testing</span>
-              <span class="conv-date">Jun 13</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="3">
-              <span class="conv-title">Code generation test</span>
-              <span class="conv-date">Jun 12</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="4">
-              <span class="conv-title">Translation comparison</span>
-              <span class="conv-date">Jun 10</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="btn-secondary" onclick="shareRef('twitter')" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#1DA1F2" stroke="none"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+              Twitter
+            </button>
+            <button class="btn-secondary" onclick="shareRef('whatsapp' )" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" stroke="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </button>
+            <button class="btn-secondary" onclick="shareRef('telegram')" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0088cc" stroke="none"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              Telegram
+            </button>
+            <button class="btn-secondary" onclick="shareRef('email')" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/>
+              </svg>
+              Email
+            </button>
           </div>
         </div>
-
-        <!-- Main Chat Area -->
-        <div class="playground-main">
-          <!-- Chat Messages -->
-          <div class="playground-chat" id="chatMessages">
-            <!-- Empty State -->
-            <div class="playground-empty" id="emptyState">
-              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                <path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/>
-              </svg>
-              <h2>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-                  <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/>
-                </svg>
-                Start a conversation
-              </h2>
-              <p>Choose a model and start chatting. Your conversations are saved automatically.</p>
-              <div class="playground-suggestions">
-                <span class="playground-suggestion" onclick="useSuggestion('Write a Python function to sort a list of dictionaries by a key')">Write a Python sort function</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Explain quantum computing in simple terms')">Explain quantum computing</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Create a React component for a modal dialog')">React modal component</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Compare GPT-4o vs Claude 3.5 Sonnet performance')">Compare AI models</span>
-              </div>
-            </div>
+        <div class="dash-card">
+          <div class="dash-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Referrals Over Time
           </div>
+          <div class="chart-container" style="height:180px"><canvas id="referralsChart"></canvas></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+            Earnings Over Time
+          </div>
+          <div class="chart-container" style="height:180px"><canvas id="earningsChart"></canvas></div>
+        </div>
+      </div>
 
-          <!-- Input Area -->
-          <div class="playground-input-area">
-            <div class="playground-input-row">
-              <button class="sidebar-mobile-toggle" onclick="togglePlaygroundSidebar()" title="Toggle sidebar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-              </button>
-              <textarea id="playgroundChatInput" placeholder="Type your message here..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPlaygroundMessage()}"></textarea>
-              <button class="playground-send-btn" id="playgroundSendBtn" onclick="sendPlaygroundMessage()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </button>
-            </div>
+      <!-- Referrals Table -->
+      <div class="dash-card">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Referrals
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tx-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Date Joined</th><th>Status</th><th>Reward Earned</th></tr></thead>
+            <tbody id="refTableBody">
+              <tr><td>Alice Johnson</td><td>alice@example.com</td><td>Jun 12, 2026</td><td><span style="color:#00D68F">● Active</span></td><td>50 GT</td></tr>
+              <tr><td>Bob Smith</td><td>bob@example.com</td><td>Jun 10, 2026</td><td><span style="color:#00D68F">● Active</span></td><td>50 GT</td></tr>
+              <tr><td>Carol Williams</td><td>carol@example.com</td><td>Jun 5, 2026</td><td><span style="color:#FFB347">◉ Pending</span></td><td>—</td></tr>
+              <tr><td>Dave Brown</td><td>dave@example.com</td><td>May 28, 2026</td><td><span style="color:#00D68F">● Active</span></td><td>50 GT</td></tr>
+              <tr><td>Eve Davis</td><td>eve@example.com</td><td>May 20, 2026</td><td><span style="color:#FF6B6B">○ Inactive</span></td><td>25 GT</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-            <!-- Toolbar -->
-            <div class="playground-toolbar">
-              <select class="playground-model-select" id="modelSelect">
-                <option value="gpt-4o">GPT-4o — OpenAI (⚡ Fast)</option>
-                <option value="claude-3.5-sonnet" selected>Claude 3.5 Sonnet — Anthropic (⚡ Fast)</option>
-                <option value="claude-3-opus">Claude 3 Opus — Anthropic (🐌 Slower)</option>
-                <option value="gemini-2.0">Gemini 2.0 Flash — Google (⚡ Fast)</option>
-                <option value="llama-3.1-405b">Llama 3.1 405B — Meta (⚡ Fast)</option>
-                <option value="deepseek-v3">DeepSeek V3 — DeepSeek (⚡ Fast)</option>
-                <option value="gpt-4-turbo">GPT-4 Turbo — OpenAI (🐌 Slower)</option>
-                <option value="mistral-large">Mistral Large — Mistral (⚡ Fast)</option>
-              </select>
-              <button class="playground-params-toggle" onclick="toggleParamsPanel()" id="paramsToggle">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                </svg>
-                Parameters
-              </button>
-              <span style="font-size:0.75rem;color:var(--text-muted);margin-left:auto" id="tokenEstimate">~0 tokens</span>
-            </div>
+      <!-- Rewards Table -->
+      <div class="dash-card">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          </svg>
+          Reward History
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tx-table">
+            <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody id="refRewardsBody">
+              <tr><td>Jun 12, 2026</td><td>Signup Bonus</td><td>50 GT</td><td><span style="color:#00D68F">● Claimed</span></td></tr>
+              <tr><td>Jun 10, 2026</td><td>Signup Bonus</td><td>50 GT</td><td><span style="color:#00D68F">● Claimed</span></td></tr>
+              <tr><td>Jun 5, 2026</td><td>Signup Bonus</td><td>50 GT</td><td><span style="color:#FFB347">◉ Pending</span></td></tr>
+              <tr><td>May 28, 2026</td><td>Signup Bonus</td><td>50 GT</td><td><span style="color:#00D68F">● Claimed</span></td></tr>
+              <tr><td>May 20, 2026</td><td>Referral Milestone</td><td>100 GT</td><td><span style="color:#00D68F">● Claimed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-            <!-- Parameters Panel -->
-            <div class="playground-params-panel" id="paramsPanel">
-              <div class="playground-param">
-                <label>Temperature <span class="param-value" id="tempValue">0.7</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0.7" oninput="document.getElementById('tempValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Max Tokens</label>
-                <input type="number" value="4096" min="1" max="131072" step="1" style="width:90px" oninput="updateTokenEstimate()" id="maxTokensInput" />
-              </div>
-              <div class="playground-param">
-                <label>Top P <span class="param-value" id="topPValue">1.0</span></label>
-                <input type="range" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Frequency Penalty <span class="param-value" id="freqValue">0.0</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('freqValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Presence Penalty <span class="param-value" id="presValue">0.0</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('presValue').textContent=this.value" />
-              </div>
+      <!-- How It Works -->
+      <div class="dash-card">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+          </svg>
+          How It Works
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:0.75rem">
+          <div style="background:var(--bg-alt);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border)">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(244,180,0,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </div>
+            <h4 style="margin:0 0 0.4rem;font-size:1rem">1. Share Your Code</h4>
+            <p style="margin:0;font-size:0.85rem;color:var(--text-muted)">Copy your unique referral link and share it with friends via social media, email, or messaging apps.</p>
+          </div>
+          <div style="background:var(--bg-alt);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border)">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,214,143,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            </div>
+            <h4 style="margin:0 0 0.4rem;font-size:1rem">2. They Sign Up</h4>
+            <p style="margin:0;font-size:0.85rem;color:var(--text-muted)">Your friends create an account using your referral link and start using GlbTOKEN.</p>
+          </div>
+          <div style="background:var(--bg-alt);border-radius:12px;padding:1.5rem;text-align:center;border:1px solid var(--border)">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(244,180,0,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+            </div>
+            <h4 style="margin:0 0 0.4rem;font-size:1rem">3. You Earn Rewards</h4>
+            <p style="margin:0;font-size:0.85rem;color:var(--text-muted)">For every friend who signs up and uses the platform, you earn GT tokens as a reward.</p>
           </div>
         </div>
       </div>
@@ -748,161 +730,85 @@ function toggleDashSidebar() {
 })();
 </script>
 
-// ===== Playground Functions =====
-var conversationCount = 4;
-var currentConversationId = 1;
-
-function togglePlaygroundSidebar(){
-  document.getElementById('playgroundSidebar').classList.toggle('open');
+<script>
+// ===== Referral Functions =====
+function copyRefLink(){
+  var el = document.getElementById('refCode');
+  navigator.clipboard.writeText(el.textContent).catch(function(){});
+  var btn = el.parentElement.querySelector('button');
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+  setTimeout(function(){ btn.innerHTML = orig; }, 2000);
 }
-function newConversation(){
-  conversationCount++;
-  var id = conversationCount;
-  var history = document.getElementById('conversationHistory');
-  var item = document.createElement('div');
-  item.className = 'playground-history-item';
-  item.setAttribute('data-id', id);
-  item.onclick = function(){ switchConversation(this); };
-  item.innerHTML = '<span class="conv-title">New conversation</span><span class="conv-date">Today</span>'
-    + '<button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">'
-    + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    + '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
-  history.prepend(item);
-  item.click();
-  document.getElementById('playgroundSidebar').classList.remove('open');
-}
-function switchConversation(el){
-  document.querySelectorAll('.playground-history-item').forEach(function(i){ i.classList.remove('active'); });
-  el.classList.add('active');
-  currentConversationId = el.getAttribute('data-id');
-  clearChat();
-}
-function deleteConvItem(btn){
-  showConfirm('Delete Conversation', 'Delete this conversation?', function(){
-    var item = btn.closest('.playground-history-item');
-    if(item){
-      var next = item.nextElementSibling || item.previousElementSibling;
-      item.remove();
-      if(next) { next.click(); } else { clearChat(); }
-    }
-  }, 'Delete');
-}
-function clearChat(){
-  var chat = document.getElementById('chatMessages');
-  chat.innerHTML = '';
-  showEmptyState();
-}
-function showEmptyState(){
-  var chat = document.getElementById('chatMessages');
-  if(chat.querySelector('.playground-msg')) return;
-  chat.innerHTML = '<div class="playground-empty" id="emptyState">'
-    + '<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'
-    + '<path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>'
-    + '<h2><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">'
-    + '<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg> Start a conversation</h2>'
-    + '<p>Choose a model and start chatting. Your conversations are saved automatically.</p>'
-    + '<div class="playground-suggestions">'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Write a Python function to sort a list of dictionaries by a key\')">Write a Python sort function</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Explain quantum computing in simple terms\')">Explain quantum computing</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Create a React component for a modal dialog\')">React modal component</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Compare GPT-4o vs Claude 3.5 Sonnet performance\')">Compare AI models</span>'
-    + '</div></div>';
-}
-function useSuggestion(text){
-  document.getElementById('playgroundChatInput').value = text;
-  document.getElementById('playgroundChatInput').focus();
-  sendPlaygroundMessage();
-}
-function sendPlaygroundMessage(){
-  var input = document.getElementById('playgroundChatInput');
-  var text = input.value.trim();
-  if(!text) return;
-  var empty = document.getElementById('emptyState');
-  if(empty) empty.remove();
-  var chat = document.getElementById('chatMessages');
-  var userMsg = document.createElement('div');
-  userMsg.className = 'playground-msg user';
-  userMsg.innerHTML = '<div class="avatar">U</div><div class="bubble-group"><div class="bubble">'+escapeHtml(text)+'</div><div class="msg-meta">Just now</div></div>';
-  chat.appendChild(userMsg);
-  input.value = '';
-  input.style.height = 'auto';
-  document.getElementById('playgroundSendBtn').disabled = true;
-  updateTokenEstimate();
-  chat.scrollTop = chat.scrollHeight;
-  showTypingIndicator();
-  setTimeout(function(){
-    removeTypingIndicator();
-    var modelName = document.getElementById('modelSelect').options[document.getElementById('modelSelect').selectedIndex].text;
-    var response = getSimulatedResponse(text);
-    var tokenCount = Math.floor(Math.random() * 300) + 50;
-    var responseTime = (Math.random() * 2.5 + 0.5).toFixed(2);
-    var aiMsg = document.createElement('div');
-    aiMsg.className = 'playground-msg ai';
-    aiMsg.innerHTML = '<div class="avatar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg></div>'
-      + '<div class="bubble-group">'
-      + '<div class="bubble">'+response+'</div>'
-      + '<div class="msg-meta"><span class="model-badge">'+modelName.split(' — ')[0]+'</span><span>'+tokenCount+' tokens</span><span>'+responseTime+'s</span></div>'
-      + '</div>';
-    chat.appendChild(aiMsg);
-    chat.scrollTop = chat.scrollHeight;
-    document.getElementById('playgroundSendBtn').disabled = false;
-    var active = document.querySelector('.playground-history-item.active .conv-title');
-    if(active && active.textContent === 'New conversation'){
-      active.textContent = text.substring(0, 30) + (text.length > 30 ? '...' : '');
-    }
-  }, 1500 + Math.random() * 1000);
-}
-function showTypingIndicator(){
-  var chat = document.getElementById('chatMessages');
-  var typing = document.createElement('div');
-  typing.className = 'playground-msg ai playground-typing';
-  typing.id = 'typingIndicator';
-  typing.innerHTML = '<div class="avatar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg></div><div class="bubble-group"><div class="bubble">Thinking</div></div>';
-  chat.appendChild(typing);
-  chat.scrollTop = chat.scrollHeight;
-}
-function removeTypingIndicator(){
-  var typing = document.getElementById('typingIndicator');
-  if(typing) typing.remove();
-}
-function getSimulatedResponse(text){
-  var responses = [
-    "That's a great question! Let me break it down for you.\n\nBased on my analysis, here are the key points to consider:\n\n1. **Performance**: Modern AI models excel at this type of task, especially when the input is well-structured.\n\n2. **Best Practices**: I recommend using a systematic approach — break the problem into smaller, manageable parts.\n\n3. **Example**: Here's a simple implementation:\n\n```python\ndef solution(data):\n    result = []\n    for item in data:\n        processed = transform(item)\n        result.append(processed)\n    return result\n```\n\nWould you like me to go into more detail on any specific aspect?",
-    "I can help with that! Here's what I know about this topic.\n\n**Overview:**\nThe field has evolved significantly over the past few years. Key developments include:\n\n- Better algorithmic efficiency\n- Larger-scale training data\n- Improved hardware acceleration\n\n**Practical Application:**\nWhen implementing this, consider:\n1. Start with a clear specification\n2. Use proper error handling\n3. Test with realistic data\n4. Monitor performance metrics\n\nLet me know if you'd like specific code examples or further explanation!",
-    "Excellent question! Here's my detailed response.\n\n## Key Insights\n\nAfter careful consideration, I believe the most important factors are:\n\n### 1. Architecture\nModern approaches use transformer-based designs that scale efficiently.\n\n### 2. Data Quality\nHigh-quality, diverse training data remains crucial for good results.\n\n### 3. Evaluation\nAlways validate your outputs against ground truth when possible.\n\nFeel free to ask follow-up questions!"
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
-}
-function escapeHtml(text){
-  var div = document.createElement('div');
-  div.appendChild(document.createTextNode(text));
-  return div.innerHTML;
-}
-function toggleParamsPanel(){
-  var panel = document.getElementById('paramsPanel');
-  var toggle = document.getElementById('paramsToggle');
-  panel.classList.toggle('open');
-  if(panel.classList.contains('open')){
-    toggle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Close';
-  } else {
-    toggle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>\n          Parameters';
+function shareRef(platform){
+  var url = encodeURIComponent('https://glbtoken.com/ref/GLB-ABCD');
+  var text = encodeURIComponent('Join me on GlbTOKEN and get access to 100+ AI models! Use my referral link:');
+  var href = '';
+  switch(platform){
+    case 'twitter': href = 'https://twitter.com/intent/tweet?text='+text+'&url='+url; break;
+    case 'whatsapp': href = 'https://wa.me/?text='+text+'%20'+url; break;
+    case 'telegram': href = 'https://t.me/share/url?url='+url+'&text='+text; break;
+    case 'email': href = 'mailto:?subject=Join%20GlbTOKEN&body='+text+'%20'+url; break;
   }
+  if(href) window.open(href, '_blank', 'noopener');
 }
-function updateTokenEstimate(){
-  var input = document.getElementById('playgroundChatInput').value;
-  var approx = Math.floor(input.length * 1.3);
-  var maxTokens = parseInt(document.getElementById('maxTokensInput').value) || 4096;
-  document.getElementById('tokenEstimate').textContent = '~'+approx+' / '+maxTokens+' tokens';
-}
-// Auto-resize textarea for playground
+
+// Referral chart initialization
 document.addEventListener('DOMContentLoaded', function(){
-  var input = document.getElementById('playgroundChatInput');
-  if(input){
-    input.addEventListener('input', function(){
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-      updateTokenEstimate();
+  var ctx1 = document.getElementById('referralsChart');
+  if(ctx1){
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: ['May 20', 'May 27', 'Jun 3', 'Jun 10', 'Jun 17'],
+        datasets: [{
+          label: 'Referrals',
+          data: [2, 5, 8, 6, 6],
+          borderColor: '#F4B400',
+          backgroundColor: 'rgba(244,180,0,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#F4B400',
+          pointBorderColor: '#F4B400'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6B7280', maxTicksLimit: 5 } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6B7280', maxTicksLimit: 5 } }
+        }
+      }
+    });
+  }
+  var ctx2 = document.getElementById('earningsChart');
+  if(ctx2){
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['May 20', 'May 27', 'Jun 3', 'Jun 10', 'Jun 17'],
+        datasets: [{
+          label: 'Earnings (GT)',
+          data: [100, 250, 400, 300, 200],
+          borderColor: '#00D68F',
+          backgroundColor: 'rgba(0,214,143,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#00D68F',
+          pointBorderColor: '#00D68F'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6B7280', maxTicksLimit: 5 } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6B7280', maxTicksLimit: 5 } }
+        }
+      }
     });
   }
 });

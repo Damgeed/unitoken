@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, " />
-  <title>Dashboard — GlbTOKEN</title>
-  <meta name="description" content="Buy GlbTOKEN using local currency or crypto. Spend across 100+ AI models." />
+  <title>Logs — GlbTOKEN</title>
+  <meta name="description" content="Monitor system performance and errors." />
   <meta name="theme-color" content="#0A0B14" id="metaTheme" />
 <link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
@@ -303,6 +303,10 @@ function showDashSection(section) {
     var toggle = document.getElementById('dashSidebarToggle');
     if(toggle) toggle.classList.remove('hidden');
   }
+  // Auto-load section data
+  if (section === 'billing' && typeof loadBillingPage === 'function') {
+    setTimeout(loadBillingPage, 50);
+  }
   // Scroll section content to top
   var content = document.querySelector('.dash-content');
   if(content) content.scrollTop = 0;
@@ -420,7 +424,7 @@ function toggleDashSidebar() {
     <!-- CHAT -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">Chat</div>
-      <a class="dash-sidebar-item" href="dashboard.html#playground">
+      <a class="dash-sidebar-item" data-section="playground" href="dashboard.html#playground">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Playground
       </a>
@@ -428,11 +432,11 @@ function toggleDashSidebar() {
     <!-- GENERAL -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">General</div>
-      <a class="dash-sidebar-item active" href="dashboard.html">
+      <a class="dash-sidebar-item" data-section="overview" href="dashboard.html">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Overview
       </a>
-      <a class="dash-sidebar-item" href="manage-keys.html">
+      <a class="dash-sidebar-item" data-section="apikeys" href="manage-keys.html">
         <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
         API Keys
       </a>
@@ -440,15 +444,15 @@ function toggleDashSidebar() {
     <!-- PERSONAL -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">Personal</div>
-      <a class="dash-sidebar-item" href="billing.html">
+      <a class="dash-sidebar-item" data-section="billing" href="billing.html">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         Billing
       </a>
-      <a class="dash-sidebar-item" href="settings.html">
+      <a class="dash-sidebar-item" data-section="settings" href="settings.html">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         Settings
       </a>
-      <a class="dash-sidebar-item" href="usage.html">
+      <a class="dash-sidebar-item" data-section="usage" href="usage.html">
         <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         Usage &amp; History
       </a>
@@ -456,7 +460,7 @@ function toggleDashSidebar() {
     <!-- ADMIN -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">Admin</div>
-      <a class="dash-sidebar-item" href="logs.html">
+      <a class="dash-sidebar-item active" data-section="overview" href="logs.html">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         Logs
       </a>
@@ -464,11 +468,11 @@ function toggleDashSidebar() {
     <!-- TEAM -->
     <div class="dash-sidebar-section">
       <div class="dash-sidebar-label">Team</div>
-      <a class="dash-sidebar-item" href="team.html">
+      <a class="dash-sidebar-item" data-section="team" href="team.html">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Team
       </a>
-      <a class="dash-sidebar-item" href="referrals.html">
+      <a class="dash-sidebar-item" data-section="referral" href="referrals.html">
         <svg viewBox="0 0 24 24"><path d="M17 20l5-5-5-5"/><path d="M7 4l-5 5 5 5"/><path d="M14 4l-4 16"/></svg>
         Referrals
       </a>
@@ -478,206 +482,62 @@ function toggleDashSidebar() {
   <div class="dash-content">
     <div class="dash-section active" id="section-overview">
       <div class="dash-header">
-        <div class="dash-welcome"><h1>Hello, <span id="dashUserName">User</span></h1><p>Token usage overview</p></div>
+        <div class="dash-welcome"><h1>Logs</h1><p>Monitor system performance and errors</p></div>
       </div>
-      <div class="dash-grid">
-        <div class="dash-balance">
-          <div class="top">
-            <div><div class="label">Available Balance</div><div class="amount"><span id="dashBalance">—</span> <small>GT</small></div><div class="usd-equiv" id="dashUsd">$0.00 USD</div></div>
-            <div class="mini-chart"><canvas id="sparkline" width="120" height="40"></canvas></div>
-          </div>
-          <div class="actions"><button class="btn-primary" onclick="showPage('topup')" style="padding:0.625rem 1.25rem;font-size:0.85rem">Buy Tokens</button></div>
+      <!-- ── ADMIN LOGS: Cost, Errors, Response Time, Speed (2x2 grid) ── -->
+      <div class="logs-grid">
+      <div class="dash-card" id="dashCostBreakdown">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Cost Breakdown by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Per-model spend</span>
         </div>
-        <div class="dash-stats">
-          <div class="dash-stat-card"><div class="num" id="dashTotalSpent">—</div><div class="lbl">Total Spent</div><div class="chg up">↑ Lifetime</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashModelsUsed">—</div><div class="lbl">Models Used</div><div class="chg up">↑ All time</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashTotalRequests">—</div><div class="lbl">API Requests</div><div class="chg up">↑ Total calls</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashKeyCount">—</div><div class="lbl">API Keys Active</div><div class="chg" style="color:var(--text-muted)" id="dashKeyStatus">-</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashDaysActive">—</div><div class="lbl">Days Active</div><div class="chg" style="color:var(--text-muted)" id="dashNewapiStatus">Offline</div></div>
-          <div class="dash-stat-card"><div class="num" id="dashTotalConsumed">—</div><div class="lbl">Tokens Consumed</div><div class="chg" style="color:var(--text-muted)">Lifetime</div></div>
+        <div class="dash-grid" style="margin-bottom:0.75rem">
+          <div class="dash-stat-card"><div class="num" id="cbTotalCost">$0.00</div><div class="lbl">Total Cost</div><div class="chg up">↑ Lifetime</div></div>
+          <div class="dash-stat-card"><div class="num" id="cbMostExpensive">—</div><div class="lbl">Most Expensive Model</div><div class="chg" style="color:var(--text-muted)">Avg cost/call</div></div>
+          <div class="dash-stat-card"><div class="num" id="cbAvgCost">$0.00</div><div class="lbl">Avg Cost / Call</div><div class="chg" style="color:var(--text-muted)">Per request</div></div>
         </div>
+        <div class="chart-container" style="min-height:0"><canvas id="costByModelChart"></canvas></div>
       </div>
-      <div class="dash-card">
-        <div class="dash-section-title">Token Usage <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="usageSubtitle">Loading...</span></div>
-        <div style="margin:0.75rem 0 0.5rem">
-          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem">
-            <span style="color:var(--text-muted)"><span id="usedTokens">—</span> used</span>
-            <span style="color:var(--text-muted)" id="remainingTokens">0 remaining</span>
-          </div>
-          <div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden;position:relative">
-            <div id="quotaBar" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#00D68F);transition:width 0.6s ease"></div>
-          </div>
+      <div class="dash-card" id="dashErrorRate">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Error Rate Monitoring <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Track API errors</span>
         </div>
-        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.25rem">
-          <div style="font-size:0.8rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span id="dashTotalConsumed">—</span> tokens consumed</div>
-          <div style="font-size:0.8rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span id="dashTotalSpentLifetime">$0.00</span> lifetime spend</div>
+        <div class="dash-grid" style="margin-bottom:0.75rem">
+          <div class="dash-stat-card"><div class="num" id="erTotalErrors">0</div><div class="lbl">Total Errors</div><div class="chg" style="color:var(--text-muted)">All time</div></div>
+          <div class="dash-stat-card"><div class="num" id="erErrorRate">0%</div><div class="lbl">Error Rate</div><div class="chg" style="color:var(--text-muted)">Percentage</div></div>
+          <div class="dash-stat-card"><div class="num" id="erLastError">—</div><div class="lbl">Last Error</div><div class="chg" style="color:var(--text-muted)">Time</div></div>
         </div>
+        <div class="chart-container" style="min-height:0"><canvas id="errorRateChart"></canvas></div>
       </div>
-      <div class="dash-card">
-        <div class="dash-section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem">
-          <span>Usage</span>
-          <div style="display:flex;gap:0.25rem;font-size:0.75rem" id="usageRangeBtns">
-            <button class="sort-btn usage-range active" data-days="7" onclick="setUsageRange(7)">7d</button>
-            <button class="sort-btn usage-range" data-days="30" onclick="setUsageRange(30)">30d</button>
-            <button class="sort-btn usage-range" data-days="90" onclick="setUsageRange(90)">90d</button>
-          </div>
-          <select id="usageModelFilter" style="font-size:0.75rem;padding:0.2rem 0.4rem;border-radius:4px;background:var(--bg-alt);border:1px solid var(--border);color:var(--text)" onchange="refreshUsageChart()">
-            <option value="">All Models</option>
-          </select>
-          <div style="display:flex;gap:0.25rem;font-size:0.75rem;margin-left:auto" id="usageModeBtns">
-            <button class="sort-btn usage-mode active" data-mode="tokens" onclick="setUsageMode('tokens')">Tokens</button>
-            <button class="sort-btn usage-mode" data-mode="cost" onclick="setUsageMode('cost')">Cost</button>
-          </div>
+      <div class="dash-card" id="dashResponseTime">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00D68F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Response Time by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Speed indicators</span>
         </div>
-        <div class="chart-container" style="height:180px"><canvas id="dailyChart"></canvas></div>
-        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border)" id="usageSummary">
-          <span id="usageTotalLabel">Total: <strong id="usageTotalVal">0</strong> tokens</span>
-          <span id="usageCostLabel">Cost: <strong id="usageCostVal">$0.00</strong></span>
+        <div style="overflow-x:auto">
+          <table class="tx-table" id="responseTimeTable">
+            <thead><tr><th>Model</th><th>Avg Response Time</th><th>Max Response Time</th><th>Call Count</th><th>Speed</th></tr></thead>
+            <tbody id="responseTimeBody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:0.85rem">Loading response times...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="dash-grid">
-        <div class="dash-card"><div class="dash-section-title">Usage by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">All time</span></div><div class="chart-container"><canvas id="usageChart"></canvas></div><div id="modelRanking" style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.5rem"></div></div>
-        <div class="dash-card"><div class="dash-section-title">Activity Timeline <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="activityCount">0 events</span></div><div id="dashActivity" class="dash-activity"><p style="color:var(--text-muted);font-size:0.85rem;padding:1rem;text-align:center">Loading activity...</p></div></div>
-      </div>
-      <div class="dash-card" id="dashAvailableModels">
-        <div class="dash-section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Your Models <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)" id="modelCountLabel">via New API</span></div>
-        <div id="dashModelList" style="max-height:200px;overflow-y:auto;margin-top:0.25rem"><p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">Connect New API to see available models.</p></div>
-      </div>
-      <div class="dash-card"><div class="dash-section-title">Recent Transactions <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Last 5</span> <a href="usage.html" style="font-size:0.8rem;color:var(--primary);cursor:pointer;margin-left:0.5rem;text-decoration:none">View all →</a></div>
-        <table class="tx-table"><thead><tr><th>Date</th><th>Type</th><th>Detail</th><th>Amount</th><th>Status</th></tr></thead>
-        <tbody id="dashTxBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:0.85rem">No transactions yet</td></tr></tbody></table>
-      </div>
-
-    </div>
-
-    </div>
-
-    <!-- ===== PLAYGROUND SECTION ===== -->
-    <div class="dash-section" id="section-playground">
-
-      <div class="playground-page">
-        <!-- Left Sidebar -->
-        <div class="playground-sidebar" id="playgroundSidebar">
-          <button class="playground-new-btn" onclick="newConversation()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            New Chat
-          </button>
-          <div class="playground-history" id="conversationHistory">
-            <div class="playground-history-item active" onclick="switchConversation(this)" data-id="1">
-              <span class="conv-title">GPT-4o API integration</span>
-              <span class="conv-date">Jun 14</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-              </button>
-            </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="2">
-              <span class="conv-title">Claude 3.5 Sonnet testing</span>
-              <span class="conv-date">Jun 13</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="3">
-              <span class="conv-title">Code generation test</span>
-              <span class="conv-date">Jun 12</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
-            <div class="playground-history-item" onclick="switchConversation(this)" data-id="4">
-              <span class="conv-title">Translation comparison</span>
-              <span class="conv-date">Jun 10</span>
-              <button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
-            </div>
-          </div>
+      <div class="dash-card" id="dashSpeedComparison">
+        <div class="dash-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Model Speed Comparison <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Performance tiers</span>
         </div>
-
-        <!-- Main Chat Area -->
-        <div class="playground-main">
-          <!-- Chat Messages -->
-          <div class="playground-chat" id="chatMessages">
-            <!-- Empty State -->
-            <div class="playground-empty" id="emptyState">
-              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                <path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/>
-              </svg>
-              <h2>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">
-                  <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/>
-                </svg>
-                Start a conversation
-              </h2>
-              <p>Choose a model and start chatting. Your conversations are saved automatically.</p>
-              <div class="playground-suggestions">
-                <span class="playground-suggestion" onclick="useSuggestion('Write a Python function to sort a list of dictionaries by a key')">Write a Python sort function</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Explain quantum computing in simple terms')">Explain quantum computing</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Create a React component for a modal dialog')">React modal component</span>
-                <span class="playground-suggestion" onclick="useSuggestion('Compare GPT-4o vs Claude 3.5 Sonnet performance')">Compare AI models</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Input Area -->
-          <div class="playground-input-area">
-            <div class="playground-input-row">
-              <button class="sidebar-mobile-toggle" onclick="togglePlaygroundSidebar()" title="Toggle sidebar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-              </button>
-              <textarea id="playgroundChatInput" placeholder="Type your message here..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPlaygroundMessage()}"></textarea>
-              <button class="playground-send-btn" id="playgroundSendBtn" onclick="sendPlaygroundMessage()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="playground-toolbar">
-              <select class="playground-model-select" id="modelSelect">
-                <option value="gpt-4o">GPT-4o — OpenAI (⚡ Fast)</option>
-                <option value="claude-3.5-sonnet" selected>Claude 3.5 Sonnet — Anthropic (⚡ Fast)</option>
-                <option value="claude-3-opus">Claude 3 Opus — Anthropic (🐌 Slower)</option>
-                <option value="gemini-2.0">Gemini 2.0 Flash — Google (⚡ Fast)</option>
-                <option value="llama-3.1-405b">Llama 3.1 405B — Meta (⚡ Fast)</option>
-                <option value="deepseek-v3">DeepSeek V3 — DeepSeek (⚡ Fast)</option>
-                <option value="gpt-4-turbo">GPT-4 Turbo — OpenAI (🐌 Slower)</option>
-                <option value="mistral-large">Mistral Large — Mistral (⚡ Fast)</option>
-              </select>
-              <button class="playground-params-toggle" onclick="toggleParamsPanel()" id="paramsToggle">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                </svg>
-                Parameters
-              </button>
-              <span style="font-size:0.75rem;color:var(--text-muted);margin-left:auto" id="tokenEstimate">~0 tokens</span>
-            </div>
-
-            <!-- Parameters Panel -->
-            <div class="playground-params-panel" id="paramsPanel">
-              <div class="playground-param">
-                <label>Temperature <span class="param-value" id="tempValue">0.7</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0.7" oninput="document.getElementById('tempValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Max Tokens</label>
-                <input type="number" value="4096" min="1" max="131072" step="1" style="width:90px" oninput="updateTokenEstimate()" id="maxTokensInput" />
-              </div>
-              <div class="playground-param">
-                <label>Top P <span class="param-value" id="topPValue">1.0</span></label>
-                <input type="range" min="0" max="1" step="0.05" value="1" oninput="document.getElementById('topPValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Frequency Penalty <span class="param-value" id="freqValue">0.0</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('freqValue').textContent=this.value" />
-              </div>
-              <div class="playground-param">
-                <label>Presence Penalty <span class="param-value" id="presValue">0.0</span></label>
-                <input type="range" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('presValue').textContent=this.value" />
-              </div>
-            </div>
-          </div>
+        <div style="overflow-x:auto">
+          <table class="tx-table" id="speedComparisonTable">
+            <thead><tr><th>Model</th><th>Avg Tokens/sec</th><th>Avg Latency</th><th>Reliability %</th><th>Speed Tier</th></tr></thead>
+            <tbody id="speedComparisonBody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;font-size:0.85rem">Loading speed data...</td></tr>
+            </tbody>
+          </table>
         </div>
+      </div>
       </div>
 
     </div>
@@ -689,7 +549,6 @@ function toggleDashSidebar() {
   <span style="font-size:16px;line-height:1;font-weight:700">→</span>
 </button>
 
-  <!-- TOP-UP -->
 <footer><div class="container">
     <div class="footer-grid">
       <div class="footer-brand notranslate"><a href="/" class="nav-logo notranslate"><span class="nav-logo-icon"><img src="logo-nav.png" alt="GlbTOKEN" width="30" height="32" class="nav-logo-img" /></span><span class="logo-full notranslate"><span class="logo-glb notranslate">Glb</span><span class="logo-token notranslate">TOKEN</span></span></a><p data-i18n="footer-tagline">Global Token for AI. One balance, 100+ models, 56 providers. Pay-as-you-go.</p><div class="trust-badges notranslate"><span class="trust-badge notranslate">💳 Stripe</span><span class="trust-badge notranslate">🔶 Paystack</span><span class="trust-badge notranslate">₿ USDT</span><span class="trust-badge notranslate">₿ BTC</span></div></div>
@@ -748,163 +607,160 @@ function toggleDashSidebar() {
 })();
 </script>
 
-// ===== Playground Functions =====
-var conversationCount = 4;
-var currentConversationId = 1;
-
-function togglePlaygroundSidebar(){
-  document.getElementById('playgroundSidebar').classList.toggle('open');
-}
-function newConversation(){
-  conversationCount++;
-  var id = conversationCount;
-  var history = document.getElementById('conversationHistory');
-  var item = document.createElement('div');
-  item.className = 'playground-history-item';
-  item.setAttribute('data-id', id);
-  item.onclick = function(){ switchConversation(this); };
-  item.innerHTML = '<span class="conv-title">New conversation</span><span class="conv-date">Today</span>'
-    + '<button class="delete-conv" onclick="event.stopPropagation();deleteConvItem(this)" title="Delete">'
-    + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    + '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
-  history.prepend(item);
-  item.click();
-  document.getElementById('playgroundSidebar').classList.remove('open');
-}
-function switchConversation(el){
-  document.querySelectorAll('.playground-history-item').forEach(function(i){ i.classList.remove('active'); });
-  el.classList.add('active');
-  currentConversationId = el.getAttribute('data-id');
-  clearChat();
-}
-function deleteConvItem(btn){
-  showConfirm('Delete Conversation', 'Delete this conversation?', function(){
-    var item = btn.closest('.playground-history-item');
-    if(item){
-      var next = item.nextElementSibling || item.previousElementSibling;
-      item.remove();
-      if(next) { next.click(); } else { clearChat(); }
-    }
-  }, 'Delete');
-}
-function clearChat(){
-  var chat = document.getElementById('chatMessages');
-  chat.innerHTML = '';
-  showEmptyState();
-}
-function showEmptyState(){
-  var chat = document.getElementById('chatMessages');
-  if(chat.querySelector('.playground-msg')) return;
-  chat.innerHTML = '<div class="playground-empty" id="emptyState">'
-    + '<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'
-    + '<path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>'
-    + '<h2><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px">'
-    + '<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg> Start a conversation</h2>'
-    + '<p>Choose a model and start chatting. Your conversations are saved automatically.</p>'
-    + '<div class="playground-suggestions">'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Write a Python function to sort a list of dictionaries by a key\')">Write a Python sort function</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Explain quantum computing in simple terms\')">Explain quantum computing</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Create a React component for a modal dialog\')">React modal component</span>'
-    + '<span class="playground-suggestion" onclick="useSuggestion(\'Compare GPT-4o vs Claude 3.5 Sonnet performance\')">Compare AI models</span>'
-    + '</div></div>';
-}
-function useSuggestion(text){
-  document.getElementById('playgroundChatInput').value = text;
-  document.getElementById('playgroundChatInput').focus();
-  sendPlaygroundMessage();
-}
-function sendPlaygroundMessage(){
-  var input = document.getElementById('playgroundChatInput');
-  var text = input.value.trim();
-  if(!text) return;
-  var empty = document.getElementById('emptyState');
-  if(empty) empty.remove();
-  var chat = document.getElementById('chatMessages');
-  var userMsg = document.createElement('div');
-  userMsg.className = 'playground-msg user';
-  userMsg.innerHTML = '<div class="avatar">U</div><div class="bubble-group"><div class="bubble">'+escapeHtml(text)+'</div><div class="msg-meta">Just now</div></div>';
-  chat.appendChild(userMsg);
-  input.value = '';
-  input.style.height = 'auto';
-  document.getElementById('playgroundSendBtn').disabled = true;
-  updateTokenEstimate();
-  chat.scrollTop = chat.scrollHeight;
-  showTypingIndicator();
-  setTimeout(function(){
-    removeTypingIndicator();
-    var modelName = document.getElementById('modelSelect').options[document.getElementById('modelSelect').selectedIndex].text;
-    var response = getSimulatedResponse(text);
-    var tokenCount = Math.floor(Math.random() * 300) + 50;
-    var responseTime = (Math.random() * 2.5 + 0.5).toFixed(2);
-    var aiMsg = document.createElement('div');
-    aiMsg.className = 'playground-msg ai';
-    aiMsg.innerHTML = '<div class="avatar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg></div>'
-      + '<div class="bubble-group">'
-      + '<div class="bubble">'+response+'</div>'
-      + '<div class="msg-meta"><span class="model-badge">'+modelName.split(' — ')[0]+'</span><span>'+tokenCount+' tokens</span><span>'+responseTime+'s</span></div>'
-      + '</div>';
-    chat.appendChild(aiMsg);
-    chat.scrollTop = chat.scrollHeight;
-    document.getElementById('playgroundSendBtn').disabled = false;
-    var active = document.querySelector('.playground-history-item.active .conv-title');
-    if(active && active.textContent === 'New conversation'){
-      active.textContent = text.substring(0, 30) + (text.length > 30 ? '...' : '');
-    }
-  }, 1500 + Math.random() * 1000);
-}
-function showTypingIndicator(){
-  var chat = document.getElementById('chatMessages');
-  var typing = document.createElement('div');
-  typing.className = 'playground-msg ai playground-typing';
-  typing.id = 'typingIndicator';
-  typing.innerHTML = '<div class="avatar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg></div><div class="bubble-group"><div class="bubble">Thinking</div></div>';
-  chat.appendChild(typing);
-  chat.scrollTop = chat.scrollHeight;
-}
-function removeTypingIndicator(){
-  var typing = document.getElementById('typingIndicator');
-  if(typing) typing.remove();
-}
-function getSimulatedResponse(text){
-  var responses = [
-    "That's a great question! Let me break it down for you.\n\nBased on my analysis, here are the key points to consider:\n\n1. **Performance**: Modern AI models excel at this type of task, especially when the input is well-structured.\n\n2. **Best Practices**: I recommend using a systematic approach — break the problem into smaller, manageable parts.\n\n3. **Example**: Here's a simple implementation:\n\n```python\ndef solution(data):\n    result = []\n    for item in data:\n        processed = transform(item)\n        result.append(processed)\n    return result\n```\n\nWould you like me to go into more detail on any specific aspect?",
-    "I can help with that! Here's what I know about this topic.\n\n**Overview:**\nThe field has evolved significantly over the past few years. Key developments include:\n\n- Better algorithmic efficiency\n- Larger-scale training data\n- Improved hardware acceleration\n\n**Practical Application:**\nWhen implementing this, consider:\n1. Start with a clear specification\n2. Use proper error handling\n3. Test with realistic data\n4. Monitor performance metrics\n\nLet me know if you'd like specific code examples or further explanation!",
-    "Excellent question! Here's my detailed response.\n\n## Key Insights\n\nAfter careful consideration, I believe the most important factors are:\n\n### 1. Architecture\nModern approaches use transformer-based designs that scale efficiently.\n\n### 2. Data Quality\nHigh-quality, diverse training data remains crucial for good results.\n\n### 3. Evaluation\nAlways validate your outputs against ground truth when possible.\n\nFeel free to ask follow-up questions!"
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
-}
+<script>
+/* ── Logs Page Scripts ── */
 function escapeHtml(text){
-  var div = document.createElement('div');
-  div.appendChild(document.createTextNode(text));
-  return div.innerHTML;
+  if(typeof text !== 'string') return text||'';
+  var d=document.createElement('div');
+  d.appendChild(document.createTextNode(text));
+  return d.innerHTML;
 }
-function toggleParamsPanel(){
-  var panel = document.getElementById('paramsPanel');
-  var toggle = document.getElementById('paramsToggle');
-  panel.classList.toggle('open');
-  if(panel.classList.contains('open')){
-    toggle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Close';
-  } else {
-    toggle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>\n          Parameters';
-  }
+function showToast(msg,type){if(typeof window.showToast==='function'){window.showToast(msg,type)}}
+function api(method,url,body,timeout){
+  return fetch(url,{method:method||'GET',headers:{'Authorization':'Bearer '+(localStorage.getItem('gt_token')||''),'Content-Type':'application/json'},body:body?JSON.stringify(body):null,signal:timeout?AbortSignal.timeout(timeout):void 0}).then(function(r){if(!r.ok)throw new Error('API error '+r.status);return r.json()}).catch(function(e){console.error('API call failed:',e);throw e});
 }
-function updateTokenEstimate(){
-  var input = document.getElementById('playgroundChatInput').value;
-  var approx = Math.floor(input.length * 1.3);
-  var maxTokens = parseInt(document.getElementById('maxTokensInput').value) || 4096;
-  document.getElementById('tokenEstimate').textContent = '~'+approx+' / '+maxTokens+' tokens';
-}
-// Auto-resize textarea for playground
-document.addEventListener('DOMContentLoaded', function(){
-  var input = document.getElementById('playgroundChatInput');
-  if(input){
-    input.addEventListener('input', function(){
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-      updateTokenEstimate();
+
+async function loadCostBreakdown(days){
+  try{
+    var container=document.getElementById('costBreakdownSection');
+    if(container){
+      var s=container.querySelector('.loading-indicator');
+      if(s)s.style.display='flex';
+    }
+    var el=document.getElementById('costByModelChart');
+    if(!el)return;
+    var data=await api('GET','/api/analytics/cost-by-model?days='+(days||7));
+    if(!data||!data.models||!data.models.length){
+      if(window.costChartInst){window.costChartInst.destroy();window.costChartInst=null}
+      el.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No cost data available.</p>';
+      return;
+    }
+    if(window.costChartInst){window.costChartInst.destroy()}
+    var labels=data.models.map(function(m){return m.model||'Unknown'});
+    var costs=data.models.map(function(m){return m.cost||0});
+    var tokens=data.models.map(function(m){return m.tokens||0});
+    window.costChartInst=new Chart(el,{
+      type:'bar',
+      data:{
+        labels:labels,
+        datasets:[
+          {label:'Cost ($)',data:costs,backgroundColor:'rgba(244,180,0,0.7)',borderColor:'#F4B400',borderWidth:1,borderRadius:4},
+          {label:'Tokens',data:tokens,backgroundColor:'rgba(0,214,143,0.5)',borderColor:'#00D68F',borderWidth:1,borderRadius:4}
+        ]
+      },
+      options:{
+        indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'var(--text-muted)',font:{size:10}}}},
+        scales:{
+          x:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+          y:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+        }
+      }
     });
+    var totalCostEl=document.getElementById('costBreakdownTotal');
+    if(totalCostEl)totalCostEl.textContent='$'+(data.total_cost||0).toFixed(2);
+    var modelCountEl=document.getElementById('costBreakdownModels');
+    if(modelCountEl)modelCountEl.textContent=data.models.length+' models';
+  }catch(e){
+    showToast('Failed to load cost breakdown','error');
+  }finally{
+    if(container){
+      var s2=container.querySelector('.loading-indicator');
+      if(s2)s2.style.display='none';
+    }
   }
+}
+
+async function loadErrorRate(days){
+  try{
+    var el=document.getElementById('errorRateChart');
+    if(!el)return;
+    var data=await api('GET','/api/analytics/error-rate?days='+(days||7));
+    if(!data||!data.labels||!data.labels.length){
+      if(window.errorChartInst){window.errorChartInst.destroy();window.errorChartInst=null}
+      el.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No error rate data available.</p>';
+      return;
+    }
+    if(window.errorChartInst){window.errorChartInst.destroy()}
+    window.errorChartInst=new Chart(el,{
+      type:'line',
+      data:{
+        labels:data.labels,
+        datasets:[
+          {label:'Success',data:data.success||[],borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,0.1)',fill:true,tension:0.3,pointRadius:3},
+          {label:'Errors',data:data.errors||[],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3,pointRadius:3}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'var(--text-muted)',font:{size:10}}}},
+        scales:{
+          y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'var(--text-muted)',font:{size:10}}},
+          x:{grid:{display:false},ticks:{color:'var(--text-muted)',font:{size:10}}}
+        }
+      }
+    });
+    var errRateEl=document.getElementById('errorRatePct');
+    if(errRateEl)errRateEl.textContent=((data.error_rate||0)*100).toFixed(1)+'%';
+    var totalErrEl=document.getElementById('errorTotal');
+    if(totalErrEl)totalErrEl.textContent=(data.total_errors||0).toLocaleString();
+  }catch(e){
+    showToast('Failed to load error rates','error');
+  }
+}
+
+async function loadResponseTimes(days){
+  try{
+    var body=document.getElementById('responseTimeBody');
+    if(!body)return;
+    body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+    var data=await api('GET','/api/analytics/response-times?days='+(days||7));
+    if(!data||!data.items||!data.items.length){
+      body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No response time data available.</td></tr>';
+      return;
+    }
+    body.innerHTML=data.items.map(function(item){
+      var ms=item.response_time_ms||0;
+      var cls=ms<500?'speed-fast':ms<2000?'speed-medium':'speed-slow';
+      return '<tr><td>'+escapeHtml(item.model||'-')+'</td><td>'+escapeHtml(item.provider||'-')+'</td><td class="'+cls+'">'+ms.toFixed(0)+' ms</td><td>'+escapeHtml(item.date||'')+'</td></tr>';
+    }).join('');
+  }catch(e){
+    var b2=document.getElementById('responseTimeBody');
+    if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load response times.</td></tr>';
+  }
+}
+
+async function loadSpeedComparison(){
+  try{
+    var body=document.getElementById('speedComparisonBody');
+    if(!body)return;
+    body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+    var result=await api('GET','/api/available-models',null,8000);
+    var models=(result&&result.models)||[];
+    if(!models.length){
+      body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No speed comparison data available.</td></tr>';
+      return;
+    }
+    var sorted=models.filter(function(m){return m.prompt_price>0;}).sort(function(a,b){return (a.prompt_price||0)-(b.prompt_price||0);}).slice(0,20);
+    body.innerHTML=sorted.map(function(m){
+      var name=m.name||m.model||m.model_id||'Unknown';
+      var provider=m.provider||'-';
+      var price=m.prompt_price||0;
+      var speedCls=price<0.0000005?'speed-fast':price<0.000002?'speed-medium':'speed-slow';
+      var speedLabel=price<0.0000005?'Fast':price<0.000002?'Medium':'Slower';
+      return '<tr><td>'+escapeHtml(name)+'</td><td>'+escapeHtml(provider)+'</td><td class="'+speedCls+'">'+speedLabel+'</td><td>$'+(price*1000).toFixed(4)+'/1K</td></tr>';
+    }).join('');
+  }catch(e){
+    var b2=document.getElementById('speedComparisonBody');
+    if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load speed comparison.</td></tr>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  loadCostBreakdown();
+  loadErrorRate();
+  loadResponseTimes();
+  loadSpeedComparison();
 });
 </script>
 
