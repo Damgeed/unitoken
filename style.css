@@ -25,7 +25,7 @@
     .logo-glb{color:var(--primary)}.logo-full{display:inline-flex;align-items:center}.nowrap{white-space:nowrap}
     .logo-token{color:var(--text)}
     .nav-center{display:flex;align-items:center;gap:1.75rem}
-    .nav-center a{font-size:0.875rem;font-weight:500;color:var(--text-secondary);transition:color 0.2s;cursor:pointer}
+    .nav-center a{font-size:0.875rem;font-weight:700;color:var(--text-secondary);transition:color 0.2s;cursor:pointer}
     .nav-center a:hover,.nav-center a.active{color:var(--text)}
     .nav-right{display:flex;align-items:center;gap:1rem;position:relative}
     .nav-balance-standalone{display:none;padding:0.4rem 0.9rem;border-radius:var(--radius-sm);background:var(--primary-subtle);border:1px solid hsla(44 96% 52% / 0.2);font-size:0.8rem;font-weight:600;color:var(--primary);white-space:nowrap;letter-spacing:0.01em}
