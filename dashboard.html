@@ -86,7 +86,7 @@ body{background:var(--bg)}
 .dash-activity .activity-item .act-time{font-size:0.72rem;color:var(--text-muted);margin-left:auto;white-space:nowrap}
 
 /* ── Playground — ChatGPT-style ── */
-.pg-page{display:flex;height:calc(100vh - 112px);position:relative;background:var(--bg);overflow:hidden}
+.pg-page{display:flex;flex:1;position:relative;background:var(--bg);overflow:hidden;min-height:0}
 .pg-sidebar{width:260px;min-width:260px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 .pg-new-btn{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;margin:0.75rem;border-radius:8px;background:var(--primary);color:#0A0B14;font-weight:600;font-size:0.82rem;cursor:pointer;border:none;transition:all 0.2s;justify-content:center}
 .pg-new-btn:hover{opacity:0.9}
@@ -215,9 +215,13 @@ body{background:var(--bg)}
 }
 
 /* Overview section visible by default */
+.dash-section{display:none}
 #section-overview{display:block}
+#section-overview.active{display:block}
 #section-playground{display:none}
 .dash-section.active{display:block!important}
+#section-playground.active{display:flex!important;flex-direction:column;height:calc(100vh - 110px);min-height:0}
+#section-overview:not(.active){display:none!important}
 @media(max-width:768px){
   .dash-balance{padding:1rem!important}
   .dash-stats{grid-template-columns:repeat(3,1fr)!important}
