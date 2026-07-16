@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GlbTOKEN — Getting Started</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0B14;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:3rem 1rem}
+.wrap{max-width:900px;width:100%}
+h1{text-align:center;font-size:2rem;font-weight:700;margin-bottom:0.3rem}
+h1 .glb{color:#F4B400}
+h1 .token{color:#00D68F}
+.sub{text-align:center;color:#888;font-size:0.95rem;margin-bottom:3rem;letter-spacing:0.3px}
+.timeline{position:relative;padding-left:60px}
+.timeline::before{content:'';position:absolute;left:22px;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,#F4B400 0%,#00D68F 50%,#F4B400 100%);border-radius:2px;box-shadow:0 0 12px rgba(244,180,0,0.15)}
+.step{position:relative;margin-bottom:2.8rem;padding-left:2rem;opacity:0;animation:fadeSlide 0.6s ease forwards}
+.step:nth-child(1){animation-delay:0.1s}
+.step:nth-child(2){animation-delay:0.25s}
+.step:nth-child(3){animation-delay:0.4s}
+.step:nth-child(4){animation-delay:0.55s}
+.step:nth-child(5){animation-delay:0.7s}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.step:last-child{margin-bottom:0}
+.dot{position:absolute;left:-60px;top:4px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;border:3px solid;z-index:2;transition:transform 0.3s}
+.step:hover .dot{transform:scale(1.15)}
+.step:nth-child(1) .dot{background:rgba(244,180,0,0.12);border-color:#F4B400;color:#F4B400}
+.step:nth-child(2) .dot{background:rgba(0,214,143,0.12);border-color:#00D68F;color:#00D68F}
+.step:nth-child(3) .dot{background:rgba(244,180,0,0.12);border-color:#F4B400;color:#F4B400}
+.step:nth-child(4) .dot{background:rgba(0,214,143,0.12);border-color:#00D68F;color:#00D68F}
+.step:nth-child(5) .dot{background:rgba(244,180,0,0.12);border-color:#F4B400;color:#F4B400}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1.4rem 1.6rem;transition:all 0.3s}
+.step:hover .card{background:rgba(255,255,255,0.055);border-color:rgba(255,255,255,0.1);transform:translateX(4px)}
+.card-title{font-size:1.1rem;font-weight:600;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.5rem}
+.card-title .icon{font-size:1.2rem}
+.card-title .hl{font-weight:700}
+.card-title .hl.gold{color:#F4B400}
+.card-title .hl.teal{color:#00D68F}
+.card p{color:#999;font-size:0.88rem;line-height:1.6}
+.card .tags{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap}
+.tag{font-size:0.68rem;padding:0.2rem 0.6rem;border-radius:6px;font-weight:500;letter-spacing:0.2px}
+.tag.gold{background:rgba(244,180,0,0.12);color:#F4B400}
+.tag.teal{background:rgba(0,214,143,0.12);color:#00D68F}
+.tag.blue{background:rgba(79,195,247,0.12);color:#4FC3F7}
+.tag.purple{background:rgba(124,77,255,0.12);color:#7C4DFF}
+.code-block{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:0.8rem 1rem;margin-top:0.7rem;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:0.8rem;color:#ccc;overflow-x:auto;position:relative}
+.code-block .prompt{color:#F4B400}
+.code-block .str{color:#00D68F}
+.code-block .kw{color:#7C4DFF}
+.code-block .cmt{color:#666;font-style:italic}
+.code-block .copy-hint{position:absolute;right:8px;top:8px;font-size:0.6rem;color:#555;letter-spacing:0.3px}
+.footer{text-align:center;margin-top:3rem;padding:1.5rem;border-top:1px solid rgba(255,255,255,0.04)}
+.footer a{color:#00D68F;text-decoration:none;font-weight:500}
+.footer a:hover{text-decoration:underline}
+.footer .cta{display:inline-block;background:linear-gradient(135deg,#F4B400,#00D68F);color:#0A0B14;font-weight:700;padding:0.8rem 2rem;border-radius:10px;font-size:1rem;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;margin-top:0.8rem}
+.footer .cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(244,180,0,0.25);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="glb">Glb</span><span class="token">TOKEN</span></h1>
+  <p class="sub">Getting Started — 5 Steps to Your First API Call</p>
+
+  <div class="timeline">
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="dot">1</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📝</span> Sign Up</div>
+        <p>Create your GlbTOKEN account in seconds. Choose your preferred method — <strong class="hl gold">email</strong>, <strong class="hl teal">Google</strong>, or <strong class="hl gold">GitHub</strong> OAuth.</p>
+        <div class="tags">
+          <span class="tag gold">EMAIL</span>
+          <span class="tag teal">GOOGLE</span>
+          <span class="tag blue">GITHUB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="dot">2</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">💳</span> Buy Tokens</div>
+        <p>Fund your wallet via <strong class="hl gold">Stripe</strong> (cards), <strong class="hl teal">Paystack</strong> (African payment methods), or <strong class="hl gold">Crypto</strong> (USDT/BTC). Minimum top-up: $5.</p>
+        <div class="tags">
+          <span class="tag blue">STRIPE</span>
+          <span class="tag teal">PAYSTACK</span>
+          <span class="tag gold">USDT</span>
+          <span class="tag purple">BTC</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="dot">3</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔑</span> Get API Key</div>
+        <p>Go to your <strong class="hl teal">Dashboard → API Keys</strong>. Click <em>"Create Key"</em>, give it a name, and copy the key. <strong class="hl gold">Keep it secret — it's shown once!</strong></p>
+        <div class="tags">
+          <span class="tag teal">DASHBOARD</span>
+          <span class="tag gold">SECRET</span>
+          <span class="tag blue">ONE-TIME</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="dot">4</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">⚡</span> Make Your First API Call</div>
+        <p>Use your API key with the OpenAI-compatible endpoint. <strong class="hl gold">No SDK needed</strong> — any OpenAI client works.</p>
+        <div class="code-block">
+          <span class="copy-hint">COPY</span>
+          <span class="prompt">$</span> curl https://api.glbtoken.com/v1/chat/completions \<br>
+          &nbsp;&nbsp;-H <span class="str">"Authorization: Bearer gbtk_xxxxxxxxxxxx"</span> \<br>
+          &nbsp;&nbsp;-H <span class="str">"Content-Type: application/json"</span> \<br>
+          &nbsp;&nbsp;-d <span class="str">'{</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"model": "gpt-4o",</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"messages": [{"role": "user", "content": "Hello!"}]</span><br>
+          &nbsp;&nbsp;<span class="str">}'</span>
+        </div>
+        <div class="tags" style="margin-top:0.7rem">
+          <span class="tag purple">CURL</span>
+          <span class="tag teal">PYTHON</span>
+          <span class="tag gold">JAVASCRIPT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="dot">5</div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> Monitor Usage</div>
+        <p>Track everything in real-time from your <strong class="hl teal">Dashboard</strong>: token consumption, spending by model, API key activity, and monthly billing. Set <strong class="hl gold">budget alerts</strong> to stay in control.</p>
+        <div class="tags">
+          <span class="tag teal">REAL-TIME</span>
+          <span class="tag gold">BUDGETS</span>
+          <span class="tag blue">ANALYTICS</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p style="color:#888;margin-bottom:1rem">Ready to build? Start for free with $5 in trial credits.</p>
+    <a class="cta" href="https://glbtoken.com">🚀 Get Started Free →</a>
+  </div>
+</div>
+</body>
+</html>

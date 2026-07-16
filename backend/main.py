@@ -85,7 +85,7 @@ async def lifespan(app: FastAPI):
     # Shutdown (nothing to clean up yet)
 
 
-app = FastAPI(title="GlbTOKEN API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="GlbTOKEN API", version="1.0.0", lifespan=lifespan, docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
