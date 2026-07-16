@@ -57,6 +57,7 @@
   .tx-table{font-size:0.75rem}
   .tx-table th,.tx-table td{padding:0.4rem 0.3rem}
   #historyBody{min-width:550px}
+  #loginTable{min-width:650px}
 }
 
 /* ── Professional Dashboard Styling ── */
@@ -453,7 +454,7 @@ function toggleDashSidebar() {
           Login Attempts
         </div>
         <div style="overflow-x:auto">
-          <table class="tx-table">
+          <table class="tx-table" id="loginTable">
             <thead><tr><th>Timestamp</th><th class="ip-col">IP Address</th><th>Device / Browser</th><th>Location</th><th>Status</th></tr></thead>
             <tbody id="historyBody">
               <tr>
