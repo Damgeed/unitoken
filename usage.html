@@ -677,7 +677,7 @@ function loadMoreHistory(){
   document.getElementById('historyCount').textContent = 'Showing '+loadedCount+' of '+(loadedCount+moreData.length)+' entries';
 
   if(moreData.length === 0){
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="6 9 12 15 18 9"/></svg> Show Less';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="18 15 12 9 6 15"/></svg> Show Less';
     btn.onclick = showLessHistory;
     btn.disabled = false;
     btn.style.opacity = '';
