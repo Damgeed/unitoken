@@ -519,6 +519,10 @@
       .nowrap{white-space:normal;overflow-wrap:break-word}
       .dash-card,.pricing-card,.model-card,.vp-card,.contact-card,.payment-card,.footer-col,.section-sub{overflow-wrap:break-word;word-break:break-word}
       .plan-price,.plan-name,.section-title,.section-label,.hero h1,.hero p,.footer-brand p,.footer-col a,.footer-col span,.topup-header,.cat-pill,.nav-center a{overflow-wrap:break-word;word-break:break-word}
+      /* Scroll hint: subtle arrow on right edge of scrollable containers, pulses on load */
+      [style*="overflow-x:auto"]{position:relative}
+      [style*="overflow-x:auto"]::after{content:'→';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--primary);pointer-events:none;animation:scrollHintPulse 2s ease-in-out 1s 3 forwards;opacity:0}
+      @keyframes scrollHintPulse{0%,100%{opacity:0;transform:translateY(-50%) translateX(0)}50%{opacity:0.7;transform:translateY(-50%) translateX(4px)}}
     }
     @media(max-width:600px){
       .hero h1{font-size:2rem;text-align:center}.hero-stats{flex-wrap:wrap;gap:1rem;justify-content:center}
