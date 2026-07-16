@@ -538,8 +538,10 @@
       .footer-grid .footer-col span{margin-bottom:0.2rem;font-size:0.8rem}
       .footer-brand .nav-logo{font-size:1.05rem}
       .footer-brand p{font-size:0.78rem;margin-top:0.4rem}
-      .footer-bottom{flex-direction:row;justify-content:center;gap:0.75rem;text-align:center;font-size:0.75rem}
+      .footer-bottom{flex-direction:row;justify-content:center;gap:0.75rem;text-align:center;font-size:0.75rem;padding-top:0.75rem;margin-top:1rem}
       .footer-brand p{max-width:100%}
+      footer{padding:1.5rem 0 1rem}
+      .trust-badges{gap:0.35rem}
       .dash-page{padding:1rem 0 1.5rem}
       .apikey-page{padding:1rem 0 1.5rem}
       .models-page{padding:1rem 0 1.5rem}
