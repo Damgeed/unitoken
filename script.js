@@ -2473,9 +2473,10 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       _sessionExpiredShown = true;
       var existing=document.getElementById('sessionExpiredModal');
       if(existing)return;
+      document.body.style.overflow = 'hidden';
       var m=document.createElement('div');
       m.id='sessionExpiredModal';
-      m.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);animation:fadeIn 0.15s ease';
+      m.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);animation:fadeIn 0.15s ease';
       var theme=document.documentElement.className;
       var isDark=theme==='dark';
       var cardBg=isDark?'#1e1f29':'#ffffff';
@@ -2491,11 +2492,12 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       document.body.appendChild(m);
       document.getElementById('sessionLoginBtn').onclick=function(){
         m.remove();
+        document.body.style.overflow = '';
         token='';userData={};
         localStorage.removeItem('gt_token');localStorage.removeItem('gt_user');
         window.location.href='login.html';
       };
-      m.onclick=function(e){if(e.target===m){m.remove();_sessionExpiredShown=false}};
+      m.onclick=function(e){if(e.target===m){m.remove();document.body.style.overflow='';_sessionExpiredShown=false}};
     }
     // ── Themed prompt dialog ──
     function showPrompt(title, placeholder, onSubmit){
