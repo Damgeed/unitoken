@@ -3343,7 +3343,11 @@ function insertPromptSuggestion(text) {
   });
   document.addEventListener('DOMContentLoaded',function(){
     var s=getSidebar();
-    if(s)obs.observe(s,{attributes:true,attributeFilter:['class']});
+    if(s){
+      obs.observe(s,{attributes:true,attributeFilter:['class']});
+      // Block browser back/forward swipe on dash pages
+      document.body.style.touchAction='pan-y';
+    }
   });
   
   document.addEventListener('touchstart',function(e){
@@ -3352,7 +3356,9 @@ function insertPromptSuggestion(text) {
     var t=e.touches[0];
     startX=t.clientX;startY=t.clientY;
     swiping=true;
-  },{passive:true});
+    // If touch starts in the edge zone, immediately claim the gesture
+    if(startX<=EDGE_ZONE){e.preventDefault()}
+  },{passive:false});
   document.addEventListener('touchmove',function(e){
     if(!swiping||!sb)return;
     var t=e.touches[0];
