@@ -1305,6 +1305,10 @@
       if(btn){btn.disabled=false;btn.textContent='Send Reset Link'}
     }
     function applyAuth(){
+      var sbName=document.getElementById('sbUserName');
+      var sbAv=document.getElementById('sbAvatar');
+      if(sbName&&userData&&userData.name)sbName.textContent=userData.name;
+      if(sbAv&&userData&&userData.name)sbAv.textContent=userData.name.charAt(0).toUpperCase();
       const loggedIn=!!token;
       var ng=document.getElementById('navGuest');if(ng)ng.style.display=loggedIn?'none':'flex';
       var nu=document.getElementById('navUser');if(nu)nu.style.display=loggedIn?'flex':'none';
