@@ -28,10 +28,7 @@ body{background:var(--bg)}
 #section-referral .dash-grid{grid-template-columns:repeat(4,1fr)}
 #section-team .dash-grid{grid-template-columns:repeat(4,1fr)}
 /* Standardised vertical spacing — all section children except header get 1.25rem gap */
-.dash-section > .dash-card,
-.dash-section > .dash-grid,
-.dash-section > .settings-grid,
-.dash-section > .billing-grid{margin-bottom:1.25rem}
+.dash-section > div{margin-bottom:1.25rem}
 .dash-section > :last-child{margin-bottom:0}
 .dash-section > .dash-header{margin-bottom:0}
 .dash-balance{background:linear-gradient(135deg,hsla(44 96% 52% / 0.18) 0%,hsla(44 96% 52% / 0.04) 100%);border:1px solid hsla(44 96% 52% / 0.25);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden}
@@ -191,10 +188,7 @@ body{background:var(--bg)}
   .status-text{display:none}
   .ip-col{display:none}
   .loc-city{display:inline}
-  .dash-section > .dash-card,
-  .dash-section > .dash-grid,
-  .dash-section > .settings-grid,
-  .dash-section > .billing-grid{margin-bottom:0.75rem}
+  .dash-section > div{margin-bottom:0.75rem}
   .pg-empty{padding:1.5rem 1rem}
   .pg-empty-logo{font-size:1.8rem}
   .pg-empty-sub{font-size:0.95rem}
@@ -489,7 +483,7 @@ function toggleDashSidebar() {
       </div>
 
       <!-- ═══════ CHARTS ROW: Bar Chart + Donut ═══════ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
         <!-- API Calls per Model Bar Chart -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;font-size:0.82rem;font-weight:600">
@@ -593,7 +587,7 @@ function toggleDashSidebar() {
       </div>
 
       <!-- ═══════ USAGE CHART + ACTIVITY FEED ═══════ -->
-      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem;margin-bottom:1.25rem">
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem">
         <!-- Usage Chart (Chart.js) -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem">
@@ -679,7 +673,7 @@ function toggleDashSidebar() {
       </div>
 
       <!-- ═══════ TOKEN USAGE BAR ═══════ -->
-      <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.25rem">
+      <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
         <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;font-size:0.82rem;font-weight:600">
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#F4B400"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M9 9h6"/></svg> Token Usage <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)" id="usageSubtitle">Loading...</span></span>
         </div>
@@ -693,7 +687,7 @@ function toggleDashSidebar() {
       </div>
 
       <!-- ═══════ AVAILABLE MODELS ═══════ -->
-      <div class="dash-card" id="dashAvailableModels" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.25rem">
+      <div class="dash-card" id="dashAvailableModels" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
         <div class="dash-section-title" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;font-size:0.82rem;font-weight:600">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
           Your Models <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)" id="modelCountLabel">via New API</span>

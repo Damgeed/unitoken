@@ -69,10 +69,7 @@ body{background:var(--bg)}
 #section-referral .dash-grid{grid-template-columns:repeat(4,1fr)}
 #section-team .dash-grid{grid-template-columns:repeat(4,1fr)}
 /* Standardised vertical spacing — all section children except header get 1.25rem gap */
-.dash-section > .dash-card,
-.dash-section > .dash-grid,
-.dash-section > .settings-grid,
-.dash-section > .billing-grid{margin-bottom:1.25rem}
+.dash-section > div{margin-bottom:1.25rem}
 .dash-section > :last-child{margin-bottom:0}
 .dash-section > .dash-header{margin-bottom:0}
 .dash-balance{background:linear-gradient(135deg,hsla(44 96% 52% / 0.18) 0%,hsla(44 96% 52% / 0.04) 100%);border:1px solid hsla(44 96% 52% / 0.25);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden}
@@ -165,10 +162,7 @@ body{background:var(--bg)}
   .ip-col{display:none}
   .loc-city{display:inline}
   /* Mobile standardised vertical spacing */
-  .dash-section > .dash-card,
-  .dash-section > .dash-grid,
-  .dash-section > .settings-grid,
-  .dash-section > .billing-grid{margin-bottom:0.75rem}
+  .dash-section > div{margin-bottom:0.75rem}
   #section-referral .dash-grid{grid-template-columns:1fr 1fr!important;gap:0.4rem;overflow-x:auto}
   #referral-share-charts{grid-template-columns:1fr 1fr!important;gap:1rem}
   #referral-share-charts>.dash-card:first-child{grid-column:1/-1}

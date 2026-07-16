@@ -72,10 +72,7 @@ body{background:var(--bg)}
 #section-referral .dash-grid{grid-template-columns:repeat(4,1fr)}
 #section-team .dash-grid{grid-template-columns:repeat(4,1fr)}
 /* Standardised vertical spacing — all section children except header get 1.25rem gap */
-.dash-section > .dash-card,
-.dash-section > .dash-grid,
-.dash-section > .settings-grid,
-.dash-section > .billing-grid{margin-bottom:1.25rem}
+.dash-section > div{margin-bottom:1.25rem}
 .dash-section > :last-child{margin-bottom:0}
 .dash-section > .dash-header{margin-bottom:0}
 .dash-balance{background:linear-gradient(135deg,hsla(44 96% 52% / 0.18) 0%,hsla(44 96% 52% / 0.04) 100%);border:1px solid hsla(44 96% 52% / 0.25);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden}
@@ -168,10 +165,7 @@ body{background:var(--bg)}
   .ip-col{display:none}
   .loc-city{display:inline}
   /* Mobile standardised vertical spacing */
-  .dash-section > .dash-card,
-  .dash-section > .dash-grid,
-  .dash-section > .settings-grid,
-  .dash-section > .billing-grid{margin-bottom:0.75rem}
+  .dash-section > div{margin-bottom:0.75rem}
   #section-referral .dash-grid{grid-template-columns:1fr 1fr!important;gap:0.4rem;overflow-x:auto}
   #referral-share-charts{grid-template-columns:1fr 1fr!important;gap:1rem}
   #referral-share-charts>.dash-card:first-child{grid-column:1/-1}
@@ -391,7 +385,7 @@ function toggleDashSidebar() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB347" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
           Cost Breakdown by Model <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Per-model spend</span>
         </div>
-        <div class="dash-grid" style="margin-bottom:0.75rem;grid-template-columns:repeat(3,1fr)">
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr)">
           <div class="dash-stat-card"><div class="num" id="cbTotalCost">$0.00</div><div class="lbl">Total Cost</div><div class="chg up">↑ Lifetime</div></div>
           <div class="dash-stat-card"><div class="num" id="cbMostExpensive">—</div><div class="lbl">Most Expensive Model</div><div class="chg" style="color:var(--text-muted)">Avg cost/call</div></div>
           <div class="dash-stat-card"><div class="num" id="cbAvgCost">$0.00</div><div class="lbl">Avg Cost / Call</div><div class="chg" style="color:var(--text-muted)">Per request</div></div>
@@ -404,7 +398,7 @@ function toggleDashSidebar() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Error Rate Monitoring <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted)">Track API errors</span>
         </div>
-        <div class="dash-grid" style="margin-bottom:0.75rem;grid-template-columns:repeat(3,1fr)">
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr)">
           <div class="dash-stat-card"><div class="num" id="erTotalErrors">0</div><div class="lbl">Total Errors</div><div class="chg" style="color:var(--text-muted)">All time</div></div>
           <div class="dash-stat-card"><div class="num" id="erErrorRate">0%</div><div class="lbl">Error Rate</div><div class="chg" style="color:var(--text-muted)">Percentage</div></div>
           <div class="dash-stat-card"><div class="num" id="erLastError">—</div><div class="lbl">Last Error</div><div class="chg" style="color:var(--text-muted)">Time</div></div>
