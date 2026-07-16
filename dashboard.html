@@ -488,7 +488,7 @@ function toggleDashSidebar() {
         <!-- API Calls per Model Bar Chart -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;font-size:0.82rem;font-weight:600">
-            <span>📊 API Calls per Model</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#F4B400"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg> API Calls per Model</span>
             <span style="font-size:0.72rem;color:var(--text-muted);cursor:pointer">7d ▼</span>
           </div>
           <div style="display:flex;align-items:flex-end;gap:0.4rem;height:100px;padding-top:0.25rem">
@@ -550,7 +550,7 @@ function toggleDashSidebar() {
         <!-- Spending by Provider Donut Chart -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;font-size:0.82rem;font-weight:600">
-            <span>💰 Spending by Provider</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#00D68F"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Spending by Provider</span>
             <span style="font-size:0.72rem;color:var(--text-muted);cursor:pointer">This month</span>
           </div>
           <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
@@ -592,7 +592,7 @@ function toggleDashSidebar() {
         <!-- Usage Chart (Chart.js) -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem">
-            <span style="font-size:0.82rem;font-weight:600">📈 Usage</span>
+            <span style="font-size:0.82rem;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#4FC3F7"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Usage</span>
             <div style="display:flex;gap:0.2rem;font-size:0.65rem" id="usageRangeBtns">
               <button class="sort-btn usage-range active" data-days="7" onclick="setUsageRange(7)" style="padding:0.25rem 0.5rem;font-size:0.65rem;border-radius:4px">7d</button>
               <button class="sort-btn usage-range" data-days="30" onclick="setUsageRange(30)" style="padding:0.25rem 0.5rem;font-size:0.65rem;border-radius:4px">30d</button>
@@ -616,7 +616,7 @@ function toggleDashSidebar() {
         <!-- Activity Timeline (upgraded) -->
         <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
           <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;font-size:0.82rem;font-weight:600">
-            <span>⚡ Activity</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#F4B400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Activity</span>
             <span style="font-size:0.72rem;color:var(--primary);cursor:pointer">Live ▸</span>
           </div>
           <div id="dashActivity" class="dash-activity" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:0.35rem">
@@ -676,7 +676,7 @@ function toggleDashSidebar() {
       <!-- ═══════ TOKEN USAGE BAR ═══════ -->
       <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.25rem">
         <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;font-size:0.82rem;font-weight:600">
-          <span>🪙 Token Usage <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)" id="usageSubtitle">Loading...</span></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#F4B400"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M9 9h6"/></svg> Token Usage <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)" id="usageSubtitle">Loading...</span></span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.35rem">
           <span style="color:var(--text-muted)"><span id="usedTokens">—</span> used</span>
@@ -699,7 +699,7 @@ function toggleDashSidebar() {
       <!-- ═══════ RECENT TRANSACTIONS ═══════ -->
       <div class="dash-card" style="padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg)">
         <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;font-size:0.82rem;font-weight:600">
-          <span>📋 Recent Transactions <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">Last 5</span></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:#4FC3F7"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Recent Transactions <span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">Last 5</span></span>
           <a href="usage.html" style="font-size:0.75rem;color:var(--primary);cursor:pointer;text-decoration:none">View all →</a>
         </div>
         <table class="tx-table" style="width:100%;border-collapse:collapse;font-size:0.82rem">
