@@ -183,7 +183,8 @@ body{background:var(--bg)}
 .toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:2px;bottom:2px;background:var(--text-muted);border-radius:50%;transition:0.3s}
 .toggle-switch input:checked+.toggle-slider{background:var(--primary);border-color:var(--primary)}
 .toggle-switch input:checked+.toggle-slider::before{background:#0A0B14;transform:translateX(20px)}
-.notif-grid{display:flex;flex-direction:column;gap:0.5rem}
+.notif-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem}
+@media(max-width:768px){.notif-grid{grid-template-columns:1fr;gap:0.5rem}}
 .notif-item{transition:all 0.2s}
 .notif-item:hover{background:var(--bg-alt)!important}
 .chart-container{height:220px;position:relative;margin-top:0.5rem}
