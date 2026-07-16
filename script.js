@@ -2512,6 +2512,26 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       };
       // Modal cannot be dismissed by clicking outside — only Log In works
     }
+    // ── Dash sidebar: close sidebar first when tapping any item ──
+    document.addEventListener('click',function(e){
+      var item=e.target.closest('.dash-sidebar-item');
+      if(!item)return;
+      var sb=document.getElementById('dashSidebar');
+      if(!sb)return;
+      // Close sidebar immediately
+      sb.classList.remove('open');
+      var toggle=document.getElementById('dashSidebarToggle');
+      if(toggle)toggle.classList.remove('hidden');
+      // If the link points to the current page, prevent reload
+      var href=item.getAttribute('href');
+      if(href){
+        var curPage=window.location.pathname.split('/').pop()||'dashboard.html';
+        var targetPage=href.split('#')[0].split('?')[0]||'dashboard.html';
+        if(targetPage===curPage||(targetPage==='dashboard.html'&&curPage==='')){
+          e.preventDefault();
+        }
+      }
+    });
     // ── Themed prompt dialog ──
     function showPrompt(title, placeholder, onSubmit){
       var existing=document.getElementById('promptModal');
