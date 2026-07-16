@@ -3,18 +3,6 @@
       ? 'https://glbtoken-backend-production.up.railway.app' : 'https://glbtoken-backend-production.up.railway.app';
     let token = localStorage.getItem('gt_token') || '';
     let userData = JSON.parse(localStorage.getItem('gt_user') || '{}');
-    // Check JWT expiry client-side — redirect to login if expired
-    if (token) {
-      try {
-        var payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.exp && payload.exp * 1000 < Date.now()) {
-          localStorage.removeItem('gt_token');
-          localStorage.removeItem('gt_user');
-          token = '';
-          userData = {};
-        }
-      } catch(e) { /* invalid token — will fail backend check anyway */ }
-    }
     let keys = JSON.parse(localStorage.getItem('gt_keys') || '[]');
     let newapiToken = localStorage.getItem('gt_newapi_token') || '';
     let newapiEndpoint = localStorage.getItem('gt_newapi_endpoint') || '';
