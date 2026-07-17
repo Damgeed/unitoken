@@ -6394,6 +6394,12 @@ body {
 #section-team .dash-grid {
   grid-template-columns: repeat(4, 1fr);
 }
+@media (max-width: 480px) {
+  #section-team .dash-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
 /* Standardised vertical spacing — all section children except header get 1.25rem gap */
 .dash-section > div {
   margin-bottom: 1.25rem;
