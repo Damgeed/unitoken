@@ -6346,13 +6346,21 @@ html.light .star.white {
 @media (max-width: 768px) {
   .scroll-hint {
     display: block;
-    text-align: center;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 0.85rem;
     color: var(--primary);
     opacity: 0.6;
-    margin-top: 0.4rem;
+    margin-top: 0;
+    pointer-events: none;
     animation: scrollHintPulse 1.8s ease-in-out infinite;
     letter-spacing: 2px;
+    z-index: 2;
+  }
+  .dash-card {
+    position: relative;
   }
 }
 @keyframes scrollHintPulse {
