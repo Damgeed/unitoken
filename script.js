@@ -3349,7 +3349,7 @@ function insertPromptSuggestion(text) {
   inputEl.focus();
 }
 
-// ── Mobile swipe to open dash sidebar ──
+// ── Swipe/drag to open dash sidebar (mobile + desktop) ──
 (function(){
   const THRESHOLD=40; // px to trigger open/close
   const EDGE_ZONE=40; // px from left edge for open gesture
@@ -3379,13 +3379,13 @@ function insertPromptSuggestion(text) {
     }
   });
   
+  // ── Touch events (mobile) ──
   document.addEventListener('touchstart',function(e){
     sb=getSidebar();
     if(!sb)return;
     var t=e.touches[0];
     startX=t.clientX;startY=t.clientY;
     swiping=true;
-    // If touch starts in the edge zone, immediately claim the gesture
     if(startX<=EDGE_ZONE){e.preventDefault()}
   },{passive:false});
   document.addEventListener('touchmove',function(e){
@@ -3393,27 +3393,23 @@ function insertPromptSuggestion(text) {
     var t=e.touches[0];
     var dx=t.clientX-startX;
     var dy=t.clientY-startY;
-    // Only handle horizontal swipes (more horizontal than vertical)
     if(Math.abs(dx)<Math.abs(dy))return;
-    // Opening: swipe right from left edge
     if(!isOpen()&&startX<=EDGE_ZONE&&dx>THRESHOLD){
-      e.preventDefault(); // prevent scroll/nav
+      e.preventDefault();
       sb.classList.add('open');
       var toggle=document.getElementById('dashSidebarToggle');
       if(toggle)toggle.classList.add('hidden');
       swiping=false;
       return;
     }
-    // Closing: swipe left when open
     if(isOpen()&&dx<-THRESHOLD){
-      e.preventDefault(); // prevent scroll/nav
+      e.preventDefault();
       sb.classList.remove('open');
       var toggle=document.getElementById('dashSidebarToggle');
       if(toggle)toggle.classList.remove('hidden');
       swiping=false;
       return;
     }
-    // If sidebar is open, prevent any horizontal scroll
     if(isOpen()&&Math.abs(dx)>10){
       e.preventDefault();
     }
@@ -3421,5 +3417,34 @@ function insertPromptSuggestion(text) {
   document.addEventListener('touchend',function(){
     swiping=false;
   },{passive:true});
+  
+  // ── Mouse events (desktop drag from left edge) ──
+  document.addEventListener('mousedown',function(e){
+    sb=getSidebar();
+    if(!sb||e.button!==0)return;
+    startX=e.clientX;startY=e.clientY;
+    swiping=(startX<=EDGE_ZONE);
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!swiping||!sb)return;
+    var dx=e.clientX-startX;
+    if(!isOpen()&&startX<=EDGE_ZONE&&dx>THRESHOLD){
+      sb.classList.add('open');
+      var toggle=document.getElementById('dashSidebarToggle');
+      if(toggle)toggle.classList.add('hidden');
+      swiping=false;
+      return;
+    }
+    if(isOpen()&&dx<-THRESHOLD){
+      sb.classList.remove('open');
+      var toggle=document.getElementById('dashSidebarToggle');
+      if(toggle)toggle.classList.remove('hidden');
+      swiping=false;
+      return;
+    }
+  });
+  document.addEventListener('mouseup',function(){
+    swiping=false;
+  });
 })();
 
