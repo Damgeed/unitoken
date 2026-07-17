@@ -6347,8 +6347,8 @@ html.light .star.white {
   .scroll-hint {
     display: block;
     text-align: center;
-    font-size: 1.1rem;
-    color: var(--primary);
+    font-size: 0.8rem;
+    color: var(--text-muted);
     opacity: 0.5;
     margin-top: 0.4rem;
     animation: scrollHintPulse 1.8s ease-in-out infinite;
