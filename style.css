@@ -6378,22 +6378,18 @@ html.light .star.white {
     color: var(--text-muted);
     opacity: 0;
     margin-top: 0.5rem;
-    animation: scrollHintFlash 6s ease-in-out forwards;
-    animation-delay: 1s;
+    animation: scrollHintFlash 3s ease-in-out forwards;
+    animation-delay: 0.5s;
   }
 }
 @keyframes scrollHintFlash {
   0% { opacity: 0; }
-  10% { opacity: 0.7; }
-  15% { opacity: 0.3; }
-  25% { opacity: 0.7; }
-  30% { opacity: 0.3; }
-  40% { opacity: 0.7; }
+  15% { opacity: 0.7; }
+  25% { opacity: 0.3; }
+  35% { opacity: 0.7; }
   45% { opacity: 0.3; }
   55% { opacity: 0.7; }
-  60% { opacity: 0.3; }
-  70% { opacity: 0.5; }
-  80% { opacity: 0.2; }
+  65% { opacity: 0.3; }
   100% { opacity: 0; }
 }
 /* ── Professional Dashboard Styling ── */
