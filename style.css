@@ -6344,23 +6344,24 @@ html.light .star.white {
 .flex-row-wrap { display:flex;gap:0.5rem;flex-wrap:wrap; }
 .scroll-hint { display:none; }
 @media (max-width: 768px) {
-  .scroll-hint {
-    display: block;
+  .dash-card [style*="overflow-x:auto"],
+  .dash-card .scroll-x {
+    position: relative;
+  }
+  .dash-card [style*="overflow-x:auto"]::after,
+  .dash-card .scroll-x::after {
+    content: "⟷";
     position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.85rem;
+    right: 6px;
+    bottom: 6px;
+    font-size: 1rem;
     color: var(--primary);
     opacity: 0.6;
-    margin-top: 0;
     pointer-events: none;
     animation: scrollHintPulse 1.8s ease-in-out infinite;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     z-index: 2;
-  }
-  .dash-card {
-    position: relative;
+    line-height: 1;
   }
 }
 @keyframes scrollHintPulse {
