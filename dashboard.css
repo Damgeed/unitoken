@@ -348,6 +348,13 @@ body {
 #dashActivity .activity-item:last-child {
   border-bottom: none !important;
 }
+/* Spending by Provider list — responsive borders for light/dark */
+.spending-list > div {
+  border-bottom: 1px solid var(--border-light) !important;
+}
+.spending-list > div:last-child {
+  border-bottom: none !important;
+}
 
 /* ── Playground — glbgpt.com/home style ── */
 .pg-page {

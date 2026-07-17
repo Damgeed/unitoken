@@ -335,26 +335,26 @@ function toggleDashSidebar() {
             <div style="position:relative;width:150px;height:150px;flex-shrink:0">
               <canvas id="spendingDonut" width="150" height="150" style="width:150px;height:150px"></canvas>
               <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
-                <div style="font-size:1.1rem;font-weight:700;color:#fff">$0.00</div>
+                <div style="font-size:1.1rem;font-weight:700;color:var(--text)">$0.00</div>
                 <div style="font-size:0.6rem;color:var(--text-muted)">spent</div>
               </div>
             </div>
-            <div style="flex:1;min-width:120px">
+            <div style="flex:1;min-width:120px" class="spending-list">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
                 <div style="display:flex;align-items:center;gap:0.35rem"><span style="width:7px;height:7px;border-radius:2px;background:#F4B400;flex-shrink:0"></span><span style="font-size:0.72rem;color:var(--text-secondary)">OpenAI</span><span style="font-size:0.68rem;color:var(--text-muted)">42%</span></div>
-                <span style="font-size:0.72rem;font-weight:500;color:#fff">$30.41</span>
+                <span style="font-size:0.72rem;font-weight:500;color:var(--text)">$30.41</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
                 <div style="display:flex;align-items:center;gap:0.35rem"><span style="width:7px;height:7px;border-radius:2px;background:#00D68F;flex-shrink:0"></span><span style="font-size:0.72rem;color:var(--text-secondary)">Anthropic</span><span style="font-size:0.68rem;color:var(--text-muted)">25%</span></div>
-                <span style="font-size:0.72rem;font-weight:500;color:#fff">$18.10</span>
+                <span style="font-size:0.72rem;font-weight:500;color:var(--text)">$18.10</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
                 <div style="display:flex;align-items:center;gap:0.35rem"><span style="width:7px;height:7px;border-radius:2px;background:#7C4DFF;flex-shrink:0"></span><span style="font-size:0.72rem;color:var(--text-secondary)">DeepSeek</span><span style="font-size:0.68rem;color:var(--text-muted)">15%</span></div>
-                <span style="font-size:0.72rem;font-weight:500;color:#fff">$10.86</span>
+                <span style="font-size:0.72rem;font-weight:500;color:var(--text)">$10.86</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04)">
                 <div style="display:flex;align-items:center;gap:0.35rem"><span style="width:7px;height:7px;border-radius:2px;background:#4FC3F7;flex-shrink:0"></span><span style="font-size:0.72rem;color:var(--text-secondary)">Google</span><span style="font-size:0.68rem;color:var(--text-muted)">10%</span></div>
-                <span style="font-size:0.72rem;font-weight:500;color:#fff">$7.24</span>
+                <span style="font-size:0.72rem;font-weight:500;color:var(--text)">$7.24</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:0.25rem 0">
                 <div style="display:flex;align-items:center;gap:0.35rem"><span style="width:7px;height:7px;border-radius:2px;background:#FF6B6B;flex-shrink:0"></span><span style="font-size:0.72rem;color:var(--text-secondary)">Other</span><span style="font-size:0.68rem;color:var(--text-muted)">8%</span></div>
