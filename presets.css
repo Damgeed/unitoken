@@ -1,0 +1,19 @@
+/* ── Presets page styles ── */
+.presets-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.presets-header h1{font-size:1.5rem;font-weight:700;margin-bottom:0.25rem}
+.presets-header p{font-size:0.85rem;color:var(--text-secondary)}
+.presets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:1rem}
+.preset-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:all 0.2s}
+.preset-card:hover{border-color:hsla(44 96% 52% / 0.25);box-shadow:var(--shadow-hover);transform:translateY(-2px)}
+.preset-card .pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem}
+.preset-card .pc-icon{font-size:2rem}
+.preset-card .pc-name{font-weight:600;font-size:1rem;margin-bottom:0.2rem}
+.preset-card .pc-desc{font-size:0.82rem;color:var(--text-muted);line-height:1.45;margin-bottom:0.75rem}
+.preset-card .pc-tags{display:flex;gap:0.35rem;flex-wrap:wrap}
+.preset-card .pc-tag{font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:999px;background:var(--bg-alt);color:var(--text-muted);font-weight:500;border:1px solid var(--border)}
+.preset-card .pc-cost{font-size:0.75rem;color:var(--primary);font-weight:500}
+@media(max-width:768px){
+  .presets-header h1{font-size:1.25rem}
+  .presets-grid{grid-template-columns:1fr;gap:0.75rem}
+  .preset-card{padding:1rem}
+}

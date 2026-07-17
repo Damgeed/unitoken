@@ -1,0 +1,7 @@
+/* ── Referral page extras ── */
+#section-referral{display:block}
+/* chart scroll row — desktop: 2-column grid */
+@media(min-width:769px){
+  .chart-scroll-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem}
+  .chart-scroll-row>.dash-card{overflow:hidden}
+}

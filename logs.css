@@ -1,0 +1,6 @@
+/* ── Logs page extras ── */
+.logs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:768px){.logs-grid{grid-template-columns:1fr;gap:0.75rem}}
+
+/* Logs section visible by default */
+#section-logs{display:block}
