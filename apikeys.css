@@ -1,3 +1,73 @@
+/* ── Docs page — extracted inline styles ── */
+
+.doc-section { margin-bottom: 2rem; }
+.doc-hero { text-align: center; margin-bottom: 2.5rem; }
+.doc-hero .section-title { font-size: 2rem; }
+.doc-hero p { color: var(--text-secondary); margin: 0.5rem auto 0; }
+
+.section-heading { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; }
+.section-heading-mb { margin-bottom: 1rem; }
+.heading-icon { vertical-align: middle; margin-right: 6px; }
+
+.desc-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.desc-sm { font-size: 0.85rem; color: var(--text-secondary); }
+.text-footnote { font-size: 0.85rem; color: var(--text-muted); }
+.text-footnote-sm { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem; }
+.text-secondary { color: var(--text-secondary); }
+
+.code-wrapper { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 0.75rem; position: relative; }
+.code-wrapper-mb-lg { margin-bottom: 1rem; }
+.code-wrapper-no-mb { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; position: relative; }
+.code-block { font-family: monospace; font-size: 0.85rem; line-height: 1.7; overflow-x: auto; white-space: pre; color: var(--text); }
+.copy-btn { position: absolute; top: 6px; right: 6px; background: var(--bg); border: 1px solid var(--border-light); border-radius: 4px; cursor: pointer; font-size: 0.7rem; padding: 2px 5px; color: var(--text-secondary); opacity: 0.55; line-height: 1; z-index: 2; }
+
+/* Syntax highlighting for code blocks */
+.syn-kw { color: var(--primary); }
+.syn-str { color: var(--text-muted); }
+.syn-plain { color: var(--text); }
+
+/* Auth header display */
+.auth-header { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 0.75rem; font-family: monospace; font-size: 0.85rem; color: var(--text); }
+
+/* Base URL display */
+.base-url-display { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 0.75rem; font-family: monospace; font-size: 0.9rem; color: var(--primary); word-break: break-all; }
+
+/* Doc tables */
+.doc-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.doc-table thead tr { border-bottom: 1px solid var(--border); color: var(--text-muted); }
+.doc-table tbody tr { border-bottom: 1px solid var(--border-light); }
+.doc-table th { text-align: left; padding: 0.625rem 0.75rem; }
+.doc-table th.t-right { text-align: right; }
+.doc-table td { padding: 0.5rem 0.75rem; }
+.doc-table td.t-right { text-align: right; }
+
+.cell-first { color: var(--text); }
+.cell-num { text-align: right; color: var(--text-secondary); }
+.cell-desc { color: var(--text-secondary); }
+.cell-error { color: var(--destructive); }
+
+/* Inline code */
+.inline-code { background: var(--bg-alt); padding: 0.15rem 0.4rem; border-radius: 4px; }
+.inline-code-lg { background: var(--bg-alt); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem; }
+
+/* Best practices list */
+.best-practices { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8; padding-left: 1.25rem; }
+.best-practices strong { color: var(--text); }
+
+/* CTA section */
+.cta-section { margin-bottom: 2rem; text-align: center; padding: 2rem; }
+.cta-btn { padding: 0.75rem 2rem; }
+.cta-btn-hidden { padding: 0.75rem 2rem; display: none; }
+
+/* Button row */
+.btn-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+/* Section small heading */
+.section-heading-sm { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+
+/* List item bottom margin */
+.li-mb { margin-bottom: 0.5rem; }
+
 @media (max-width: 768px) {
   .apikey-page {
     padding: 0.75rem 0.5rem 2rem;
