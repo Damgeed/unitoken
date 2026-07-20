@@ -6366,7 +6366,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
   padding-bottom: 0.75rem;
 }
 .dash-welcome h1 {
@@ -6403,15 +6402,12 @@ body {
     gap: 0.75rem;
   }
 }
-/* Standardised vertical spacing — all section children except header get 1.25rem gap */
-.dash-section > div {
-  margin-bottom: 1.25rem;
+/* Standardised vertical spacing — adjacent section children */
+.dash-section > * + * {
+  margin-top: 1.25rem;
 }
-.dash-section > :last-child {
-  margin-bottom: 0;
-}
-.dash-section > .dash-header {
-  margin-bottom: 0;
+.dash-section > .dash-header + * {
+  margin-top: 0;
 }
 .dash-balance {
   background: linear-gradient(
@@ -6771,7 +6767,6 @@ body {
     flex-direction: row;
     text-align: left;
     gap: 0.35rem;
-    margin-bottom: 0.75rem;
   }
   .dash-welcome h1 {
     font-size: 1.2rem;
@@ -6881,8 +6876,8 @@ body {
     text-align: center;
   }
   /* Mobile standardised vertical spacing */
-  .dash-section > div {
-    margin-bottom: 0.75rem;
+  .dash-section > * + * {
+    margin-top: 0.75rem;
   }
   #section-referral .dash-grid {
     grid-template-columns: 1fr 1fr !important;
