@@ -1,4 +1,3 @@
-<style>
 /* ── Billing page extras ── */
 .billing-grid{display:grid;gap:1.25rem;margin-top:1.25rem}
 @media(min-width:768px){.billing-grid{grid-template-columns:1fr 1fr}}
@@ -52,4 +51,137 @@
   .tx-table{min-width:500px}
   .tx-table th,.tx-table td{white-space:nowrap}
 }
-</style>
+
+/* ── Referrals inline style extraction ── */
+/* Sidebar toggle arrow */
+.refs-sidebar-arrow {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+/* Referral code in stat card */
+.refs-code-text {
+  font-size: 1.1rem;
+  font-family: monospace;
+  letter-spacing: 2px;
+  color: #F4B400;
+}
+/* Card with top margin + bottom padding */
+.refs-card-hero {
+  margin-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+/* Share link row */
+.refs-share-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0.75rem 0;
+}
+/* Referral link box */
+.refs-link-box {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+/* Referral link text */
+.refs-link-text {
+  padding: 0.75rem 1rem;
+  font-family: monospace;
+  font-size: 0.95rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+/* Copy button */
+.refs-copy-btn {
+  border-radius: 0;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+/* Share buttons row */
+.refs-share-btn-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+/* Share button */
+.refs-share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+}
+/* Chart container with min-width for scroll */
+.chart-container-wide {
+  height: 180px;
+  min-width: 300px;
+}
+/* Pending/awaiting color */
+.refs-pending {
+  color: #FFB347;
+}
+/* Status color: success */
+.refs-status-success {
+  color: #00D68F;
+}
+/* Status color: failed */
+.refs-status-failed {
+  color: #FF6B6B;
+}
+/* Rewards grid */
+.refs-rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+/* Reward/incentive card */
+.reward-card {
+  background: var(--bg-alt);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+/* Reward icon — gold */
+.reward-icon-gold {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(244, 180, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+/* Reward icon — teal */
+.reward-icon-teal {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 214, 143, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+/* Reward title */
+.reward-title {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+/* Reward description */
+.reward-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
