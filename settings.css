@@ -248,6 +248,20 @@ button.settings-save-btn:hover {
   .dash-card + .dash-card {
     margin-top: 0.75rem;
   }
+  .settings-input-mt.btn-primary,
+  .settings-input-mt.btn-secondary {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+  button.settings-save-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+  .settings-center-mt .btn-secondary {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 /* Action button right-aligned */
 .settings-btn-right {
