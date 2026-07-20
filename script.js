@@ -3460,3 +3460,37 @@ function insertPromptSuggestion(text) {
   });
 })();
 
+// ── Token recovery from URL (payment redirect) ──
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var urlToken = params.get('token');
+  var urlUser = params.get('user');
+  if (urlToken) {
+    localStorage.setItem('gt_token', urlToken);
+    if (urlUser) {
+      try { localStorage.setItem('gt_user', decodeURIComponent(urlUser)); } catch(e) {}
+    }
+    var clean = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, clean);
+  }
+})();
+
+// ── Dashboard sidebar toggle (called from onclick) ──
+function toggleDashSidebar() {
+  var sb = document.getElementById('dashSidebar');
+  var toggle = document.getElementById('dashSidebarToggle');
+  if(!sb) return;
+  var isOpen = sb.classList.toggle('open');
+  if(toggle) toggle.classList.toggle('hidden', isOpen);
+}
+
+// ── Scroll-hint: hide gold arrow when user scrolls ──
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.dash-card div[style*="overflow-x:auto"], .dash-card .scroll-x').forEach(function(el) {
+    el.addEventListener('scroll', function() {
+      var card = this.closest('.dash-card');
+      if(card) card.classList.add('is-scrolled');
+    }, {passive:true});
+  });
+});
+
