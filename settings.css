@@ -243,18 +243,25 @@ button.settings-save-btn:hover {
   background: var(--primary-hover);
   box-shadow: var(--primary-glow-strong);
 }
+/* Unified secondary button */
+.settings-btn-full {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+.settings-btn-mt {
+  margin-top: 0.75rem;
+}
 /* Gap between cards on mobile */
 @media (max-width: 768px) {
   .dash-card + .dash-card {
     margin-top: 0.75rem;
   }
-  .settings-input-mt.btn-primary,
-  .settings-input-mt.btn-secondary {
+  button.settings-save-btn {
     padding: 0.65rem 1rem;
     font-size: 0.85rem;
-    width: 100%;
   }
-  button.settings-save-btn {
+  .settings-btn-full {
     padding: 0.65rem 1rem;
     font-size: 0.85rem;
   }
