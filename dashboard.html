@@ -255,7 +255,7 @@ function toggleDashSidebar() {
             <div><div class="label">Available Balance</div><div class="amount"><span id="dashBalance" class="dash-gradient-text">0</span> <small>GT</small> <span class="dash-badge-inline"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> +12.4%</span></div><div class="usd-equiv" id="dashUsd">$0.00 USD</div></div>
             <div class="mini-chart"><canvas id="sparkline" width="120" height="40"></canvas></div>
           </div>
-          <div class="actions" class="dash-actions-mt"><button class="btn-primary" onclick="showPage('topup')" class="dash-action-btn">Buy Tokens</button></div>
+          <div class="actions dash-actions-mt"><button class="btn-primary dash-action-btn" onclick="showPage('topup')">Buy Tokens</button></div>
         </div>
         <div class="dash-stats">
           <div class="dash-stat-card"><div class="num" id="dashTotalSpent">—</div><div class="lbl">Total Spent</div><div class="chg up">↑ Lifetime</div></div>
@@ -307,7 +307,7 @@ function toggleDashSidebar() {
               <span  class="label-micro">Mistral</span>
             </div>
           </div>
-          <div class="api-stats-grid" class="model-grid">
+          <div class="api-stats-grid model-grid">
             <div  class="text-center">
               <div  class="stat-value">8.3k</div>
               <div  class="text-tiny-muted">Total Calls</div>
@@ -340,12 +340,12 @@ function toggleDashSidebar() {
           <div class="dash-usage-row">
             <div class="donut-wrap">
               <canvas id="spendingDonut" width="150" height="150" class="donut-canvas"></canvas>
-class="donut-center"
+            <div class="donut-center">
                 <div class="donut-value">$0.00</div>
                 <div  class="text-tiny-muted">spent</div>
               </div>
             </div>
-            <div class="legend-item-flex" class="spending-list">
+            <div class="legend-item-flex spending-list">
               <div  class="provider-row">
                 <div  class="flex-row-sm"><span class="legend-dot legend-dot-gold"></span><span  class="text-sm-secondary">OpenAI</span><span  class="text-xs-muted">42%</span></div>
                 <span  class="text-sm-medium">$30.41</span>
@@ -375,7 +375,7 @@ class="donut-center"
       <div class="charts-side-grid">
         <!-- Usage Chart (Chart.js) -->
         <div class="dash-card stat-card" >
-          <div class="dash-section-title" class="filter-btn-row">
+          <div class="dash-section-title filter-btn-row">
             <span class="filter-btn-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"  class="icon-blue"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Usage</span>
             <div class="filter-badge-row" id="usageRangeBtns">
               <button class="sort-btn usage-range active badge" data-days="7" onclick="setUsageRange(7)" >7d</button>
@@ -390,7 +390,7 @@ class="donut-center"
               <button class="sort-btn usage-mode badge" data-mode="cost" onclick="setUsageMode('cost')" >Cost</button>
             </div>
           </div>
-          <div class="chart-container" class="chart-container-rel"><canvas id="dailyChart"></canvas></div>
+          <div class="chart-container chart-container-rel"><canvas id="dailyChart"></canvas></div>
           <div class="chart-axis-labels" id="usageSummary">
             <span id="usageTotalLabel">Total: <strong id="usageTotalVal"  class="text-semibold">0</strong> tokens</span>
             <span id="usageCostLabel">Cost: <strong id="usageCostVal"  class="text-semibold">$0.00</strong></span>
@@ -403,7 +403,7 @@ class="donut-center"
             <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"  class="icon-gold"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Activity</span>
             <span class="view-details-link">Live ▸</span>
           </div>
-          <div id="dashActivity" class="dash-activity" class="activity-scroll">
+          <div id="dashActivity" class="dash-activity activity-scroll">
             <div class="activity-item activity-row" >
               <div  class="color-dot-blue">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -440,7 +440,7 @@ class="donut-center"
                 <div  class="text-micro-top">32 min ago</div>
               </div>
             </div>
-            <div class="activity-item" class="activity-row">
+            <div class="activity-item activity-row">
               <div class="activity-icon activity-icon-red">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               </div>
@@ -450,7 +450,7 @@ class="donut-center"
               </div>
             </div>
           </div>
-class="activity-footer"
+          <div class="activity-footer">
             <span id="activityCount">5 events</span>
             <span class="activity-view-all">View all →</span>
           </div>
@@ -459,21 +459,21 @@ class="activity-footer"
 
       <!-- ═══════ TOKEN USAGE BAR ═══════ -->
       <div class="dash-card stat-card" >
-class="progress-header"
+<div class="progress-header">
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"  class="icon-gold"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M9 9h6"/></svg> Token Usage <span id="usageSubtitle" class="text-sm-muted">Loading...</span></span>
         </div>
-class="chart-axis-labels"
+        <div class="chart-axis-labels">
           <span  class="text-muted"><span id="usedTokens">—</span> used</span>
           <span id="remainingTokens" class="text-muted">0 remaining</span>
         </div>
         <div class="progress-track">
-class="progress-fill"
+<div class="progress-fill">
         </div>
       </div>
 
       <!-- ═══════ AVAILABLE MODELS ═══════ -->
       <div class="dash-card stat-card" id="dashAvailableModels" >
-class="model-usage-row"
+<div class="model-usage-row">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
           Your Models <span id="modelCountLabel" class="text-sm-muted">via New API</span>
         </div>
@@ -486,7 +486,7 @@ class="model-usage-row"
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"  class="icon-blue"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Recent Transactions <span  class="text-sm-muted">Last 5</span></span>
           <a href="usage.html" class="view-models-link">View all →</a>
         </div>
-        <table class="tx-table" class="tx-table-full">
+        <table class="tx-table tx-table-full">
           <thead><tr><th  class="table-header">Date</th><th  class="table-header">Type</th><th  class="table-header">Detail</th><th class="tx-th tx-th-right">Amount</th><th class="tx-th tx-th-center">Status</th></tr></thead>
           <tbody id="dashTxBody"><tr><td colspan="5" class="td-empty">No transactions yet</td></tr></tbody>
         </table>
