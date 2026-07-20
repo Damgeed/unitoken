@@ -253,14 +253,9 @@ button.settings-save-btn:hover {
 .settings-btn-mt {
   margin-top: 0.75rem;
 }
-/* Gap between cards on mobile */
+
+/* Mobile button sizing */
 @media (max-width: 768px) {
-  .dash-card + .dash-card {
-    margin-top: 0.75rem;
-  }
-  .settings-grid > .dash-card + .dash-card {
-    margin-top: 0;
-  }
   button.settings-save-btn {
     padding: 0.65rem 1rem;
     font-size: 0.85rem;

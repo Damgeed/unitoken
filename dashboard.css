@@ -969,12 +969,6 @@ body {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  .settings-grid > .dash-card + .dash-card {
-    margin-top: 0;
-  }
-  .dash-card + .dash-card {
-    margin-top: 0.75rem;
-  }
   .dash-section > div {
     margin-bottom: 0.75rem;
   }
@@ -985,10 +979,6 @@ body {
   .charts-side-grid {
     grid-template-columns: 1fr !important;
     gap: 0.75rem !important;
-  }
-  .mini-chart-grid > .dash-card + .dash-card,
-  .charts-side-grid > .dash-card + .dash-card {
-    margin-top: 0;
   }
   .billing-grid {
     gap: 0.75rem;
@@ -1187,10 +1177,6 @@ body {
   .charts-side-grid {
     grid-template-columns: 1fr !important;
     gap: 0.75rem !important;
-  }
-  .mini-chart-grid > .dash-card + .dash-card,
-  .charts-side-grid > .dash-card + .dash-card {
-    margin-top: 0;
   }
   .api-stats-grid {
     grid-template-columns: repeat(4, 1fr) !important;

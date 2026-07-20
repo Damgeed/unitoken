@@ -1681,9 +1681,15 @@ input[type="range"]::-moz-range-thumb {
   .dash-content {
     padding: 1rem;
   }
-  .dash-header {
-    margin-bottom: 0.75rem;
+  /* Grids handle internal spacing — reset stacking margin inside them */
+  .logs-grid > .dash-card + .dash-card,
+  .settings-grid > .dash-card + .dash-card,
+  .billing-grid > .dash-card + .dash-card,
+  .mini-chart-grid > .dash-card + .dash-card,
+  .charts-side-grid > .dash-card + .dash-card {
+    margin-top: 0;
   }
+  /* Stacking margin for dash-cards NOT inside a grid (e.g. apikeys.html) */
   .dash-card + .dash-card {
     margin-top: 0.75rem;
   }
