@@ -978,6 +978,12 @@ body {
   .dash-card + .dash-card {
     margin-top: 0.75rem;
   }
+  .mini-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .charts-side-grid {
+    grid-template-columns: 1fr !important;
+  }
   .billing-grid {
     gap: 0.5rem;
     margin: 0;
@@ -1167,10 +1173,10 @@ body {
   .dash-stats {
     grid-template-columns: repeat(3, 1fr) !important;
   }
-  [style*="grid-template-columns:1fr 1fr"] {
+  .mini-chart-grid {
     grid-template-columns: 1fr !important;
   }
-  [style*="grid-template-columns:1.5fr 1fr"] {
+  .charts-side-grid {
     grid-template-columns: 1fr !important;
   }
   .api-stats-grid {
