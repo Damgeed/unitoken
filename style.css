@@ -3454,7 +3454,7 @@ html.light .modal-overlay {
   .models-page .container,
   .topup-page .container {
     max-width: 100% !important;
-    padding: 0 1rem !important;
+    padding: 0 0.5rem !important;
     margin-top: 0 !important;
   }
   .dash-page,
