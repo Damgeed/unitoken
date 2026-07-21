@@ -1678,9 +1678,6 @@ input[type="range"]::-moz-range-thumb {
     z-index: 100;
     border-radius: 0 12px 12px 0;
   }
-  .dash-content {
-    padding: 1rem;
-  }
   /* Grids handle internal spacing — reset stacking margin inside them */
   .logs-grid > .dash-card + .dash-card,
   .settings-grid > .dash-card + .dash-card,
@@ -3156,9 +3153,25 @@ html.light .modal-overlay {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  .container {
+  .container,
+  .dash-content,
+  .dash-page .container,
+  .apikey-page .container,
+  .history-page .container,
+  .models-page .container,
+  .topup-page .container {
     max-width: 100%;
+  }
+  .container,
+  .dash-page .container,
+  .apikey-page .container,
+  .history-page .container,
+  .models-page .container,
+  .topup-page .container {
     padding: 0 0.5rem;
+  }
+  .dash-content {
+    padding: 0.5rem;
   }
   .hero h1 {
     font-size: 2.5rem;
@@ -3448,15 +3461,6 @@ html.light .modal-overlay {
   .history-page {
     padding: 1rem 0 1.5rem;
   }
-  .dash-page .container,
-  .apikey-page .container,
-  .history-page .container,
-  .models-page .container,
-  .topup-page .container {
-    max-width: 100% !important;
-    padding: 0 0.5rem !important;
-    margin-top: 0 !important;
-  }
   .dash-page,
   .topup-page,
   .models-page,
@@ -3616,9 +3620,6 @@ html.light .modal-overlay {
   }
   .calc-result .big {
     font-size: 1.35rem;
-  }
-  .container {
-    padding: 0 0.5rem;
   }
   section {
     padding: 1rem 0;
