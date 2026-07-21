@@ -778,9 +778,14 @@ html.dark .nav-logo-img {
   background-clip: text;
 }
 .hero-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.hero-actions .btn-primary,
+.hero-actions .btn-secondary {
+  padding: 0.65rem 1.5rem;
+  font-size: 0.9rem;
 }
 .btn-primary {
   padding: 0.875rem 2rem;
@@ -3425,8 +3430,8 @@ html.light .modal-overlay {
   .hero-actions .btn-secondary {
     width: 100%;
     text-align: center;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
   }
   .btn-primary,
   .btn-secondary,
