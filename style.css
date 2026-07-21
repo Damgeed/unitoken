@@ -1718,6 +1718,13 @@ input[type="range"]::-moz-range-thumb {
   opacity: 0;
   pointer-events: none;
 }
+@media (min-width: 769px) {
+  .dash-sidebar-toggle.hidden {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 60;
+  }
+}
 @media (max-width: 768px) {
   .dash-sidebar {
     left: -300px;
