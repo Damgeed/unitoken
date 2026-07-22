@@ -1338,6 +1338,27 @@ input[type="range"]::-moz-range-thumb {
 .phone-country:hover {
   background: rgba(255, 255, 255, 0.04);
 }
+.icon-badge {
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.btn-block {
+  width: 100%;
+}
+.btn-block-mt {
+  margin-top: 0.75rem;
+}
+.btn-hidden {
+  display: none;
+}
+.oauth-btn-full {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+.phone-section-hidden {
+  display: none;
+  margin: 0 0 0.75rem 0;
+}
 .phone-country svg {
   opacity: 0.45;
   transition: transform 0.2s;
