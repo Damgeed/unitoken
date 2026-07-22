@@ -1980,6 +1980,16 @@ input[type="range"]::-moz-range-thumb {
   .mb-2-5 {
     margin-bottom: 0.75rem;
   }
+  .models-page,
+  .topup-page {
+    padding: 1rem 0 1.5rem;
+  }
+  .models-page .container,
+  .topup-page .container,
+  .hero .container,
+  section > .container {
+    padding: 0 0.75rem;
+  }
 }
 
 .dash-card {
