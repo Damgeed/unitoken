@@ -1956,7 +1956,7 @@ input[type="range"]::-moz-range-thumb {
     padding: 1rem;
   }
   .blog-listing-page {
-    padding: 1rem 0 1.5rem !important;
+    padding: 0.75rem 0 1.25rem !important;
   }
   .blog-listing-page .container {
     padding: 0 0.75rem;
@@ -1973,7 +1973,7 @@ input[type="range"]::-moz-range-thumb {
     text-align: center !important;
   }
   .dash-page:not(.dash-layout) {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .dash-page:not(.dash-layout) .container {
     padding: 0 0.75rem;
@@ -1985,7 +1985,7 @@ input[type="range"]::-moz-range-thumb {
   .topup-page,
   .apikey-page,
   .history-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .models-page .container,
   .topup-page .container,
@@ -3717,19 +3717,19 @@ html.light .modal-overlay {
     gap: 0.35rem;
   }
   .dash-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .apikey-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .models-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .topup-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .history-page {
-    padding: 1rem 0 1.5rem;
+    padding: 0.75rem 0 1.25rem;
   }
   .dash-page,
   .topup-page,
@@ -6470,10 +6470,10 @@ html.light .star.white {
     padding: 0.5rem 0.75rem;
   }
   section:not(.dash-page):not(.hero) {
-    padding: 1.5rem 0 !important;
+    padding: 0.75rem 0 !important;
   }
   section.hero {
-    padding: 1rem 0 !important;
+    padding: 0.75rem 0 !important;
   }
   .section-title {
     font-size: 1.4rem !important;
