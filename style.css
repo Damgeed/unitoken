@@ -6461,7 +6461,7 @@ html.light .star.white {
   .chat-input-area {
     padding: 0.5rem 0.75rem;
   }
-  section {
+  section:not(.dash-page):not(.hero) {
     padding: 1.5rem 0 !important;
   }
   section.hero {
@@ -6469,7 +6469,7 @@ html.light .star.white {
   }
   .section-title {
     font-size: 1.4rem !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
   }
   .section-sub {
     font-size: 0.85rem !important;
@@ -6478,7 +6478,7 @@ html.light .star.white {
   .section-label {
     font-size: 0.65rem !important;
     padding: 0.2rem 0.6rem !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
   }
   .faq-item .faq-q {
     font-size: 0.9rem !important;
