@@ -1982,11 +1982,15 @@ input[type="range"]::-moz-range-thumb {
     margin-bottom: 0.75rem;
   }
   .models-page,
-  .topup-page {
+  .topup-page,
+  .apikey-page,
+  .history-page {
     padding: 1rem 0 1.5rem;
   }
   .models-page .container,
   .topup-page .container,
+  .apikey-page .container,
+  .history-page .container,
   .hero .container,
   section > .container {
     padding: 0 0.75rem;
@@ -1999,6 +2003,9 @@ input[type="range"]::-moz-range-thumb {
   }
   .faq-list {
     gap: 0.75rem !important;
+  }
+  .section-center-text {
+    margin-bottom: 0.75rem;
   }
 }
 
@@ -2545,6 +2552,9 @@ input[type="range"]::-moz-range-thumb {
 }
 .apikey-page {
   padding: 2rem 1.25rem 3rem;
+}
+.apikey-page .dash-card + .dash-card {
+  margin-top: 1.25rem;
 }
 .api-key-card {
   display: flex;
