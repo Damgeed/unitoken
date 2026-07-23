@@ -2291,9 +2291,26 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       if(btn) btn.remove();
     }
     function lockBodyScroll(hide){
-      document.body.style.overflow = hide ? 'hidden' : '';
-      const fab = document.querySelector('.chat-fab');
-      if(fab) fab.style.display = hide ? 'none' : '';
+      if(hide){
+        var scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.overflow = 'hidden';
+        var fab = document.querySelector('.chat-fab');
+        if(fab) fab.style.display = 'none';
+      } else {
+        var scrollY = parseInt(document.body.style.top || '0') * -1 || 0;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        var fab = document.querySelector('.chat-fab');
+        if(fab) fab.style.display = '';
+        window.scrollTo(0, scrollY);
+      }
     }
     // Auto-resize textareas
     document.addEventListener('DOMContentLoaded',function(){
