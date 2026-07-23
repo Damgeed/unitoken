@@ -295,6 +295,79 @@
       if (pageMap[page]) { window.location=pageMap[page]; }
     }
 
+    // ── Auth Guard ──
+    function requireAuth(){
+      if(!localStorage.getItem('gt_token')){
+        window.location.replace('login.html');
+        return false;
+      }
+      return true;
+    }
+    window.addEventListener('pageshow',function(e){
+      if(e.persisted && !localStorage.getItem('gt_token')){
+        window.location.replace('login.html');
+      }
+    });
+
+    // ── Hero Variants ──
+    function initHeroVariants(){
+      var tagline = document.getElementById('heroTagline');
+      if(tagline){
+        var n = Math.floor(Math.random() * 6) + 1;
+        var key = 'hero-variant-' + n;
+        var lang = localStorage.getItem('gt_lang') || 'en';
+        if(typeof TRANS !== 'undefined' && TRANS[key] && TRANS[key][lang]){
+          tagline.textContent = TRANS[key][lang];
+        } else if(typeof TRANS !== 'undefined' && TRANS[key] && TRANS[key]['en']){
+          tagline.textContent = TRANS[key]['en'];
+        }
+      }
+      var headline = document.getElementById('heroHeadline');
+      if(headline){
+        var n2 = Math.floor(Math.random() * 5) + 1;
+        var key2 = 'hero-headline-' + n2;
+        var lang2 = localStorage.getItem('gt_lang') || 'en';
+        if(typeof TRANS !== 'undefined' && TRANS[key2] && TRANS[key2][lang2]){
+          headline.innerHTML = TRANS[key2][lang2];
+        } else if(typeof TRANS !== 'undefined' && TRANS[key2] && TRANS[key2]['en']){
+          headline.innerHTML = TRANS[key2]['en'];
+        }
+      }
+    }
+
+    // ── Chat Drag Handler ──
+    function initChatDrag(){
+      var cw = document.getElementById('chatWindow');
+      if(!cw) return;
+      var h = cw.querySelector('.chat-header');
+      if(!h) return;
+      var offX, offY, dragging = false;
+      function startDrag(e){
+        if(e.target.tagName === 'BUTTON') return;
+        dragging = true; cw.classList.add('dragging');
+        var r = cw.getBoundingClientRect();
+        var cx = e.clientX || (e.touches && e.touches[0].clientX);
+        var cy = e.clientY || (e.touches && e.touches[0].clientY);
+        offX = cx - r.left; offY = cy - r.top;
+        e.preventDefault();
+      }
+      function moveDrag(e){
+        if(!dragging) return;
+        var cx = e.clientX || (e.touches && e.touches[0].clientX);
+        var cy = e.clientY || (e.touches && e.touches[0].clientY);
+        cw.style.left = (cx - offX) + 'px';
+        cw.style.top = (cy - offY) + 'px';
+        cw.style.right = 'auto'; cw.style.bottom = 'auto';
+      }
+      function endDrag(){if(dragging){dragging=false;cw.classList.remove('dragging')}}
+      h.addEventListener('mousedown', startDrag);
+      h.addEventListener('touchstart', startDrag, {passive:false});
+      document.addEventListener('mousemove', moveDrag);
+      document.addEventListener('touchmove', moveDrag, {passive:false});
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
     // ── Auth (Passwordless Email via Auth0) ──
     function setBtnLoading(btn, loading, originalText) {
       if (!btn) return;
