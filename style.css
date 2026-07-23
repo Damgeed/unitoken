@@ -1795,7 +1795,10 @@ input[type="range"]::-moz-range-thumb {
 .text-muted { color: var(--text-muted); }
 .text-secondary { color: var(--text-secondary); }
 .text-destructive { color: var(--destructive); }
+.text-success { color: var(--success); }
+.text-primary { color: var(--primary); }
 .text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.85rem; }
 .text-nowrap { white-space: nowrap; }
 .text-center { text-align: center; }
 .font-normal { font-weight: 400; }
@@ -1803,6 +1806,20 @@ input[type="range"]::-moz-range-thumb {
 .align-middle { vertical-align: middle; }
 .mx-auto { margin: 0 auto; }
 .block { display: block; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-sm { gap: 0.5rem; }
+.gap-md { gap: 0.75rem; }
+.gap-lg { gap: 1rem; }
+.mt-sm { margin-top: 0.75rem; }
+.mb-sm { margin-bottom: 0.75rem; }
+.mb-md { margin-bottom: 1rem; }
+.mb-lg { margin-bottom: 1.25rem; }
 .flex-1 { flex: 1; }
 .pad-sm { padding: 0.6rem; }
 .overflow-auto { overflow-x: auto; }
@@ -1813,6 +1830,60 @@ input[type="range"]::-moz-range-thumb {
 .opacity-5 { opacity: 0.5; }
 .h-40 { height: 40px; min-height: 0; }
 .empty-state-alt { text-align: center; color: var(--text-muted); padding: 1.5rem; font-size: 0.85rem; }
+.w-full { width: 100%; }
+.cursor-pointer { cursor: pointer; }
+.text-decoration-none { text-decoration: none; }
+.relative { position: relative; }
+.overflow-hidden { overflow: hidden; }
+.rounded-sm { border-radius: var(--radius-sm); }
+.bg-alt { background: var(--bg-alt); }
+.bg-primary-subtle { background: var(--primary-subtle); }
+.hidden { display: none; }
+.mt-xs { margin-top: 0.25rem; }
+.pad-md { padding: 1.25rem; }
+
+/* ── Modal ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-dialog {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  padding: 2rem;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ── Spinner ── */
+.spinner-btn {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: btnSpin .6s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
 
 /* ── Form Field ── */
 .field-label {
