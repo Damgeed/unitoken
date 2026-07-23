@@ -7037,9 +7037,9 @@ body {
     background: var(--card);
     box-shadow: var(--shadow-elevated);
     min-height: auto;
-    max-height: calc(100dvh - 60px);
+    max-height: calc(100% - 32px);
     overflow: hidden;
-    height: calc(100dvh - 60px);
+    height: calc(100% - 32px);
   }
   .ai-chat-section.chat-focused .chat-header {
     flex-shrink: 0;
@@ -7109,8 +7109,8 @@ body {
     position: static;
     width: 100%;
     max-width: 400px;
-    height: calc(100dvh - 60px);
-    max-height: calc(100dvh - 60px);
+    height: calc(100% - 32px);
+    max-height: calc(100% - 32px);
     min-height: auto;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
