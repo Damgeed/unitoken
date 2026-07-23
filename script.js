@@ -2293,23 +2293,30 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     function lockBodyScroll(hide){
       if(hide){
         var scrollY = window.scrollY;
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.top = '-' + scrollY + 'px';
         document.body.style.left = '0';
         document.body.style.right = '0';
-        document.body.style.overflow = 'hidden';
+        window._lockedScrollY = scrollY;
         var fab = document.querySelector('.chat-fab');
         if(fab) fab.style.display = 'none';
       } else {
-        var scrollY = parseInt(document.body.style.top || '0') * -1 || 0;
+        var scrollY = window._lockedScrollY || 0;
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.top = '';
         document.body.style.left = '';
         document.body.style.right = '';
-        document.body.style.overflow = '';
         var fab = document.querySelector('.chat-fab');
         if(fab) fab.style.display = '';
-        window.scrollTo(0, scrollY);
+        window._lockedScrollY = null;
+        // Restore scroll position on next tick so iOS finishes resizing first
+        requestAnimationFrame(function(){
+          window.scrollTo(0, scrollY);
+        });
       }
     }
     // Auto-resize textareas
