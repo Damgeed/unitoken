@@ -284,7 +284,11 @@
         if(timer) clearTimeout(timer);
       }
     }
-
+    // ── Safe API (auto-toast on error) ──
+    async function safeApi(method, path, body, timeoutMs){
+      try { return await api(method, path, body, timeoutMs); }
+      catch(e){ showToast(e.message, 'error'); return null; }
+    }
     // ── Page Routing ──
     function showPage(page){
       // Auth-based redirects for multi-page setup
@@ -749,13 +753,13 @@
       if(!e||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showToast('Please enter a valid email','error');email.focus();return}
       if(!m||m.length<10){showToast('Message must be at least 10 characters','error');msg.focus();return}
       var btn=document.querySelector('.info-card button.btn-primary');
-      setBtnLoading(btn, true, 'Send Message');
-      try{
-        await api('POST','/api/contact',{name:n,email:e,message:m});
-        showToast('Message sent! We\'ll get back to you soon.','success');
-        name.value='';email.value='';msg.value='';
-      }catch(err){showToast(err.message||'Failed to send message','error')}
-      finally{if(btn){btn.disabled=false;btn.textContent='Send Message'}}
+      setBtnLoading(btn, true, 'Sending');
+      try {
+        await safeApi('POST','/api/contact',{name:n,email:e,message:m});
+        showToast('Message sent successfully','success');
+      } finally {
+        if(btn){btn.disabled=false;btn.textContent='Send Message'}
+      }
     }
     async function refreshMe(){
       if(!token)return;
