@@ -5736,10 +5736,17 @@ body {
   position: relative;
   margin-top: 0.5rem;
 }
+.chart-container.chart-sm {
+  height: 40px;
+  margin-top: 0.25rem;
+}
 .chart-container canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
+}
+.chart-container.chart-sm canvas {
+  height: 40px !important;
 }
 .sort-btn {
   padding: 0.4rem 0.75rem;
@@ -7561,8 +7568,14 @@ body {
   .chart-container {
     height: 120px;
   }
+  .chart-container.chart-sm {
+    height: 40px;
+  }
   .chart-container canvas {
     height: 120px !important;
+  }
+  .chart-container.chart-sm canvas {
+    height: 40px !important;
   }
   .dash-header .btn-primary,
   .dash-header .btn-secondary {
