@@ -942,11 +942,10 @@
     }
 
     async function loadResponseTimes(days){
-      try{
-        var body=document.getElementById('responseTimeBody');
-        if(!body)return;
-        body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
-        var data=await api('GET','/api/analytics/response-times?days='+(days||7));
+      var body=document.getElementById('responseTimeBody');
+      if(!body)return;
+      body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+      var data=await safeApi('GET','/api/analytics/response-times?days='+(days||7),null,null,true); if(!data){ body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load response times.</td></tr>';return}
         if(!data||!data.items||!data.items.length){
           body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No response time data available.</td></tr>';
           return;
@@ -956,18 +955,14 @@
           var cls=ms<500?'speed-fast':ms<2000?'speed-medium':'speed-slow';
           return '<tr><td>'+escapeHtml(item.model||'-')+'</td><td>'+escapeHtml(item.provider||'-')+'</td><td class="'+cls+'">'+ms.toFixed(0)+' ms</td><td>'+escapeHtml(item.date||'')+'</td></tr>';
         }).join('');
-      }catch(e){
-        var b2=document.getElementById('responseTimeBody');
-        if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load response times.</td></tr>';
-      }
+
     }
 
     async function loadKeyUsage(days){
-      try{
-        var body=document.getElementById('keyUsageBody');
-        if(!body)return;
-        body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
-        var data=await api('GET','/api/analytics/key-usage?days='+(days||7));
+      var body=document.getElementById('keyUsageBody');
+      if(!body)return;
+      body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+      var data=await safeApi('GET','/api/analytics/key-usage?days='+(days||7),null,null,true); if(!data){ body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load key usage.</td></tr>';return}
         if(!data||!data.keys||!data.keys.length){
           body.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No key usage data available.</td></tr>';
           return;
@@ -975,10 +970,7 @@
         body.innerHTML=data.keys.map(function(k){
           return '<tr><td>'+escapeHtml(k.name||'Key '+k.id)+'</td><td>'+escapeHtml(k.key_prefix||'')+'...</td><td>'+(k.request_count||0).toLocaleString()+'</td><td>'+(k.tokens||0).toLocaleString()+'</td><td>'+escapeHtml(k.last_used?new Date(k.last_used).toLocaleDateString():'Never')+'</td></tr>';
         }).join('');
-      }catch(e){
-        var b2=document.getElementById('keyUsageBody');
-        if(b2)b2.innerHTML='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load key usage.</td></tr>';
-      }
+
     }
 
     async function loadCostProjection(){
@@ -998,11 +990,10 @@
     }
 
     async function loadSpeedComparison(){
-      try{
-        var body=document.getElementById('speedComparisonBody');
-        if(!body)return;
-        body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
-        var result=await api('GET','/api/available-models',null,8000);
+      var body=document.getElementById('speedComparisonBody');
+      if(!body)return;
+      body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-muted)">Loading...</td></tr>';
+      var result=await safeApi('GET','/api/available-models',null,8000,true); if(!result){ body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load speed comparison.</td></tr>';return}
         var models=(result&&result.models)||[];
         if(!models.length){
           body.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No speed comparison data available.</td></tr>';
@@ -1017,10 +1008,7 @@
           var speedLabel=price<0.0000005?'Fast':price<0.000002?'Medium':'Slower';
           return '<tr><td>'+escapeHtml(name)+'</td><td>'+escapeHtml(provider)+'</td><td class="'+speedCls+'">'+speedLabel+'</td><td>$'+(price*1000).toFixed(4)+'/1K</td></tr>';
         }).join('');
-      }catch(e){
-        var b2=document.getElementById('speedComparisonBody');
-        if(b2)b2.innerHTML='<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">Failed to load speed comparison.</td></tr>';
-      }
+
     }
 
 
@@ -1211,11 +1199,10 @@
     }
 
     async function loadMonthlySummary(){
-      try{
-        var container=document.getElementById('monthlySummary');
-        if(!container)return;
-        container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Loading monthly comparison...</p>';
-        var data=await api('GET','/api/activity?months=2');
+      var container=document.getElementById('monthlySummary');
+      if(!container)return;
+      container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Loading monthly comparison...</p>';
+      var data=await safeApi('GET','/api/activity?months=2',null,null,true); if(!data){ container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Failed to load monthly summary.</p>';return}
         var items=(data&&data.items)||[];
         if(!items.length){
           container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Not enough data for monthly comparison.</p>';
@@ -1258,18 +1245,14 @@
         html+='</div>';
         html+='<div style="margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted)">Most used model: <strong>'+escapeHtml(thisSumm.topModel)+'</strong> · Avg cost/call: $'+thisSumm.avgCost.toFixed(6)+'</div>';
         container.innerHTML=html;
-      }catch(e){
-        var c2=document.getElementById('monthlySummary');
-        if(c2)c2.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:1rem">Failed to load monthly summary.</p>';
-      }
+
     }
 
     async function loadRecentActivity(){
-      try{
-        var container=document.getElementById('recentActivity');
-        if(!container)return;
-        container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Loading...</p>';
-        var act=await api('GET','/api/activity');
+      var container=document.getElementById('recentActivity');
+      if(!container)return;
+      container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Loading...</p>';
+      var act=await safeApi('GET','/api/activity',null,null,true); if(!act){ container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Failed to load activity.</p>';return}
         var items=(act&&act.items)||[];
         if(!items.length){
           container.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">No recent activity.</p>';
@@ -1286,11 +1269,8 @@
           var dt=a.created_at?new Date(a.created_at).toLocaleString():'';
           return '<div class="dash-activity-item" style="padding:0.5rem 0.75rem"><div class="icon" style="width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;background:'+colorCls+'">'+icon+'</div><div class="info" style="flex:1;min-width:0"><div class="title" style="font-size:0.8rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+desc+'</div><div class="time" style="font-size:0.7rem;color:var(--text-muted)">'+escapeHtml(dt)+'</div></div></div>';
         }).join('');
-      }catch(e){
-        var c2=document.getElementById('recentActivity');
-        if(c2)c2.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem;font-size:0.85rem">Failed to load activity.</p>';
-      }
     }
+
 
     function startUsageTicker(){
       var tickerEl=document.getElementById('usageTicker');
@@ -1620,9 +1600,8 @@
       var container=document.getElementById('dashActivity');
       var countEl=document.getElementById('activityCount');
       if(!container)return;
-      try{
-        var act=await api('GET','/api/activity');
-        var items=act.items||[];
+      var act=await safeApi('GET','/api/activity',null,null,true); if(!act)return;
+      var items=act.items||[];
         if(!items.length){
           if(countEl)countEl.textContent='0 events';
           container.innerHTML='<div class="empty-state" style="padding:1.5rem 1rem"><div class="empty-icon" style="font-size:2rem;opacity:0.35">📭</div><div class="empty-title" style="font-size:0.85rem">No activity yet</div><div class="empty-desc" style="font-size:0.75rem">Buy tokens or make API calls to see activity here.</div></div>';
@@ -1651,9 +1630,6 @@
             '</div>'+
             (hasLog?'<div id="'+expandId+'" class="log-content" style="display:none;padding:0.5rem 0.75rem;margin:0 0.5rem 0.5rem 3.5rem;background:var(--bg-alt);border-radius:var(--radius-sm);font-size:0.75rem;max-height:200px;overflow-y:auto"><p style="color:var(--text-muted);text-align:center;padding:0.5rem">Loading...</p></div>':'');
         }).join('');
-      }catch(e){
-        container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:1rem">Failed to load activity.</p>';
-      }
     }
     async function toggleLogContent(el,expandId){
       var expand=document.getElementById(expandId);
@@ -1671,9 +1647,8 @@
       expand.setAttribute('data-loaded','true');
       var logId=el.getAttribute('data-log-id');
       if(!logId){expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">No log data available</p>';return}
-      try{
-        var content=await api('GET','/api/logs/content?log_id='+logId);
-        if(content.error||(!content.prompt&&!content.completion)){
+      var content=await safeApi('GET','/api/logs/content?log_id='+logId,null,null,true); if(!content){expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">Failed to load log content.</p>';return}
+      if(content.error||(!content.prompt&&!content.completion)){
           expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">Log content not available</p>';
           return;
         }
@@ -1685,9 +1660,7 @@
           '</div>'+
           (content.prompt?'<div style="margin-bottom:0.5rem"><div style="font-weight:600;margin-bottom:0.25rem;color:var(--primary);font-size:0.7rem">📤 Prompt</div><div style="background:var(--bg);padding:0.5rem;border-radius:4px;white-space:pre-wrap;word-break:break-word">'+escapeHtml(content.prompt.substring(0,2000))+(content.prompt.length>2000?'...':'')+'</div></div>':'')+
           (content.completion?'<div><div style="font-weight:600;margin-bottom:0.25rem;color:var(--success);font-size:0.7rem">📥 Completion</div><div style="background:var(--bg);padding:0.5rem;border-radius:4px;white-space:pre-wrap;word-break:break-word">'+escapeHtml(content.completion.substring(0,2000))+(content.completion.length>2000?'...':'')+'</div></div>':'');
-      }catch(e){
-        expand.innerHTML='<p style="color:var(--text-muted);text-align:center;padding:0.5rem">Failed to load content.</p>';
-      }
+
     }
     async function loadUsageAnalytics(days,model,mode){
       var canvas=document.getElementById('dailyChart');
@@ -1695,8 +1668,7 @@
       var summaryTotal=document.getElementById('usageTotalVal');
       var summaryCost=document.getElementById('usageCostVal');
       var summaryLabel=document.getElementById('usageTotalLabel');
-      try{
-        var params='?days='+(days||7);
+      var params='?days='+(days||7);
         if(model)params+='&model='+encodeURIComponent(model);
         var data=await safeApi('GET','/api/usage-analytics'+params);
         if(!data) return;
@@ -1729,9 +1701,6 @@
         if(summaryTotal)summaryTotal.textContent=(data.total_tokens||0).toLocaleString();
         if(summaryCost)summaryCost.textContent='$'+(data.total_cost||0).toFixed(2);
         if(summaryLabel)summaryLabel.innerHTML='Total: <strong>'+(data.total_tokens||0).toLocaleString()+'</strong> '+(isCost?'cost ($)':'tokens');
-      }catch(e){
-        // Silent — safeApi already handled errors
-      }
     }
     function setUsageRange(days){
       usageDays=days;
@@ -1768,9 +1737,8 @@
       var container=document.getElementById('dashModelList');
       var countEl=document.getElementById('modelCountLabel');
       if(!container)return;
-      try{
-        var result=await api('GET','/api/available-models');
-        var models=result.models||[];
+      var result=await safeApi('GET','/api/available-models',null,null,true); if(!result){container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">Failed to load models.</p>';return}
+      var models=result.models||[];
         if(!models.length){
           countEl.textContent='0 models';
           container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">No models available yet. Configure New API.</p>';
@@ -1796,9 +1764,7 @@
             tags+
           '</div>';
         }).join('');
-      }catch(e){
-        container.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:0.75rem">Failed to load models.</p>';
-      }
+
     }
     function initCharts(usage){
       const canvas=document.getElementById('usageChart');
@@ -2715,8 +2681,7 @@
       // Save current HTML to restore on API failure
       var fallbackHtml = container.innerHTML;
       container.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-muted);font-size:0.8rem">Loading models...</div>';
-      try{
-        var all=await api('GET','/api/models',null,8000);
+      var all=await safeApi('GET','/api/models',null,8000,true); if(!all){container.innerHTML=fallbackHtml;return}
         if(!all||!all.length){container.innerHTML=fallbackHtml;return;}
         var featured=all.filter(function(m){return m.category==='Flagship'||m.category==='Flash';});
         var top4=featured.length>=4?featured.slice(0,4):all.slice(0,4);
@@ -2730,13 +2695,7 @@
             +'<div style="font-size:0.75rem;color:var(--text-secondary);overflow-wrap:break-word;word-break:break-word">'+ctx+' ctx · '+price+'</div>'
             +'</div>';
         });
-        container.innerHTML=html;
-      }catch(e){
-        // API failed (backend down) — restore original HTML so carousel doesn't go blank
-        container.innerHTML=fallbackHtml;
-      }
     }
-
     function slideTopView(dir){
       var track=document.getElementById('tmTrack');
       if(!track)return;
