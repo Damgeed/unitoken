@@ -1720,7 +1720,8 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       try{
         var params='?days='+(days||7);
         if(model)params+='&model='+encodeURIComponent(model);
-        var data=await api('GET','/api/usage-analytics'+params);
+        var data=await safeApi('GET','/api/usage-analytics'+params);
+        if(!data) return;
         if((!data.labels||!data.labels.length)&&(!data.tokens||!data.tokens.length)){
           if(window.dailyChartInst){window.dailyChartInst.destroy();window.dailyChartInst=null}
           canvas.parentNode.innerHTML+='<p style="color:var(--text-muted);text-align:center;padding:1rem;font-size:0.85rem">No usage data for this period.</p>';
@@ -1751,8 +1752,7 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         if(summaryCost)summaryCost.textContent='$'+(data.total_cost||0).toFixed(2);
         if(summaryLabel)summaryLabel.innerHTML='Total: <strong>'+(data.total_tokens||0).toLocaleString()+'</strong> '+(isCost?'cost ($)':'tokens');
       }catch(e){
-        if(summaryTotal)summaryTotal.textContent='0';
-        if(summaryCost)summaryCost.textContent='$0.00';
+        // Silent — safeApi already handled errors
       }
     }
     function setUsageRange(days){
@@ -1772,7 +1772,8 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       var sel=document.getElementById('usageModelFilter');
       if(!sel)return;
       try{
-        var result=await api('GET','/api/available-models');
+        var result=await safeApi('GET','/api/available-models');
+        if(!result) return;
         var models=result.models||[];
         var seen={};
         models.forEach(function(m){
@@ -2138,13 +2139,14 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
       const name=document.getElementById('newKeyName').value;
       const perms=document.getElementById('newKeyPerms').value;
       try{
-        const d=await api('POST','/api/keys',{name,permissions:perms});
+        const d=await safeApi('POST','/api/keys',{name,permissions:perms});
+        if(!d) return;
         document.getElementById('newKeyValue').textContent=d.key;
         document.getElementById('newKeyResult').style.display='block';
         loadKeys();
         loadDashKeys();
         showToast('Key created! Copy it now.','success');
-      }catch(e){showToast(e.message,'error')}
+      }catch(e){}
     }
     async function toggleKeyStatus(id){
       const key=keys.find(k=>k.id===id);if(!key)return;
@@ -3272,7 +3274,8 @@ async function loadLoginHistory(offset) {
   if(!token)return;
   const off=offset!==undefined?offset:0;
   try {
-    const d=await api('GET','/api/auth/login-history?offset='+off+'&limit='+LOGIN_PAGE_SIZE);
+    const d=await safeApi('GET','/api/auth/login-history?offset='+off+'&limit='+LOGIN_PAGE_SIZE);
+    if(!d) return;
     const body=document.getElementById('loginHistoryBody');
     if(!body)return;
     const events=d.events||d||[];
@@ -3282,7 +3285,7 @@ async function loadLoginHistory(offset) {
     loginHistoryOffset=off+events.length;
     const loadMore=document.getElementById('loginLoadMore');
     if(loadMore) loadMore.style.display=events.length<LOGIN_PAGE_SIZE?'none':'block';
-  }catch(e){showToast('Failed to load login history','error')}
+  }catch(e){}
 }
 
 function renderLoginRow(event) {
@@ -3344,7 +3347,8 @@ function createNewChat() {
 async function loadConversations() {
   if(!token)return;
   try {
-    const d=await api('GET','/api/playground/conversations');
+    const d=await safeApi('GET','/api/playground/conversations');
+    if(!d) return;
     const list=document.querySelector('.playground-sidebar .conv-list');
     if(!list)return;
     const convs=d.conversations||d||[];
@@ -3352,13 +3356,14 @@ async function loadConversations() {
     list.innerHTML=convs.map(function(c){
       return '<div class="conv-item" data-id="'+escapeHtml(String(c.id))+'" onclick="loadConversation('+escapeHtml(String(c.id))+')"><span class="conv-title">'+escapeHtml(c.title||'Untitled')+'</span><button class="conv-delete" onclick="event.stopPropagation();deleteConversation('+escapeHtml(String(c.id))+')">✕</button></div>';
     }).join('');
-  }catch(e){showToast('Failed to load conversations','error')}
+  }catch(e){}
 }
 
 async function loadConversation(id) {
   if(!token)return;
   try {
-    const d=await api('GET','/api/playground/conversations/'+id);
+    const d=await safeApi('GET','/api/playground/conversations/'+id);
+    if(!d) return;
     playgroundCurrentId=id;
     playgroundMessages=d.messages||[];
     const msgsEl=document.getElementById('playgroundMessages');
@@ -3373,7 +3378,7 @@ async function loadConversation(id) {
     if(titleEl) titleEl.textContent=d.title||'Chat';
     // Highlight in sidebar
     document.querySelectorAll('.conv-item').forEach(function(e){e.classList.toggle('active',String(e.dataset.id)===String(id));});
-  }catch(e){showToast('Failed to load conversation','error')}
+  }catch(e){}
 }
 
 async function deleteConversation(id) {
@@ -3430,11 +3435,12 @@ async function saveConversation() {
   const titleEl=document.getElementById('playgroundTitle');
   const title=titleEl?titleEl.textContent:'Chat '+(new Date().toLocaleString());
   try {
-    const d=await api('POST','/api/playground/conversations',{title:title,messages:playgroundMessages});
+    const d=await safeApi('POST','/api/playground/conversations',{title:title,messages:playgroundMessages});
+    if(!d) return;
     playgroundCurrentId=d.id;
     loadConversations();
     showToast('Conversation saved','success');
-  }catch(e){showToast(e.message||'Failed to save conversation','error')}
+  }catch(e){}
 }
 
 async function updateConversationTitle(id) {
@@ -3443,9 +3449,9 @@ async function updateConversationTitle(id) {
   if(!titleEl)return;
   const newTitle=titleEl.textContent.trim()||'Untitled';
   try {
-    await api('PUT','/api/playground/conversations/'+id,{title:newTitle});
+    await safeApi('PUT','/api/playground/conversations/'+id,{title:newTitle});
     loadConversations();
-  }catch(e){showToast(e.message||'Failed to update title','error')}
+  }catch(e){}
 }
 
 async function loadPlaygroundModels() {
