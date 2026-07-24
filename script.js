@@ -784,13 +784,11 @@
       var settingsName=document.getElementById('settingsName');
       var tz=document.getElementById('settingsTz');
       if(!settingsName){showToast('Settings form not found','error');return}
-      try{
-        await api('PUT','/api/user/profile',{name:settingsName.value.trim(),timezone:tz?tz.value:''});
-        userData.name=settingsName.value.trim();
-        localStorage.setItem('gt_user',JSON.stringify(userData));
-        applyAuth();
-        showToast('Profile saved','success');
-      }catch(e){showToast(e.message||'Failed to save profile','error')}
+      await safeApi('PUT','/api/user/profile',{name:settingsName.value.trim(),timezone:tz?tz.value:''});
+      userData.name=settingsName.value.trim();
+      localStorage.setItem('gt_user',JSON.stringify(userData));
+      applyAuth();
+      showToast('Profile saved','success');
     }
     async function updatePassword(){
       if(!token){showToast('Please sign in first','error');return}
@@ -798,11 +796,9 @@
       var nw=document.getElementById('settingsNewPw');
       if(!cur||!nw||!cur.value||!nw.value){showToast('Fill in both password fields','error');return}
       if(nw.value.length<6){showToast('New password must be at least 6 characters','error');return}
-      try{
-        await api('PUT','/api/user/password',{current_password:cur.value,new_password:nw.value});
-        cur.value='';nw.value='';
-        showToast('Password updated','success');
-      }catch(e){showToast(e.message||'Failed to update password','error')}
+      await safeApi('PUT','/api/user/password',{current_password:cur.value,new_password:nw.value});
+      cur.value='';nw.value='';
+      showToast('Password updated','success');
     }
     // ── Notification Settings ──
     async function loadSettings(){
@@ -823,14 +819,12 @@
       var balEl=document.getElementById('notifLowBalance');
       var loginEl=document.getElementById('notifLogin');
       if(!emailEl){showToast('Settings form not found','error');return}
-      try{
-        await api('PUT','/api/user/settings',{
-          email_notifications:emailEl.checked,
-          low_balance_alert:balEl?balEl.checked:false,
-          login_alerts:loginEl?loginEl.checked:false
-        });
-        showToast('Notification preferences saved','success');
-      }catch(e){showToast(e.message||'Failed to save notification settings','error')}
+      await safeApi('PUT','/api/user/settings',{
+        email_notifications:emailEl.checked,
+        low_balance_alert:balEl?balEl.checked:false,
+        login_alerts:loginEl?loginEl.checked:false
+      });
+      showToast('Notification preferences saved','success');
     }
     // ── History / Transactions ──
 
@@ -2137,10 +2131,8 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     // ── API Keys ──
     async function loadKeys(){
       if(!token)return;
-      try{
-        keys=await api('GET','/api/keys');
-        renderKeys(keys);
-      }catch(e){showToast('Failed to load keys','error')}
+      keys=await safeApi('GET','/api/keys');
+      if(keys) renderKeys(keys);
     }
     function renderKeys(k){
       const list=document.getElementById('keyList');
@@ -2175,11 +2167,14 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     }
     async function toggleKeyStatus(id){
       const key=keys.find(k=>k.id===id);if(!key)return;
-      try{await api('PUT',`/api/keys/${id}`,{is_active:!key.is_active});loadKeys()}catch(e){showToast(e.message,'error')}
+      await safeApi('PUT',`/api/keys/${id}`,{is_active:!key.is_active});
+      loadKeys();
     }
     async function deleteKey(id){
       showConfirm('Delete API Key?','This cannot be undone.',async function(){
-        try{await api('DELETE',`/api/keys/${id}`);loadKeys();showToast('Key deleted','info')}catch(e){showToast(e.message,'error')}
+        await safeApi('DELETE',`/api/keys/${id}`);
+        loadKeys();
+        showToast('Key deleted','info');
       });
     }
     function sortKeys(mode){
@@ -3262,21 +3257,17 @@ async function inviteMember(orgId) {
 
 async function updateMemberRole(orgId, userId, role) {
   if(!token)return;
-  try {
-    await api('PUT','/api/orgs/'+orgId+'/members/'+userId+'/role',{role:role});
-    loadOrgDetails(orgId);
-    showToast('Member role updated','success');
-  }catch(e){showToast(e.message||'Failed to update role','error')}
+  await safeApi('PUT','/api/orgs/'+orgId+'/members/'+userId+'/role',{role:role});
+  loadOrgDetails(orgId);
+  showToast('Member role updated','success');
 }
 
 async function removeMember(orgId, userId) {
   if(!token)return;
   showConfirm('Remove member?','This action cannot be undone.',async function(){
-    try {
-      await api('DELETE','/api/orgs/'+orgId+'/members/'+userId);
-      loadOrgDetails(orgId);
-      showToast('Member removed','info');
-    }catch(e){showToast(e.message||'Failed to remove member','error')}
+    await safeApi('DELETE','/api/orgs/'+orgId+'/members/'+userId);
+    loadOrgDetails(orgId);
+    showToast('Member removed','info');
   });
 }
 
