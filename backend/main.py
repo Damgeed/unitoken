@@ -33,6 +33,54 @@ from contextlib import asynccontextmanager
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+# ═══════════════════════════════════════════════════════════════
+# CONFIG — All environment variables loaded here
+# ═══════════════════════════════════════════════════════════════
+
+# SMTP / Email
+_smtp_host = os.getenv("SMTP_HOST", "")
+_smtp_port = int(os.getenv("SMTP_PORT", "587"))
+_smtp_user = os.getenv("SMTP_USER", "")
+_smtp_pass = os.getenv("SMTP_PASS", "")
+_from_addr = os.getenv("SMTP_FROM", "")
+
+# New API Gateway
+NEW_API_BASE_URL = os.getenv("NEW_API_BASE_URL", "")
+
+# Fallback AI API
+FALLBACK_API_KEY = os.getenv("FALLBACK_API_KEY", "")
+FALLBACK_API_URL = os.getenv("FALLBACK_API_URL", "")
+
+# Payments: Paystack
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
+PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "")
+
+# Payments: Stripe
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Payments: Crypto wallet addresses
+CRYPTO_USDT_TRC20 = os.getenv("CRYPTO_USDT_TRC20", "")
+CRYPTO_USDT_ERC20 = os.getenv("CRYPTO_USDT_ERC20", "")
+CRYPTO_BTC = os.getenv("CRYPTO_BTC", "")
+CRYPTO_ETH = os.getenv("CRYPTO_ETH", "")
+TRON_USDT_ADDRESS = os.getenv("TRON_USDT_ADDRESS", "")
+ETH_USDT_ADDRESS = os.getenv("ETH_USDT_ADDRESS", "")
+BTC_ADDRESS = os.getenv("BTC_ADDRESS", "")
+
+# Security
+GLBTOKEN_SECRET = os.environ.get("GLBTOKEN_SECRET")
+
+# Server
+PORT = os.getenv("PORT", "8000")
+
+CRYPTO_WALLET_ADDRESSES = {
+    "USDT_TRC20": CRYPTO_USDT_TRC20,
+    "USDT_ERC20": CRYPTO_USDT_ERC20,
+    "BTC": CRYPTO_BTC,
+    "ETH": CRYPTO_ETH,
+}
+
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -318,11 +366,8 @@ class SaveConversationRequest(BaseModel):
 
 # ── Email Config ──
 def send_email(to: str, subject: str, body: str) -> bool:
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    from_addr = os.getenv("SMTP_FROM", "")
+    global _smtp_host, _smtp_port, _smtp_user, _smtp_pass, _from_addr
+    smtp_host, smtp_port, smtp_user, smtp_pass, from_addr = _smtp_host, _smtp_port, _smtp_user, _smtp_pass, _from_addr
     if not smtp_host:
         print(f"📧 SMTP not configured. Would send email to {to}: {subject}")
         return False
@@ -342,7 +387,7 @@ def send_email(to: str, subject: str, body: str) -> bool:
         return False
 
 # ── Startup check ──
-if not os.getenv("SMTP_HOST"):
+if not _smtp_host:
     print("⚠️  SMTP not configured — password reset and email verification will silently fail.")
 
 # ── Login History Helper ──
@@ -425,7 +470,7 @@ async def register(req: RegisterRequest, request: Request, db: Session = Depends
     }
     if newapi_token:
         result["newapi_token"] = newapi_token
-        result["newapi_endpoint"] = os.getenv("NEW_API_BASE_URL", "")
+        result["newapi_endpoint"] = NEW_API_BASE_URL
     
     # Record login event
     try:
@@ -1355,8 +1400,7 @@ async def topup(req: TopupRequest, user: User = Depends(get_current_user), db: S
     }
 
 # ── Paystack Payment ──
-PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
-PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "")
+
 
 @app.post("/api/payments/paystack/initialize")
 def paystack_initialize(req: InitiatePaymentRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -1421,8 +1465,7 @@ def paystack_verify(reference: str = Body(...), user: User = Depends(get_current
     return {"status": "success", "tokens_added": tokens, "new_balance": user.token_balance}
 
 # ── Stripe Payment ──
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
 
 @app.post("/api/payments/stripe/create-checkout")
 def stripe_create_checkout(req: InitiatePaymentRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -1485,16 +1528,9 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     return {"status": "ok"}
 
 # ── Crypto Payment ──
-CRYPTO_WALLET_ADDRESSES = {
-    "USDT_TRC20": os.getenv("CRYPTO_USDT_TRC20", ""),
-    "USDT_ERC20": os.getenv("CRYPTO_USDT_ERC20", ""),
-    "BTC": os.getenv("CRYPTO_BTC", ""),
-    "ETH": os.getenv("CRYPTO_ETH", ""),
-}
 
-TRON_USDT_ADDRESS = os.getenv("TRON_USDT_ADDRESS", "")
-ETH_USDT_ADDRESS = os.getenv("ETH_USDT_ADDRESS", "")
-BTC_ADDRESS = os.getenv("BTC_ADDRESS", "")
+
+
 
 @app.get("/api/payments/crypto/addresses")
 def get_crypto_addresses(user: User = Depends(get_current_user)):
@@ -1553,7 +1589,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
     
     # Route through New API if configured, otherwise fallback to Fallback
     newapi_key = user.newapi_token
-    newapi_url = os.getenv("NEW_API_BASE_URL", "")
+    newapi_url = NEW_API_BASE_URL
     
     import httpx
     headers = {"Content-Type": "application/json"}
@@ -1564,7 +1600,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
         api_endpoint = f"{newapi_url}/v1/chat/completions"
     else:
         # Fallback: route via Fallback directly
-        fallback_key = os.getenv("FALLBACK_API_KEY", "")
+        fallback_key = FALLBACK_API_KEY
         if not fallback_key:
             raise HTTPException(status_code=400, detail="No AI routing configured. Set NEW_API_BASE_URL or FALLBACK_API_KEY")
         headers = {
@@ -1573,7 +1609,7 @@ async def proxy_chat(req: ProxyChatRequest, request: Request, user: User = Depen
             "HTTP-Referer": "https://glbtoken.com",
             "X-Title": "GlbTOKEN",
         }
-        fallback_url = os.getenv("FALLBACK_API_URL", "")
+        fallback_url = FALLBACK_API_URL
         if not fallback_url:
             raise HTTPException(status_code=400, detail="No AI routing configured. Set NEW_API_BASE_URL or FALLBACK_API_URL")
         api_endpoint = f"{fallback_url.rstrip('/')}/v1/chat/completions"
@@ -1658,7 +1694,7 @@ async def playground_chat(req: PlaygroundChatRequest, request: Request,
         raise HTTPException(status_code=402, detail=f"Insufficient balance. Need {cost_tokens} tokens, have {user.token_balance}")
     
     newapi_key = user.newapi_token
-    newapi_url = os.getenv("NEW_API_BASE_URL", "")
+    newapi_url = NEW_API_BASE_URL
     
     import httpx
     headers = {"Content-Type": "application/json"}
@@ -1667,7 +1703,7 @@ async def playground_chat(req: PlaygroundChatRequest, request: Request,
         headers["Authorization"] = f"Bearer {newapi_key}"
         api_endpoint = f"{newapi_url}/v1/chat/completions"
     else:
-        fallback_key = os.getenv("FALLBACK_API_KEY", "")
+        fallback_key = FALLBACK_API_KEY
         if not fallback_key:
             raise HTTPException(status_code=400, detail="No AI routing configured")
         headers = {
@@ -1676,7 +1712,7 @@ async def playground_chat(req: PlaygroundChatRequest, request: Request,
             "HTTP-Referer": "https://glbtoken.com",
             "X-Title": "GlbTOKEN",
         }
-        fallback_url = os.getenv("FALLBACK_API_URL", "")
+        fallback_url = FALLBACK_API_URL
         if not fallback_url:
             raise HTTPException(status_code=400, detail="No AI routing configured")
         api_endpoint = f"{fallback_url.rstrip('/')}/v1/chat/completions"
@@ -2377,8 +2413,8 @@ def auto_pull_models():
     print("🔄 Auto-pulling models from Fallback...")
     try:
         # Try New API's admin endpoint first, then fallback URL
-        newapi_url = os.getenv("NEW_API_BASE_URL", "")
-        fallback_url = os.getenv("FALLBACK_API_URL", "")
+        newapi_url = NEW_API_BASE_URL
+        fallback_url = FALLBACK_API_URL
         models_url = ""
         headers = {"Content-Type": "application/json"}
         
@@ -2387,7 +2423,7 @@ def auto_pull_models():
             models_url = f"{newapi_url.rstrip('/')}/api/model"
         elif fallback_url:
             models_url = f"{fallback_url.rstrip('/')}/v1/models"
-            admin_key = os.getenv("FALLBACK_API_KEY", "")
+            admin_key = FALLBACK_API_KEY
             if admin_key:
                 headers["Authorization"] = f"Bearer {admin_key}"
         else:
@@ -2472,7 +2508,7 @@ def trigger_model_pull(authorization: str = Header(None)):
     api_key = ""
     if authorization and authorization.startswith("Bearer "):
         api_key = authorization.removeprefix("Bearer ")
-    glbtoken_secret = os.environ.get("GLBTOKEN_SECRET")
+    glbtoken_secret = GLBTOKEN_SECRET
     if not glbtoken_secret or api_key != glbtoken_secret:
         raise HTTPException(status_code=403, detail="Invalid API key")
     auto_pull_models()
@@ -2500,7 +2536,7 @@ async def admin_sync_users(
     if authorization and authorization.startswith("Bearer "):
         api_key = authorization.removeprefix("Bearer ")
     # Allow GLBTOKEN_SECRET as alternative auth (for automated calls)
-    glbtoken_secret = os.environ.get("GLBTOKEN_SECRET")
+    glbtoken_secret = GLBTOKEN_SECRET
     if not glbtoken_secret or api_key != glbtoken_secret:
         if not user or not user.is_admin:
             raise HTTPException(status_code=403, detail="Admin access required")
@@ -3341,7 +3377,6 @@ def delete_preset(preset_id: int, user: User = Depends(get_current_user), db: Se
 if __name__ == "__main__":
     import uvicorn
     import sys
-    port = int(os.getenv("PORT", 8000))
-    print(f"PORT_ENV_CHECK: PORT env = |{os.getenv('PORT', 'NOT_SET')}| -> using port {port}", flush=True)
+    port = int(PORT)
     sys.stdout.flush()
     uvicorn.run(app, host="0.0.0.0", port=port)
