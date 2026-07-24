@@ -2211,6 +2211,11 @@ input[type="range"]::-moz-range-thumb {
   height: 220px;
   position: relative;
 }
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 .tx-table {
   width: 100%;
   border-collapse: collapse;
@@ -6690,6 +6695,11 @@ body {
   height: 220px;
   position: relative;
   margin-top: 0.5rem;
+}
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 .sort-btn {
   padding: 0.4rem 0.75rem;
