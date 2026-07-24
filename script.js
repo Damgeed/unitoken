@@ -2708,7 +2708,7 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
     }
 
 /* ══════════════════════════════════════════
-   UI — Mobile menu, chat, referral, copy, toast
+   UI — Mobile menu & carousel
    ══════════════════════════════════════════ */
     function toggleMobile(){
       const overlay = document.getElementById('mobileOverlay');
@@ -2993,7 +2993,9 @@ body.innerHTML=d.items.map(t=>'<tr><td>'+escapeHtml(t.created_at?new Date(t.crea
         else if(btn.dataset.action==='delete')deleteKey(id);
       });
     });
-// ── Lang menu toggle ──
+/* ══════════════════════════════════════════
+   UI — Language & Theme
+   ══════════════════════════════════════════ */
 function toggleLangMenu() {
   var m = document.getElementById('langMenu');
   if (m) m.classList.toggle('open');
@@ -3089,7 +3091,9 @@ document.addEventListener('click', function(e) {
   }
 })();
 
-// ── Referral System Functions ──
+/* ══════════════════════════════════════════
+   REFERRAL
+   ══════════════════════════════════════════ */
 
 async function loadReferralStats() {
   if(!token)return;
@@ -3164,7 +3168,9 @@ async function claimRewards() {
   showToast('Rewards claimed!','success');
 }
 
-// ── Team / Org Functions ──
+/* ══════════════════════════════════════════
+   ORGS / TEAM
+   ══════════════════════════════════════════ */
 
 async function loadOrgs() {
   if(!token)return;
@@ -3265,7 +3271,9 @@ async function joinOrg(inviteToken) {
   showToast('Joined organization!','success');
 }
 
-// ── Login History Functions ──
+/* ══════════════════════════════════════════
+   LOGIN HISTORY
+   ══════════════════════════════════════════ */
 
 let loginHistoryOffset=0;
 const LOGIN_PAGE_SIZE=20;
@@ -3326,7 +3334,9 @@ function filterLoginHistory() {
   });
 }
 
-// ── Playground Functions ──
+/* ══════════════════════════════════════════
+   PLAYGROUND
+   ══════════════════════════════════════════ */
 
 let playgroundMessages=[];
 let playgroundCurrentId=null;
